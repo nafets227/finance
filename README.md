@@ -1,2 +1,2 @@
 # finance
-Finance system based on AqBankind and MariaDB
+Finance system based on AqBanking and MariaDB
