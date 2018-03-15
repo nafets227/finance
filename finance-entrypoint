@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# (C) 2012-2018 Stefan Schallenberg
+# 
+# Execute automatic tasks for finance
+aqb=/usr/bin/aqbanking-cli
+
+# Call profile since CRON does not do it.
+#. ~/.profile
+
+test -d ~/inbound.aqb      || mkdir ~/inbound.aqb
+test -d ~/inbound.aqb-tran || mkdir ~/inbound.aqb-tran
+test -d ~/inbound.aqb-bal  || mkdir ~/inbound.aqb-bal
+test -d ~/store.aqb        || mkdir ~/store.aqb
+
+$aqb  -P ~/.hbci-pinfile -n request --balance --transactions \
+    -c ~/inbound.aqb/`date +\%Y\%m\%d-\%H\%M\%S.\%N`
+
+for f in ~/inbound.aqb/* ; do 
+    fnam=$(basename $f)
+    $aqb listtrans -c $f -o ~/inbound.aqb-tran/$fnam && \
+    $aqb listbal   -c $f -o ~/inbound.aqb-bal/$fnam  && \
+    mv $f ~/store.aqb 
+    done
+
+pushd ~ >/dev/null
+$(dirname $0)/finance -mysql
+$(dirname $0)/mail.sh
+popd
