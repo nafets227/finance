@@ -20,6 +20,9 @@ RUN \
 
 RUN \
 	mkdir /finance /finance/fntxt2sql
+	
+RUN \
+	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf
 
 # download, compile and install pxlib, a paradox DB library
 RUN \
@@ -31,7 +34,8 @@ RUN \
 	./configure --prefix=/usr/local \
               --with-gsf \
               --disable-static && \
-	make install
+	make install && \
+	ldconfig
 
 # copy, compile and install fntxt2sql	
 COPY fntxt2sql/* /finance/fntxt2sql/
