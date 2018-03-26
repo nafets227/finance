@@ -30,6 +30,10 @@ extern DebugInfo debugInfo;
 typedef struct _Config {
 	char achSqlTabName[255]; // Data for SQL Generation
 	char achInpFileName[255]; // Data for Input File Handling
+	char achMysqlHost[255];
+	char achMysqlDatabase[255];
+	char achMysqlUser[255];
+	char achMysqlPassword[255];
 	enum _printFormat
 	{
 		outpInit = 0,
@@ -132,7 +136,7 @@ int processHbci(char * dirName);
 //****************************************************************************
 //***** Functions from fntxt2sql-mysql.c **************************************
 //****************************************************************************
-int initMysql(void);
+int initMysql(const char *pchHost, const char *pchDb, const char *pchUser, const char *pchPassword);
 int writeMysqlRecord(const Buchung buchung);
 int checkMysqlRecord(const Buchung buchung);
 void termMysql(void);

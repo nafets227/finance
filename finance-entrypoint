@@ -24,8 +24,13 @@ elif [ -z "$MYSQL_PASSWORD" ] ; then
 	exit 1
 fi
 
-dbexist=$(mysql -h $MYSQL_HOST -u $MYSQL_USER \
-	--password=$MYSQL_PASSWORD $MYSQL_DATABASE -N <<-"EOF"
+MYSQL_CMD="mysql"
+MYSQL_CMD="$MYSQL_CMD --host=$MYSQL_HOST"
+MYSQL_CMD="$MYSQL_CMD --user=$MYSQL_USER"
+MYSQL_CMD="$MYSQL_CMD --password=$MYSQL_PASSWORD"
+MYSQL_CMD="$MYSQL_CMD $MYSQL_DATABASE"
+
+dbexist=$($MYSQL_CMD -N <<-"EOF"
 	SELECT COUNT(*) 
 		FROM information_schema.tables
 		WHERE table_schema="$MYSQL_DATABASE" AND table_name="fn_entry";
@@ -40,7 +45,11 @@ fi
 if [ "$dbexist" == "0" ] ; then
 	printf "database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
 	set -x
-	$fnt -cre
+	$fnt -cre -mysql \
+		-mysql_host $MYSQL_HOST \
+		-mysql_database $MYSQL_DATABASE \
+		-mysql_user $MYSQL_USER \
+		-mysql_password $MYSQL_PASSWORD
 fi
 
 printf "Work in progress - exiting now with Error.\n"

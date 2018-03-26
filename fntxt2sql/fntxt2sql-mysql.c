@@ -31,31 +31,29 @@ static void printMysqlError(MYSQL * conn)
 //****************************************************************************
 //***** Mysql initialisieren *************************************************
 //****************************************************************************
-int initMysql(void)
+int initMysql(const char const *pchHost, const char const *pchDb, const char *pchUser, const char *pchPassword)
 {
 	MYSQL *conn = NULL;
-	char *pchHost, *pchUser, *pchPasswd, *pchDb, *pchSocket;
+	char *pchSocket;
 	int iPort, iCliFlags;
 
 	conn = mysql_init(NULL);
 	if(conn == NULL)
 	{ fprintf(stderr, "Error in mysql_Init\n"); return -1; }
 
-	pchHost = NULL;
-	pchUser = NULL;
-	pchPasswd = NULL;
-	pchDb = "dbFinance";
+	if (!pchDb || ! *pchDb)
+		pchDb = "dbFinance";
 	pchSocket = NULL;
 	iPort = 0;
 	iCliFlags = 0;
-	pMysqlConn = mysql_real_connect(conn, pchHost, pchUser, pchPasswd, pchDb, 
+	pMysqlConn = mysql_real_connect(conn, pchHost, pchUser, pchPassword, pchDb,
 			iPort, pchSocket, iCliFlags);
 	if(pMysqlConn == NULL)
 	{
 		printMysqlError(conn); mysql_close(conn);
 		fprintf(stderr, "\tTried Host \"%s\", User \"%s\", Passwd \"%s\", "
 				"Db \"%s\", Port %d, Socket \"%s\", Clientflag %d.\n",
-				pchHost, pchUser, pchPasswd, pchDb, iPort, pchSocket, 
+				pchHost, pchUser, pchPassword, pchDb, iPort, pchSocket,
 				iCliFlags);
 		return -1; 
 	}

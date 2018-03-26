@@ -170,6 +170,55 @@ int main(int argc, char *argv[])
 		else if(!strcasecmp(argv[iActArg], "/MYSQLCHECK") ||
 				!strcasecmp(argv[iActArg], "-MYSQLCHECK")     )
 			config.printFormat = checkMysql;
+		else if(!strcasecmp(argv[iActArg], "/MYSQL_HOST") ||
+				!strcasecmp(argv[iActArg], "-MYSQL_HOST")     )
+		{
+			if(iActArg+1 >= argc)
+			{
+				printf( "Error: /MYSQL_HOST parameter given "
+				"without value\n");
+				return -1;
+			}
+			strcpy(config.achMysqlHost, argv[iActArg+1]);
+			iActArg++;
+		}
+		else if(!strcasecmp(argv[iActArg], "/MYSQL_DATABASE") ||
+				!strcasecmp(argv[iActArg], "-MYSQL_DATABASE")     )
+		{
+			if(iActArg+1 >= argc)
+			{
+				printf( "Error: /MYSQL_DATABASE parameter given "
+				"without value\n");
+				return -1;
+			}
+			strcpy(config.achMysqlDatabase, argv[iActArg+1]);
+			iActArg++;
+		}
+		else if(!strcasecmp(argv[iActArg], "/MYSQL_USER") ||
+				!strcasecmp(argv[iActArg], "-MYSQL_USER")     )
+		{
+			if(iActArg+1 >= argc)
+			{
+				printf( "Error: /MYSQL_USER parameter given "
+				"without value\n");
+				return -1;
+			}
+			strcpy(config.achMysqlUser, argv[iActArg+1]);
+			iActArg++;
+		}
+		else if(!strcasecmp(argv[iActArg], "/MYSQL_PASSWORD") ||
+				!strcasecmp(argv[iActArg], "-MYSQL_PASSWORD")     )
+		{
+			if(iActArg+1 >= argc)
+			{
+				printf( "Error: /MYSQL_PASSWORD parameter given "
+				"without value\n");
+				return -1;
+			}
+			strcpy(config.achMysqlPassword, argv[iActArg+1]);
+			iActArg++;
+		}
+
 #endif
 
 		//***** Actions *****
@@ -203,7 +252,7 @@ int main(int argc, char *argv[])
 			if(iActArg+1 >= argc)
 			{
 				printf( "Error: /F parameter given "
-				"without Fileame\n");
+				"without Filename\n");
 				return -1;
 			}
 			strcpy(config.achInpFileName, argv[iActArg+1]);
@@ -216,7 +265,7 @@ int main(int argc, char *argv[])
 			if(iActArg+1 >= argc)
 			{
 				printf( "Error: /CP parameter given "
-				"without Fileame\n");
+				"without Filename\n");
 				return -1;
 			}
 			strcpy(config.achCodePage, argv[iActArg+1]);
@@ -252,7 +301,8 @@ int main(int argc, char *argv[])
 #ifdef CONF_MYSQL	
 	if(config.printFormat == execMysql || config.printFormat == checkMysql)
 	{
-		iRc = initMysql();
+		iRc = initMysql(config.achMysqlHost, config.achMysqlDatabase,
+				config.achMysqlUser, config.achMysqlPassword);
 		if(iRc != 0)
 			return iRc;
 	}
