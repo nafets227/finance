@@ -30,7 +30,36 @@ MYSQL_CMD="$MYSQL_CMD --user=$MYSQL_USER"
 MYSQL_CMD="$MYSQL_CMD --password=$MYSQL_PASSWORD"
 MYSQL_CMD="$MYSQL_CMD $MYSQL_DATABASE"
 
-dbexist=$($MYSQL_CMD -N <<-"EOF"
+MYSQL_ROOT_CMD="mysql"
+MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --host=$MYSQL_HOST"
+MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --user=root"
+MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --password=$MYSQL_ROOT_PASSWORD"
+MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD	$MYSQL_DATABASE"
+
+if [ ! -z "$MYSQL_ROOT_PASSWORD" ] ; then
+	printf "Got DBADM privilege because \$MYSQL_ROOT_PASSWORD is set. "
+	printf "Resetting privileges.\n"
+	$MYSQL_ROOT_CMD <<-EOF
+		GRANT all privileges
+			ON $MYSQL_DATABASE.*
+			TO '$MYSQL_USER'@'%'
+			WITH GRANT OPTION;
+		CREATE OR REPLACE ROLE fin_user;
+		EOF
+	if [ $? != "0" ] ; then
+		printf "Error resetting privileges.\n"
+		exit 1
+	fi
+fi
+	
+#DEBUG#
+$MYSQL_CMD <<-EOF
+	DROP TABLE fn_entry;
+	DROP VIEW fn_entry_cat;
+	SHOW GRANTS;
+	EOF
+
+dbexist=$($MYSQL_CMD -N <<-EOF
 	SELECT COUNT(*) 
 		FROM information_schema.tables
 		WHERE table_schema="$MYSQL_DATABASE" AND table_name="fn_entry";
@@ -44,12 +73,42 @@ fi
 
 if [ "$dbexist" == "0" ] ; then
 	printf "database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
-	set -x
 	$fnt -cre -mysql \
 		-mysql_host $MYSQL_HOST \
 		-mysql_database $MYSQL_DATABASE \
 		-mysql_user $MYSQL_USER \
 		-mysql_password $MYSQL_PASSWORD
+	if [ $? != "0" ] ; then
+		printf "Error creating tables.\n"
+		exit 1
+	fi
+else
+	printf "using existing database %s.\n" "$MYSQL_DATABASE"
+fi
+
+# Setup Users
+if [ ! -z "$DB_USERS" ] ; then
+	for u in $DB_USERS ; do
+		eval p=\$DB_${u}_PASSWORD
+		if [ -z "$p" ] ; then
+			printf "Creating User %s without password\n" "$u"
+			$MYSQL_ROOT_CMD <<-EOF
+				CREATE OR REPLACE USER '$u'@'%'
+				EOF
+			if [ $? != "0" ] ; then exit 1 ; fi
+		else
+			printf "Creating User %s with password\n" "$u"
+			$MYSQL_ROOT_CMD <<-EOF
+				CREATE OR REPLACE USER '$u'@'%' IDENTIFIED BY '$p';
+				EOF
+			if [ $? != "0" ] ; then exit 1 ; fi
+		fi
+		$MYSQL_ROOT_CMD <<-EOF
+			GRANT fin_user TO '$u'@'%';
+			SET DEFAULT ROLE fin_user FOR '$u'@'%';
+			EOF
+		if [ $? != "0" ] ; then exit 1 ; fi
+	done
 fi
 
 printf "Work in progress - exiting now with Error.\n"

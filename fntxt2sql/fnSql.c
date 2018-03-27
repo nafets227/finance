@@ -169,15 +169,12 @@ const char * const * getCreateSql(void)
                         "substring_index(katg5, '/', 3) as KATG_L3 "
 			"FROM %s "
 			"WHERE KATG5_BETRAG <> 0 AND KATG5_BETRAG IS NOT NULL) ";
-	static const char achGrantBatch[] =
-			"GRANT SELECT, INSERT on %s TO finance";
 	static const char achGrantUser[] =
-			"GRANT SELECT, UPDATE (katg2, katg, katg2_betrag, datum_kor) ON %s TO stefan";
+			"GRANT SELECT, UPDATE (katg2, katg, katg2_betrag, datum_kor) ON %s TO fin_user";
 	static const char achGrantView[] =
-			"GRANT SELECT on %s_cat TO finance,stefan";
+			"GRANT SELECT on %s_cat TO fin_user";
 	static char achTempCreTab[sizeof(achCreTab)+100] = "";
 	static char achTempCreView[sizeof(achCreView)+100] = "";
-	static char achTempGrantBatch[sizeof(achGrantBatch)+100] = "";
 	static char achTempGrantUser[sizeof(achGrantUser)+100] = "";
 	static char achTempGrantView[sizeof(achGrantView)+100] = "";
 
@@ -187,7 +184,7 @@ const char * const * getCreateSql(void)
 
 	static char const * apchTempResult[] = {
 		achTempCreTab, achTempCreView,
-		achTempGrantBatch, achTempGrantUser, achTempGrantView, NULL};
+		achTempGrantUser, achTempGrantView, NULL};
 
 	snprintf(achTempCreTab , sizeof(achTempCreTab ), achCreTab,
 		config.achSqlTabName);
@@ -195,8 +192,6 @@ const char * const * getCreateSql(void)
 		config.achSqlTabName, config.achSqlTabName,
 	    config.achSqlTabName, config.achSqlTabName,
 	    config.achSqlTabName, config.achSqlTabName);
-	snprintf(achTempGrantBatch, sizeof(achTempGrantBatch), achGrantBatch,
-		config.achSqlTabName);
 	snprintf(achTempGrantUser , sizeof(achTempGrantUser ), achGrantUser,
 		config.achSqlTabName);
 	snprintf(achTempGrantView , sizeof(achTempGrantView ), achGrantView,
