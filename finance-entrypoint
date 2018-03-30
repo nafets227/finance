@@ -7,50 +7,80 @@
 
 #### DB Setup privileges #####################################################
 function dbsetup_privileges () {
-	printf "Resetting privileges.\n"
+	printf "Granting privileges to %s.\n" "$MYSQL_USER"
 	$MYSQL_ROOT_CMD <<-EOF
 		GRANT all privileges
 			ON $MYSQL_DATABASE.*
 			TO '$MYSQL_USER'@'%'
 			WITH GRANT OPTION;
-		CREATE OR REPLACE ROLE fin_user;
 		EOF
 	if [ $? != "0" ] ; then
 		printf "Error resetting privileges.\n"
-		exit 1
+		return 1
 	fi
 }
 
 #### DB Setup Users ##########################################################
 function dbsetup_users () {
-	printf "Deleting non-system users except finance.\n"
-	$MYSQL_ROOT_CMD <<-EOF
-		DELETE
+	where_users=""
+	for u in $DB_USERS ; do
+		where_users="${where_users}, '$u'"
+	done
+	$MYSQL_ROOT_CMD -N --batch <<-EOF |
+		SELECT user, host
 			FROM mysql.user
-			WHERE user NOT IN ('mysql.sys', 'mysqlxsys', 'root', 'finance')
-				OR host NOT IN ('localhost');
+			WHERE user NOT IN ('root', '$MYSQL_USER' $where_users ) AND
+			 is_role="N";
 		EOF
+	while IFS=$'\t' read db_user db_host ; do
+		printf "Deleting User %s @ %s\n" "$db_user" "$db_host"
+		$MYSQL_ROOT_CMD <<-EOF
+			DROP USER '$db_user'@'$db_host';
+			EOF
+		if [ $? != "0" ] ; then return  1 ; fi
+	done
+	if [ $? != "0" ] ; then return 1 ; fi
+
+	$MYSQL_ROOT_CMD -N --batch <<-EOF |
+		SELECT user
+			FROM mysql.user
+			WHERE is_role="Y";
+		EOF
+	while read db_user ; do
+			printf "Deleting Role %s\n" "$db_user"
+			$MYSQL_ROOT_CMD <<-EOF
+				DROP ROLE '$db_user' ;
+				EOF
+			if [ $? != "0" ] ; then return  1 ; fi
+	done
+	if [ $? != "0" ] ; then return 1 ; fi
+		
+	printf "Creating Role fin_user.\n"
+	$MYSQL_ROOT_CMD <<-EOF
+		CREATE ROLE fin_user;
+		EOF
+	if [ $? != "0" ] ; then return  1 ; fi
 
 	for u in $DB_USERS ; do
 		eval p=\$DB_${u}_PASSWORD
 		if [ -z "$p" ] ; then
 			printf "Creating User %s without password\n" "$u"
 			$MYSQL_ROOT_CMD <<-EOF
-				CREATE OR REPLACE USER '$u'@'%'
+				CREATE USER IF NOT EXISTS '$u'@'%'
 				EOF
-			if [ $? != "0" ] ; then exit 1 ; fi
+			if [ $? != "0" ] ; then return  1 ; fi
 		else
 			printf "Creating User %s with password\n" "$u"
 			$MYSQL_ROOT_CMD <<-EOF
-				CREATE OR REPLACE USER '$u'@'%' IDENTIFIED BY '$p';
+				CREATE USER IF NOT EXISTS '$u'@'%' IDENTIFIED BY '$p';
 				EOF
-			if [ $? != "0" ] ; then exit 1 ; fi
+			if [ $? != "0" ] ; then return  1 ; fi
 		fi
 		$MYSQL_ROOT_CMD <<-EOF
 			GRANT fin_user TO '$u'@'%';
 			SET DEFAULT ROLE fin_user FOR '$u'@'%';
 			EOF
-		if [ $? != "0" ] ; then exit 1 ; fi
+		if [ $? != "0" ] ; then return 1 ; fi
 	done
 }
 
@@ -92,15 +122,12 @@ else
 	MYSQL_ROOT_CMD=""
 fi
 
-#DEBUG#
-$MYSQL_CMD <<-EOF
-	DROP TABLE fn_entry;
-	DROP VIEW fn_entry_cat;
-	SHOW GRANTS;
-	EOF
+if [ ! -z "$MYSQL_ROOT_CMD" ] ; then
+	dbsetup_privileges || exit 1
+fi
 
-if [ ! -z $MYSQL_ROOT_CMD ] && [ ! -z "$DB_USERS] ; then
-	dbsetup_privileges
+if [ ! -z "$MYSQL_ROOT_CMD" ] && [ ! -z "$DB_USERS" ] ; then
+	dbsetup_users || exit 1
 fi
 
 dbexist=$($MYSQL_CMD -N <<-EOF
@@ -122,7 +149,7 @@ if [ "$dbexist" == "0" ] ; then
 		-mysql_database $MYSQL_DATABASE \
 		-mysql_user $MYSQL_USER \
 		-mysql_password $MYSQL_PASSWORD
-	if [ $? != "0" ] ; then
+	if [ "$?" != "0" ] ; then
 		printf "Error creating tables.\n"
 		exit 1
 	fi
@@ -130,14 +157,8 @@ else
 	printf "using existing database %s.\n" "$MYSQL_DATABASE"
 fi
 
-if [ ! -z $MYSQL_ROOT_CMD ] && [ ! -z "$DB_USERS] ; then
-	dbsetup_users
-fi
-
-printf "Work in progress - exiting now with Error.\n"
-
-# End for now
-exit 1
+printf "Work in progress - exiting now.\n"
+exit 0
 
 
 # Call profile since CRON does not do it.
