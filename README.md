@@ -7,6 +7,13 @@ you can categorize your bookings, thus enhancing the data imported via HBCI.
 IN the end various reports are available in SQL that you can look at using the same tool as for editing
 the data. 
 
+## AqBanking setup
+AqBanking setup is expected to be mounted into the container via Docker-Volume at /finance. finance container
+will set access rights as needed.
+### PinFile
+AqBanking PINFILE is expected at /finance/.hbci-pinfile
+ 
+
 ## DB Setup
 Setup a MariaDB (or MySQL) database, no matter if in container of not. 
 Then provide the credentrials in Environment variables to the finance container (see below for details).

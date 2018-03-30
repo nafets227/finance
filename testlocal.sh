@@ -104,6 +104,7 @@ setup_testdb
 printf "Executing container start.\n"
 DB_USERS="testuser1 testuser2"
 DB_testuser1_PASSWORD="dummypw"
+test -d ./testdata || mkdir ./testdata
 
 export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
 export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
@@ -115,10 +116,11 @@ docker run \
 	-e MYSQL_ROOT_PASSWORD \
 	-e DB_USERS \
 	-e DB_testuser1_PASSWORD \
+	-v /finance:$(pwd)/testdata \
 	"nafets227/finance:local" \
 	|| exit 1
 
-printf "Exeuting container end.\n"
+printf "Executing container end.\n"
 
 # Now check is results are what we expected.
 test_dbsetup

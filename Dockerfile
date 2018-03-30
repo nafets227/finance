@@ -3,6 +3,8 @@ FROM pritunl/archlinux
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Container"
 
+VOLUME /finance
+
 RUN \
     pacman -S --needed --noconfirm \
         aqbanking \
@@ -19,10 +21,13 @@ RUN \
     rm -rf /var/tmp/*
 
 RUN \
-	mkdir /finance /finance/fntxt2sql
+	mkdir /finance/fntxt2sql
 	
 RUN \
 	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf
+	
+RUN \
+	useradd -d /finance -U finance
 
 # download, compile and install pxlib, a paradox DB library
 RUN \
@@ -45,10 +50,10 @@ RUN \
 	cp -a fntxt2sql /usr/local/bin/fntxt2sql
 
 # copy and install additional scripts
-COPY finance finance-entrypoint mail.sh /usr/local/bin/
+COPY finance finance-root-wrapper finance-entrypoint mail.sh /usr/local/bin/
 RUN \
     chown root:root /usr/local/bin/* && \
     chmod 755 /usr/local/bin/*
 
-ENTRYPOINT [ "/usr/local/bin/finance-entrypoint" ]
+ENTRYPOINT [ "/usr/local/bin/finance-root-wrapper" ]
 
