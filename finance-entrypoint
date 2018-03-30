@@ -7,7 +7,6 @@
 
 #### DB Setup privileges #####################################################
 function dbsetup_privileges () {
-
 	printf "Resetting privileges.\n"
 	$MYSQL_ROOT_CMD <<-EOF
 		GRANT all privileges
@@ -24,6 +23,14 @@ function dbsetup_privileges () {
 
 #### DB Setup Users ##########################################################
 function dbsetup_users () {
+	printf "Deleting non-system users except finance.\n"
+	$MYSQL_ROOT_CMD <<-EOF
+		DELETE
+			FROM mysql.user
+			WHERE user NOT IN ('mysql.sys', 'mysqlxsys', 'root', 'finance')
+				OR host NOT IN ('localhost');
+		EOF
+
 	for u in $DB_USERS ; do
 		eval p=\$DB_${u}_PASSWORD
 		if [ -z "$p" ] ; then
