@@ -5,7 +5,49 @@
 # Execute automatic tasks for finance
 
 
+#### DB Setup privileges #####################################################
+function dbsetup_privileges () {
 
+	printf "Resetting privileges.\n"
+	$MYSQL_ROOT_CMD <<-EOF
+		GRANT all privileges
+			ON $MYSQL_DATABASE.*
+			TO '$MYSQL_USER'@'%'
+			WITH GRANT OPTION;
+		CREATE OR REPLACE ROLE fin_user;
+		EOF
+	if [ $? != "0" ] ; then
+		printf "Error resetting privileges.\n"
+		exit 1
+	fi
+}
+
+#### DB Setup Users ##########################################################
+function dbsetup_users () {
+	for u in $DB_USERS ; do
+		eval p=\$DB_${u}_PASSWORD
+		if [ -z "$p" ] ; then
+			printf "Creating User %s without password\n" "$u"
+			$MYSQL_ROOT_CMD <<-EOF
+				CREATE OR REPLACE USER '$u'@'%'
+				EOF
+			if [ $? != "0" ] ; then exit 1 ; fi
+		else
+			printf "Creating User %s with password\n" "$u"
+			$MYSQL_ROOT_CMD <<-EOF
+				CREATE OR REPLACE USER '$u'@'%' IDENTIFIED BY '$p';
+				EOF
+			if [ $? != "0" ] ; then exit 1 ; fi
+		fi
+		$MYSQL_ROOT_CMD <<-EOF
+			GRANT fin_user TO '$u'@'%';
+			SET DEFAULT ROLE fin_user FOR '$u'@'%';
+			EOF
+		if [ $? != "0" ] ; then exit 1 ; fi
+	done
+}
+
+##### Main ###################################################################
 aqb=/usr/bin/aqbanking-cli
 fnt=/usr/local/bin/fntxt2sql
 datadir=~
@@ -30,34 +72,29 @@ MYSQL_CMD="$MYSQL_CMD --user=$MYSQL_USER"
 MYSQL_CMD="$MYSQL_CMD --password=$MYSQL_PASSWORD"
 MYSQL_CMD="$MYSQL_CMD $MYSQL_DATABASE"
 
-MYSQL_ROOT_CMD="mysql"
-MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --host=$MYSQL_HOST"
-MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --user=root"
-MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --password=$MYSQL_ROOT_PASSWORD"
-MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD	$MYSQL_DATABASE"
-
 if [ ! -z "$MYSQL_ROOT_PASSWORD" ] ; then
-	printf "Got DBADM privilege because \$MYSQL_ROOT_PASSWORD is set. "
-	printf "Resetting privileges.\n"
-	$MYSQL_ROOT_CMD <<-EOF
-		GRANT all privileges
-			ON $MYSQL_DATABASE.*
-			TO '$MYSQL_USER'@'%'
-			WITH GRANT OPTION;
-		CREATE OR REPLACE ROLE fin_user;
-		EOF
-	if [ $? != "0" ] ; then
-		printf "Error resetting privileges.\n"
-		exit 1
-	fi
+	printf "Got DBADM privilege because \$MYSQL_ROOT_PASSWORD is set.\n"
+
+	MYSQL_ROOT_CMD="mysql"
+	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --host=$MYSQL_HOST"
+	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --user=root"
+	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --password=$MYSQL_ROOT_PASSWORD"
+	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD	$MYSQL_DATABASE"
+else
+	printf "No DBADM privileges because \$MYSQL_ROOT_PASSWORD is not set.\ Will not check users.n"
+	MYSQL_ROOT_CMD=""
 fi
-	
+
 #DEBUG#
 $MYSQL_CMD <<-EOF
 	DROP TABLE fn_entry;
 	DROP VIEW fn_entry_cat;
 	SHOW GRANTS;
 	EOF
+
+if [ ! -z $MYSQL_ROOT_CMD ] && [ ! -z "$DB_USERS] ; then
+	dbsetup_privileges
+fi
 
 dbexist=$($MYSQL_CMD -N <<-EOF
 	SELECT COUNT(*) 
@@ -86,29 +123,8 @@ else
 	printf "using existing database %s.\n" "$MYSQL_DATABASE"
 fi
 
-# Setup Users
-if [ ! -z "$DB_USERS" ] ; then
-	for u in $DB_USERS ; do
-		eval p=\$DB_${u}_PASSWORD
-		if [ -z "$p" ] ; then
-			printf "Creating User %s without password\n" "$u"
-			$MYSQL_ROOT_CMD <<-EOF
-				CREATE OR REPLACE USER '$u'@'%'
-				EOF
-			if [ $? != "0" ] ; then exit 1 ; fi
-		else
-			printf "Creating User %s with password\n" "$u"
-			$MYSQL_ROOT_CMD <<-EOF
-				CREATE OR REPLACE USER '$u'@'%' IDENTIFIED BY '$p';
-				EOF
-			if [ $? != "0" ] ; then exit 1 ; fi
-		fi
-		$MYSQL_ROOT_CMD <<-EOF
-			GRANT fin_user TO '$u'@'%';
-			SET DEFAULT ROLE fin_user FOR '$u'@'%';
-			EOF
-		if [ $? != "0" ] ; then exit 1 ; fi
-	done
+if [ ! -z $MYSQL_ROOT_CMD ] && [ ! -z "$DB_USERS] ; then
+	dbsetup_users
 fi
 
 printf "Work in progress - exiting now with Error.\n"
