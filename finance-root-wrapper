@@ -6,6 +6,8 @@
 # correct ownership of files and call
 # finance-entrypoint as restricted user.
 
+ls -la /finance
+
 printf "Setting permissions of /finance\n"
 # change all files ownership to finance:finance
 # use find instead of chown -R avoids touching all files. This is especially
@@ -14,9 +16,9 @@ find /finance -! -user finance -exec chown finance {} ";"
 find /finance -! -group finance -exec chown :finance {} ";"
 
 # set permission to rr- of /finance/.hbci-pinfile
-find /finance -name .hbci-pinfile -perm /o=rwx -exec chmod o-rwx {} ";"
-find /finance -name .hbci-pinfile -maxdepth 0 -perm /g=wx -exec chmod g-wx {} ";"
-find /finance -name .hbci-pinfile -maxdepth 0 -perm /u=wx -exec chmod u-wx {} ";"
+find /finance -name .hbci-pinfile -maxdepth 1 -perm /o=rwx -exec chmod o-rwx {} ";"
+find /finance -name .hbci-pinfile -maxdepth 1 -perm /g=wx -exec chmod g-wx {} ";"
+find /finance -name .hbci-pinfile -maxdepth 1 -perm /u=wx -exec chmod u-wx {} ";"
 
 printf "Switching to restricted user finance\n"
 cd /finance

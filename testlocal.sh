@@ -104,7 +104,14 @@ setup_testdb
 printf "Executing container start.\n"
 DB_USERS="testuser1 testuser2"
 DB_testuser1_PASSWORD="dummypw"
+
 test -d ./testdata || mkdir ./testdata
+ls -l ./testdata/.hbci-pinfile /etc/hbci.pinfile 
+if [ ! -f ./testdata/.hbci-pinfile ] && \
+   [ -e /etc/hbci.pinfile ] ; then
+   printf "copying hbci.pinfile from /etc\n"
+	cp /etc/hbci.pinfile ./testdata/.hbci-pinfile
+fi   	
 
 export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
 export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
@@ -116,7 +123,7 @@ docker run \
 	-e MYSQL_ROOT_PASSWORD \
 	-e DB_USERS \
 	-e DB_testuser1_PASSWORD \
-	-v /finance:$(pwd)/testdata \
+	-v $(pwd)/testdata:/finance \
 	"nafets227/finance:local" \
 	|| exit 1
 

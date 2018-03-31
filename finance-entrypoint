@@ -87,7 +87,7 @@ function dbsetup_users () {
 ##### Main ###################################################################
 aqb=/usr/bin/aqbanking-cli
 fnt=/usr/local/bin/fntxt2sql
-datadir=~
+datadir=/finance
 
 if [ -z "$MYSQL_HOST" ] ; then
 	printf "Variable MYSQL_HOST needs to be set.\n"
@@ -100,6 +100,10 @@ elif [ -z "$MYSQL_USER" ] ; then
 	exit 1
 elif [ -z "$MYSQL_PASSWORD" ] ; then
 	printf "Variable MYSQL_PASSWORD needs to be set.\n"
+	exit 1
+elif [ ! -r $datadir/.hbci-pinfile ] ; then
+	printf "%s/.hbci-pinfile must exist and be readable.\n" \
+		"$datadir"
 	exit 1
 fi
 
@@ -157,29 +161,22 @@ else
 	printf "using existing database %s.\n" "$MYSQL_DATABASE"
 fi
 
-printf "Work in progress - exiting now.\n"
-exit 0
+test -d $datadir/inbound.aqb      || mkdir $datadir/inbound.aqb
+test -d $datadir/inbound.aqb-tran || mkdir $datadir/inbound.aqb-tran
+test -d $datadir/inbound.aqb-bal  || mkdir $datadir/inbound.aqb-bal
+test -d $datadir/store.aqb        || mkdir $datadir/store.aqb
 
-
-# Call profile since CRON does not do it.
-#. ~/.profile
-
-test -d ~/inbound.aqb      || mkdir ~/inbound.aqb
-test -d ~/inbound.aqb-tran || mkdir ~/inbound.aqb-tran
-test -d ~/inbound.aqb-bal  || mkdir ~/inbound.aqb-bal
-test -d ~/store.aqb        || mkdir ~/store.aqb
-
-$aqb  -P ~/.hbci-pinfile -n request --balance --transactions \
+$aqb  -P $datadir/.hbci-pinfile -n request --balance --transactions \
     -c ~/inbound.aqb/`date +\%Y\%m\%d-\%H\%M\%S.\%N`
 
-for f in ~/inbound.aqb/* ; do 
+for f in $datadir/inbound.aqb/* ; do 
     fnam=$(basename $f)
-    $aqb listtrans -c $f -o ~/inbound.aqb-tran/$fnam && \
-    $aqb listbal   -c $f -o ~/inbound.aqb-bal/$fnam  && \
-    mv $f ~/store.aqb 
+    $aqb listtrans -c $f -o $datadir/inbound.aqb-tran/$fnam && \
+    $aqb listbal   -c $f -o $datadir/inbound.aqb-bal/$fnam  && \
+    mv $f $datadir/store.aqb 
     done
 
-pushd ~ >/dev/null
-$(dirname $0)/finance -mysql
-$(dirname $0)/mail.sh
-popd
+/usr/local/bin/finance -mysql
+
+#/usr/local/bin/mail.sh
+
