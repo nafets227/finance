@@ -21,9 +21,6 @@ RUN \
     rm -rf /var/tmp/*
 
 RUN \
-	mkdir /finance/fntxt2sql
-	
-RUN \
 	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf
 	
 RUN \
@@ -40,14 +37,21 @@ RUN \
               --with-gsf \
               --disable-static && \
 	make install && \
-	ldconfig
+	ldconfig && \
+	cd /finance && \
+	rm -rf /finance/pxlib-0.6.6
 
 # copy, compile and install fntxt2sql	
-COPY fntxt2sql/* /finance/fntxt2sql/
 RUN \
-	cd /finance/fntxt2sql && \ 
+	mkdir /tmp/fntxt2sql
+
+COPY fntxt2sql/* /tmp/fntxt2sql/
+
+RUN \
+	cd /tmp/fntxt2sql && \ 
 	make && \
-	cp -a fntxt2sql /usr/local/bin/fntxt2sql
+	cp -a fntxt2sql /usr/local/bin/fntxt2sql && \ 
+	rm -rf /tmp/fntxt2sql
 
 # copy and install additional scripts
 COPY finance finance-root-wrapper finance-entrypoint mail.sh /usr/local/bin/
