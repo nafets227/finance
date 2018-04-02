@@ -6,8 +6,6 @@
 # correct ownership of files and call
 # finance-entrypoint as restricted user.
 
-ls -la /finance
-
 printf "Setting permissions of /finance\n"
 # change all files ownership to finance:finance
 # use find instead of chown -R avoids touching all files. This is especially
