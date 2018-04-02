@@ -279,6 +279,91 @@ function aqsetup_acc () {
 	return 0
 }
 
+##### Import ################################################################
+function import () {
+##### Initalise Logging ######################################################
+loghead=`basename $0`
+fntxt2sql=~/tools/fntxt2sql/fntxt2sql
+echo >&2 "$loghead: Started at $(date) in $(pwd)"
+
+##### Handle parms ###########################################################
+if [ $1. == --rescan. ]; then
+	echo >&2 "$loghead: Scanning all Files in Store"
+	searchFor="store.*"
+	moveTo=""
+	shift
+else
+	echo >&2 "$loghead: Scanning inbound [use --rescan to scan all Files in store]"
+	searchFor="inbound.*"	
+	moveTo="store"
+fi
+
+parm=$*
+echo >&2 "$loghead: Parameter \"$parm\""
+
+##### Now do the search ######################################################
+for f in `ls -d $searchFor 2>/dev/null`; do
+	if [ -d $f ]; then
+		echo >&2 "$loghead: processing directory $f"
+		handleDir $f
+	else
+		echo >&2 "$loghead: Ignoring Non-Directory $f"
+	fi
+done
+
+echo >&2 "$loghead: Ended at" `date`
+return 0
+}
+
+##### Handle one inbound or store directory ##################################
+function import_handleDir
+{
+# get type from Extension
+ftype=${1##*.}
+
+for f in `ls -d $1/* 2>/dev/null`; do
+	case $ftype in 
+		aqb-tran | aqb-bal | aqm | btx)
+			if [ -f $f ]; then
+				echo >&2 "$loghead: Processing file $f"
+				$fntxt2sql $parm -$ftype -f $f
+				rc=$?
+			else
+				echo >&2 "$loghead: Ignoring Directory $ftype $f"
+				rc=-1
+			fi
+			;;
+		# for HBCI only directories are allowed
+		hbci )
+			if [ -d $f ]; then
+				echo >&2 "$loghead: Processing file $f"
+				$fntxt2sql $parm -$ftype -f $f
+				rc=$?
+			else
+				echo >&2 "$loghead: Ignoring Non-Directory $ftype $f"
+				rc=-1
+			fi
+			;;
+		manual )
+		    echo >&2 "$loghead: Warning: Ignoring $ftype $f. Run manually!"
+		    ;;
+		*)
+			echo >&2 "$loghead: Ignoring unknown type $ftype"
+			rc=-1
+			return
+	esac
+	
+	if [ ! -z $moveTo ]; then
+		if [ $rc. == 0. ]; then
+			mv --backup=numbered $f $moveTo.$ftype/
+		else
+			echo >&2 "$loghead: Import of $f failed (RC=$rc)."
+		fi 
+	fi
+done
+
+}
+
 ##### Main ###################################################################
 fnt=/usr/local/bin/fntxt2sql
 datadir=/finance

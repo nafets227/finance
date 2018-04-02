@@ -54,7 +54,7 @@ RUN \
 	rm -rf /tmp/fntxt2sql
 
 # copy and install additional scripts
-COPY finance finance-root-wrapper finance-entrypoint mail.sh /usr/local/bin/
+COPY finance-root-wrapper finance-entrypoint mail.sh /usr/local/bin/
 RUN \
     chown root:root /usr/local/bin/* && \
     chmod 755 /usr/local/bin/*
