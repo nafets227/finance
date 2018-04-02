@@ -56,4 +56,8 @@ the Environment variable DB_USERS, then start the container and it will grant th
 * MYSQL_PASSWORD Password to connect to the database
 * DB_USERS List of users that should have "normal" access to the database
 * DB_xxx_PASSWORD password to set for user xxx. xxx must be in the DB_USERS
+
+## Advanced features
+fntxt2sql program supports more than mySql targets, have a look into its C sourceode. However, the scripts of this
+container only support importing into a Mysql/Mariadb database.
   in order to take effect.

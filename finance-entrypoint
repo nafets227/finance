@@ -116,7 +116,7 @@ dbsetup_tables () {
 	
 	if [ "$dbexist" == "0" ] ; then
 		printf "Database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
-		$fnt -cre -mysql \
+	fntxt2sql -cre -mysql \
 			-mysql_host $MYSQL_HOST \
 			-mysql_database $MYSQL_DATABASE \
 			-mysql_user $MYSQL_USER \
@@ -281,119 +281,132 @@ function aqsetup_acc () {
 
 ##### Import ################################################################
 function import () {
-##### Initalise Logging ######################################################
-loghead=`basename $0`
-fntxt2sql=~/tools/fntxt2sql/fntxt2sql
-echo >&2 "$loghead: Started at $(date) in $(pwd)"
+	for f in `ls -d $datadir/inbound.* 2>/dev/null`; do
+		if [ -d $f ]; then
+			printf "Importing directory %s\n" "$f"
+			import_handleDir "$f" "$datadir/store"
 
-##### Handle parms ###########################################################
-if [ $1. == --rescan. ]; then
-	echo >&2 "$loghead: Scanning all Files in Store"
-	searchFor="store.*"
-	moveTo=""
-	shift
-else
-	echo >&2 "$loghead: Scanning inbound [use --rescan to scan all Files in store]"
-	searchFor="inbound.*"	
-	moveTo="store"
-fi
+		else
+			printf "Not Importing Non-Directory %s\n" "$f"
+		fi
+	done
 
-parm=$*
-echo >&2 "$loghead: Parameter \"$parm\""
+	return 0
+}
 
-##### Now do the search ######################################################
-for f in `ls -d $searchFor 2>/dev/null`; do
-	if [ -d $f ]; then
-		echo >&2 "$loghead: processing directory $f"
-		handleDir $f
-	else
-		echo >&2 "$loghead: Ignoring Non-Directory $f"
-	fi
-done
+##### Import_rescan ##########################################################
+function import_rescan () {
+	for f in `ls -d $datadir/store.* 2>/dev/null`; do
+		if [ -d $f ]; then
+			printf "Importing directory %s\n" "$f"
+			import_handleDir "$f"
+		else
+			printf "Not Importing Non-Directory %s\n" "$f"
+		fi
+	done
 
-echo >&2 "$loghead: Ended at" `date`
-return 0
+	return 0
 }
 
 ##### Handle one inbound or store directory ##################################
+# Parameter 1: Directory to be scanned
+# Parameter 2: where to move files after successful importing
 function import_handleDir
 {
-# get type from Extension
-ftype=${1##*.}
+	scandir="$1"
+	moveTo="$2"
 
-for f in `ls -d $1/* 2>/dev/null`; do
-	case $ftype in 
-		aqb-tran | aqb-bal | aqm | btx)
-			if [ -f $f ]; then
-				echo >&2 "$loghead: Processing file $f"
-				$fntxt2sql $parm -$ftype -f $f
-				rc=$?
-			else
-				echo >&2 "$loghead: Ignoring Directory $ftype $f"
+	# get type from Extension
+	ftype=${scandir##*.}
+
+	for f in `ls -d $scandir/* 2>/dev/null`; do
+		case $ftype in 
+			aqb-tran | aqb-bal | aqm | btx)
+				if [ -f $f ]; then
+					printf "Importing file %s\n" "$f"
+					fntxt2sql \
+						-$ftype \
+						-f $f-mysql \
+						-mysql_host $MYSQL_HOST \
+						-mysql_database $MYSQL_DATABASE \
+						-mysql_user $MYSQL_USER \
+						-mysql_password $MYSQL_PASSWORD
+					rc=$?
+				else
+					printf "Not importing Directory %s %s\n" "$ftype" "$f"
+					rc=-1
+				fi
+				;;
+			# for HBCI only directories are allowed
+			hbci )
+				if [ -d $f ]; then
+					printf "Importing HBCI directory %s\n" "$f"
+					$fntxt2sql \
+						-$ftype \
+						-f $f-mysql \
+						-mysql_host $MYSQL_HOST \
+						-mysql_database $MYSQL_DATABASE \
+						-mysql_user $MYSQL_USER \
+						-mysql_password $MYSQL_PASSWORD
+					rc=$?
+				else
+					printf "Not importing Non-Directory %s %s\n" "$ftype" "$f"
+					rc=-1
+				fi
+				;;
+			manual )
+				printf "Not importing %s %s. Run manually!\n" "$ftype" "$f"
 				rc=-1
-			fi
-			;;
-		# for HBCI only directories are allowed
-		hbci )
-			if [ -d $f ]; then
-				echo >&2 "$loghead: Processing file $f"
-				$fntxt2sql $parm -$ftype -f $f
-				rc=$?
-			else
-				echo >&2 "$loghead: Ignoring Non-Directory $ftype $f"
+			    ;;
+			*)
+				printf "Not importing unknown type %s in %s\n" "$ftype" "$f"
 				rc=-1
-			fi
-			;;
-		manual )
-		    echo >&2 "$loghead: Warning: Ignoring $ftype $f. Run manually!"
-		    ;;
-		*)
-			echo >&2 "$loghead: Ignoring unknown type $ftype"
-			rc=-1
-			return
-	esac
-	
-	if [ ! -z $moveTo ]; then
-		if [ $rc. == 0. ]; then
-			mv --backup=numbered $f $moveTo.$ftype/
-		else
-			echo >&2 "$loghead: Import of $f failed (RC=$rc)."
-		fi 
-	fi
-done
+				return 1
+		esac
+		
+		if [ ! -z $moveTo ]; then
+			if [ "$rc" == 0 ]; then
+				mv --backup=numbered $f $moveTo.$ftype/
+			else
+				printf "Import of $f failed (RC=%s).\n" "$rc"
+			fi 
+		fi
+	done
+
+	return 0
 }
 
 ##### Alert ##################################################################
-# Mail Kontostand und Buchungen
+# send balance and transactions via EMail
 function alert () {
-
-myaccounts="12345 98765"
-
-for a in $myaccounts ; do
+	myaccounts="12345 98765"
 	
-	Saldo=$(
-	mysql -s dbFinance <<-EOF
-	SELECT datum, betrag
-	  FROM fn_entry 
-	 WHERE buchart = 'E' AND
-	         orig_ktonr="$a" AND 
-	         datum = ( SELECT MAX(DATUM) from fn_entry where orig_ktonr='$a');
-	EOF
-	)
-	
-	( mysql dbFinance <<-EOF
-	SELECT datum, betrag, part_name1, vzweck1, vzweck2
-	  FROM fn_entry
-	 WHERE buchart='B' AND
-	       orig_ktonr='$a' AND
-	       datum >= DATE_SUB(CURDATE(), INTERVAL 7 DAY);
-	EOF
-	) | mail -s "Kontoinfos $a: $Saldo" -r "finance <no-reply@mydomain.tld>" recipient@mydomain.tld
-done
+	for a in $myaccounts ; do
+		
+		Saldo=$(
+		mysql -s dbFinance <<-EOF
+		SELECT datum, betrag
+		  FROM fn_entry 
+		 WHERE buchart = 'E' AND
+		         orig_ktonr="$a" AND 
+		         datum = ( SELECT MAX(DATUM) from fn_entry where orig_ktonr='$a');
+		EOF
+		)
+		
+		( mysql dbFinance <<-EOF
+		SELECT datum, betrag, part_name1, vzweck1, vzweck2
+		  FROM fn_entry
+		 WHERE buchart='B' AND
+		       orig_ktonr='$a' AND
+		       datum >= DATE_SUB(CURDATE(), INTERVAL 7 DAY);
+		EOF
+		) | mail -s "Kontoinfos $a: $Saldo" -r "finance <no-reply@mydomain.tld>" recipient@mydomain.tld
+	done
+
+	return 0
 }
 
 ##### Main ###################################################################
-fnt=/usr/local/bin/fntxt2sql
 datadir=/finance
 
 if [ -z "$MYSQL_HOST" ] ; then
@@ -473,9 +486,9 @@ for f in $datadir/inbound.aqb/* ; do
     done
 
 printf "Importing transactions and balances into database (disabled)\n"
-#/usr/local/bin/finance -mysql
+#import
 
 printf "Sending alert EMail (disabled)\n"
-#/usr/local/bin/mail.sh
+#alert
 
 exit 0
