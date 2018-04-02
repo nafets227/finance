@@ -17,6 +17,7 @@ function test_dbconnect {
 		PRT_PW=""
 	else
 		CMD_PW="--password=$pw"
+		PRT_PW=", password \"$pw\""
 	fi
 	mysql \
 		--host=$MYSQL_HOST \
@@ -30,8 +31,8 @@ function test_dbconnect {
 		EOF
 	rc=$?
 	if [ $rc != "$rcexp" ] ; then
-		printf "ERR: Connecting to DB with user %s: RC=%s(Exp=%s)\n" \
-			"$user" "$rc" "$rcexp"  
+		printf "ERR: Connecting to DB with user %s%s: RC=%s(Exp=%s)\n" \
+			"$user" "$PRT_PW" "$rc" "$rcexp"  
 		return 1
 	fi
 	
