@@ -5,6 +5,21 @@
 # Execute automatic tasks for finance
 
 
+##### trim ###################################################################
+function trim {
+	if [ $# -ne 1 ] ; then
+		# Empty String results in empty string
+		return
+	fi
+
+	# remove leading blanks
+	local v="$1"
+	v="${v#"${v%%[![:space:]]*}"}"
+	v="${v%"${v##*[![:space:]]}"}"
+	
+	printf "%s\n" "$v"
+	}
+
 #### DB Setup privileges #####################################################
 function dbsetup_privileges () {
 	printf "Granting privileges to %s.\n" "$MYSQL_USER"
@@ -84,79 +99,35 @@ function dbsetup_users () {
 	done
 }
 
-##### trim ###################################################################
-function trim {
-	if [ $# -ne 1 ] ; then
-		# Empty String results in empty string
-		return
+##### dbsetup_tables #########################################################
+dbsetup_tables () {
+	dbexist=$($MYSQL_CMD -N <<-EOF
+	SELECT COUNT(*) 
+		FROM information_schema.tables
+		WHERE table_schema="$MYSQL_DATABASE" AND table_name="fn_entry";
+		EOF
+		)
+	if [ "$?" != "0" ] ; then 
+		printf "Error connecting to datatabase %s on %s (User %s PW %s)\n" \
+			"$MYSQL_HOST" "$MYSQL_HOST" "$MYSQL_USER" "$MYSQL_PASSWORD"
+		exit 1
 	fi
-
-	# remove leading blanks
-	local v="$1"
-	v="${v#"${v%%[![:space:]]*}"}"
-	v="${v%"${v##*[![:space:]]}"}"
 	
-	printf "%s\n" "$v"
-	}
-
-##### aqsetup_acc ############################################################
-function aqsetup_acc () {
-	local blz="$1"
-	local u="$2"
-	local parm="$3"
-
-	printf "Configuring HBCI for BLZ %s User %s setup=\"%s\"\n" \
-		"$blz" "$u" "$parm"
-			
-	aqhbci-tool4 \
-		--noninteractive \
-		adduser \
-		-b $blz \
-		-N $u \
-		-u $u \
-		-t pintan \
-		$parm
-	rc=$?; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 adduser\n" "$rc"
-		return 1
+	if [ "$dbexist" == "0" ] ; then
+		printf "database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
+		$fnt -cre -mysql \
+			-mysql_host $MYSQL_HOST \
+			-mysql_database $MYSQL_DATABASE \
+			-mysql_user $MYSQL_USER \
+			-mysql_password $MYSQL_PASSWORD
+		if [ "$?" != "0" ] ; then
+			printf "Error creating tables.\n"
+			exit 1
+		fi
+	else
+		printf "using existing database %s.\n" "$MYSQL_DATABASE"
 	fi
 
-	aqhbci-tool4 \
-		--noninteractive \
-		--acceptvalidcerts \
-		--pinfile=$datadir/.hbci-pinfile \
-		getsysid \
-		-b $blz
-	rc=$? ; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 getsysid. Proceeding anyway.\n" "$rc"
-	fi
-
-	aqhbci-tool4 \
-		--noninteractive \
-		--acceptvalidcerts \
-		--pinfile=$datadir/.hbci-pinfile \
-		getkeys \
-		-b $blz
-	rc=$? ; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 getkeys. Proceeding anyway.\n" "$rc"
-	fi
-
-	aqhbci-tool4 \
-		--noninteractive \
-		--acceptvalidcerts \
-		--pinfile=$datadir/.hbci-pinfile \
-		getaccounts \
-		-b $blz
-	rc=$? ; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 getaccounts. aqhbci-config dump follows.\n" "$rc"
-		aqhbci-tool4 \
-			listusers
-		aqhbci-tool4 \
-			listaccounts
-		return 1
-	fi
-
-	return 0
 }
 
 ##### aqsetup ################################################################
@@ -246,6 +217,66 @@ function aqsetup () {
 	return 0
 }
 
+##### aqsetup_acc ############################################################
+function aqsetup_acc () {
+	local blz="$1"
+	local u="$2"
+	local parm="$3"
+
+	printf "Configuring HBCI for BLZ %s User %s setup=\"%s\"\n" \
+		"$blz" "$u" "$parm"
+			
+	aqhbci-tool4 \
+		--noninteractive \
+		adduser \
+		-b $blz \
+		-N $u \
+		-u $u \
+		-t pintan \
+		$parm
+	rc=$?; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 adduser\n" "$rc"
+		return 1
+	fi
+
+	aqhbci-tool4 \
+		--noninteractive \
+		--acceptvalidcerts \
+		--pinfile=$datadir/.hbci-pinfile \
+		getsysid \
+		-b $blz
+	rc=$? ; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 getsysid. Proceeding anyway.\n" "$rc"
+	fi
+
+	aqhbci-tool4 \
+		--noninteractive \
+		--acceptvalidcerts \
+		--pinfile=$datadir/.hbci-pinfile \
+		getkeys \
+		-b $blz
+	rc=$? ; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 getkeys. Proceeding anyway.\n" "$rc"
+	fi
+
+	aqhbci-tool4 \
+		--noninteractive \
+		--acceptvalidcerts \
+		--pinfile=$datadir/.hbci-pinfile \
+		getaccounts \
+		-b $blz
+	rc=$? ; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 getaccounts. aqhbci-config dump follows.\n" "$rc"
+		aqhbci-tool4 \
+			listusers
+		aqhbci-tool4 \
+			listaccounts
+		return 1
+	fi
+
+	return 0
+}
+
 ##### Main ###################################################################
 fnt=/usr/local/bin/fntxt2sql
 datadir=/finance
@@ -295,32 +326,7 @@ if [ ! -z "$MYSQL_ROOT_CMD" ] && [ ! -z "$DB_USERS" ] ; then
 	dbsetup_users || exit 1
 fi
 
-dbexist=$($MYSQL_CMD -N <<-EOF
-	SELECT COUNT(*) 
-		FROM information_schema.tables
-		WHERE table_schema="$MYSQL_DATABASE" AND table_name="fn_entry";
-		EOF
-		)
-if [ "$?" != "0" ] ; then 
-	printf "Error connecting to datatabase %s on %s (User %s PW %s)\n" \
-		"$MYSQL_HOST" "$MYSQL_HOST" "$MYSQL_USER" "$MYSQL_PASSWORD"
-	exit 1
-fi
-
-if [ "$dbexist" == "0" ] ; then
-	printf "database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
-	$fnt -cre -mysql \
-		-mysql_host $MYSQL_HOST \
-		-mysql_database $MYSQL_DATABASE \
-		-mysql_user $MYSQL_USER \
-		-mysql_password $MYSQL_PASSWORD
-	if [ "$?" != "0" ] ; then
-		printf "Error creating tables.\n"
-		exit 1
-	fi
-else
-	printf "using existing database %s.\n" "$MYSQL_DATABASE"
-fi
+dbsetup_tables || exit 1
 
 aqsetup || exit 1
 
