@@ -45,7 +45,7 @@ function dbsetup_users () {
 		SELECT user, host
 			FROM mysql.user
 			WHERE user NOT IN ('root', '$MYSQL_USER' $where_users ) AND
-			 is_role="N";
+				is_role="N";
 		EOF
 	while IFS=$'\t' read db_user db_host ; do
 		printf "Deleting DB User %s @ %s\n" "$db_user" "$db_host"
@@ -59,7 +59,8 @@ function dbsetup_users () {
 	$MYSQL_ROOT_CMD -N --batch <<-EOF |
 		SELECT user
 			FROM mysql.user
-			WHERE is_role="Y";
+			WHERE user NOT IN ('fin_user') AND
+				is_role="Y";
 		EOF
 	while read db_user ; do
 			printf "Deleting DB Role %s\n" "$db_user"
@@ -72,7 +73,7 @@ function dbsetup_users () {
 		
 	printf "Creating DB Role fin_user.\n"
 	$MYSQL_ROOT_CMD <<-EOF
-		CREATE ROLE fin_user;
+		CREATE ROLE IF NOT EXISTS fin_user;
 		EOF
 	if [ $? != "0" ] ; then return  1 ; fi
 
@@ -344,9 +345,9 @@ aqbanking-cli \
 	request \
 	--balance \
 	--transactions \
-    -c $datadir/inbound.aqb/`date +\%Y\%m\%d-\%H\%M\%S.\%N`
-if [ "$?" != 0 ] ; then
-	printf "Error %s in aqbanking-cli request --balance --transactions\n" "$?"
+	-c $datadir/inbound.aqb/`date +\%Y\%m\%d-\%H\%M\%S.\%N`
+rc=$? ; if [ "$rc" != 0 ] ; then
+	printf "Error %s in aqbanking-cli request --balance --transactions\n" "$rc"
 	exit 1
 fi
 
