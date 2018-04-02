@@ -22,7 +22,7 @@ function trim {
 
 #### DB Setup privileges #####################################################
 function dbsetup_privileges () {
-	printf "Granting privileges to %s.\n" "$MYSQL_USER"
+	printf "Granting DB privileges to %s.\n" "$MYSQL_USER"
 	$MYSQL_ROOT_CMD <<-EOF
 		GRANT all privileges
 			ON $MYSQL_DATABASE.*
@@ -30,7 +30,7 @@ function dbsetup_privileges () {
 			WITH GRANT OPTION;
 		EOF
 	if [ $? != "0" ] ; then
-		printf "Error resetting privileges.\n"
+		printf "Error granting DB privileges.\n"
 		return 1
 	fi
 }
@@ -48,7 +48,7 @@ function dbsetup_users () {
 			 is_role="N";
 		EOF
 	while IFS=$'\t' read db_user db_host ; do
-		printf "Deleting User %s @ %s\n" "$db_user" "$db_host"
+		printf "Deleting DB User %s @ %s\n" "$db_user" "$db_host"
 		$MYSQL_ROOT_CMD <<-EOF
 			DROP USER '$db_user'@'$db_host';
 			EOF
@@ -62,7 +62,7 @@ function dbsetup_users () {
 			WHERE is_role="Y";
 		EOF
 	while read db_user ; do
-			printf "Deleting Role %s\n" "$db_user"
+			printf "Deleting DB Role %s\n" "$db_user"
 			$MYSQL_ROOT_CMD <<-EOF
 				DROP ROLE '$db_user' ;
 				EOF
@@ -70,7 +70,7 @@ function dbsetup_users () {
 	done
 	if [ $? != "0" ] ; then return 1 ; fi
 		
-	printf "Creating Role fin_user.\n"
+	printf "Creating DB Role fin_user.\n"
 	$MYSQL_ROOT_CMD <<-EOF
 		CREATE ROLE fin_user;
 		EOF
@@ -79,13 +79,13 @@ function dbsetup_users () {
 	for u in $DB_USERS ; do
 		eval p=\$DB_${u}_PASSWORD
 		if [ -z "$p" ] ; then
-			printf "Creating User %s without password\n" "$u"
+			printf "Creating DB User %s without password\n" "$u"
 			$MYSQL_ROOT_CMD <<-EOF
 				CREATE USER IF NOT EXISTS '$u'@'%'
 				EOF
 			if [ $? != "0" ] ; then return  1 ; fi
 		else
-			printf "Creating User %s with password\n" "$u"
+			printf "Creating DB User %s with password\n" "$u"
 			$MYSQL_ROOT_CMD <<-EOF
 				CREATE USER IF NOT EXISTS '$u'@'%' IDENTIFIED BY '$p';
 				EOF
@@ -114,7 +114,7 @@ dbsetup_tables () {
 	fi
 	
 	if [ "$dbexist" == "0" ] ; then
-		printf "database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
+		printf "Database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
 		$fnt -cre -mysql \
 			-mysql_host $MYSQL_HOST \
 			-mysql_database $MYSQL_DATABASE \
@@ -125,7 +125,7 @@ dbsetup_tables () {
 			exit 1
 		fi
 	else
-		printf "using existing database %s.\n" "$MYSQL_DATABASE"
+		printf "Reusing existing database %s.\n" "$MYSQL_DATABASE"
 	fi
 
 }
@@ -174,7 +174,8 @@ function aqsetup () {
 				eval "SETUP_$blz_$u=\"\$parm\"" 
 				;;
 			* )
-				printf "Warning: Ignoring unknown HBCI config Line %s\n" "$line"
+				printf "Warning: Ignoring unknown HBCI config Line %s in %s\n" \
+					"$line" "$datadir/.hbci-pinfile"
 				;;
 		esac
 	done <$datadir/.hbci-pinfile
@@ -187,7 +188,7 @@ function aqsetup () {
 	while read line ; do
 		# line looks like
 		# User 1: Bank: de/50010517 User Id: 1234567890 Customer Id: 12345678901234
-		printf "DEBUG: Line \"%s\"\n" "$line"
+		#DEBUG printf "DEBUG: Line \"%s\"\n" "$line"
 		if [ -z "$line" ] ; then
 			continue
 		fi
@@ -196,7 +197,7 @@ function aqsetup () {
 		blz=${blz##de/}
 		u=${line##*User Id: }
 		u=${u%% Customer Id: *}
-		printf "DEBUG: SETUP blz=%s u=%s\n" "$blz" "$u"
+		#DEBUG printf "DEBUG: SETUP blz=%s u=%s\n" "$blz" "$u"
 		eval "AQCONF_$blz_$u=1" 
 	done <<<$users
 
@@ -294,7 +295,7 @@ elif [ -z "$MYSQL_PASSWORD" ] ; then
 	printf "Variable MYSQL_PASSWORD needs to be set.\n"
 	exit 1
 elif [ ! -r $datadir/.hbci-pinfile ] ; then
-	printf "%s/.hbci-pinfile must exist and be readable.\n" \
+	printf "File %s/.hbci-pinfile must exist and be readable.\n" \
 		"$datadir"
 	exit 1
 fi
@@ -349,7 +350,7 @@ if [ "$?" != 0 ] ; then
 	exit 1
 fi
 
-printf "processing transactions and balances \n"
+printf "Processing transactions and balances \n"
 for f in $datadir/inbound.aqb/* ; do 
     fnam=$(basename $f)
     aqbanking-cli listtrans -c $f -o $datadir/inbound.aqb-tran/$fnam && \
@@ -357,10 +358,10 @@ for f in $datadir/inbound.aqb/* ; do
     mv $f $datadir/store.aqb 
     done
 
-printf "importing transactions and balances into database (disabled)\n"
+printf "Importing transactions and balances into database (disabled)\n"
 #/usr/local/bin/finance -mysql
 
-printf "sending alert EMail (disabled)\n"
+printf "Sending alert EMail (disabled)\n"
 #/usr/local/bin/mail.sh
 
 exit 0
