@@ -1,17 +1,28 @@
 # finance
 Finance system based on AqBanking and MariaDB
 
-This software helps to manage financial data of your accounts. It iomports all bookings via AqBanking 
-that supports HBCI and stores them in a SQL Database. Using a standard SQL access tool like MS Access
+This software helps to manage financial data of your accounts. It imports all bookings via AqBanking 
+that supports HBCI / FinTS and stores them in a SQL Database. Using a standard SQL access tool like MS Access
 you can categorize your bookings, thus enhancing the data imported via HBCI.
-IN the end various reports are available in SQL that you can look at using the same tool as for editing
-the data. 
+In the end various reports are available in SQL that you can look at using the same tool as for editing
+the data.
+
+## Limitations
+* Only PIN access is currently supported, no HBCI Keys
+* Only tested with german banks that have a "BLZ". 
 
 ## AqBanking setup
 AqBanking setup is expected to be mounted into the container via Docker-Volume at /finance. finance container
 will set access rights as needed.
 ### PinFile
 AqBanking PINFILE is expected at /finance/.hbci-pinfile
+### Setup Parameters
+For banks or accounts that need special parameters, you can add a line 
+```
+SETUP_<blz>_<user> = "aqhbci-tool4 parms"
+```
+into the Pinfile. The parameters wil be forwarded to aqhbci-tool4 adduser when it is called.
+Please note that this is not available in AqBanking but just in this container.  
  
 
 ## DB Setup

@@ -84,8 +84,141 @@ function dbsetup_users () {
 	done
 }
 
+##### trim ###################################################################
+function trim {
+	if [ $# -ne 1 ] ; then
+		# Empty String results in empty string
+		return
+	fi
+
+	# remove leading blanks
+	local v="$1"
+	v="${v#"${v%%[![:space:]]*}"}"
+	v="${v%"${v##*[![:space:]]}"}"
+	
+	printf "%s\n" "$v"
+	}
+
+##### aqsetup_acc ############################################################
+function aqsetup_acc () {
+	local blz="$1"
+	local u="$2"
+	local parm="$3"
+
+	printf "Configuring HBCI for BLZ %s User %s setup=\"%s\"\n" \
+		"$blz" "$u" "$parm"
+			
+	aqhbci-tool4 \
+		--noninteractive \
+		adduser \
+		-b $blz \
+		-N $u \
+		-u $u \
+		-t pintan \
+		$parm
+	rc=$?; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 adduser\n" "$rc"
+		return 1
+	fi
+
+	aqhbci-tool4 \
+		--noninteractive \
+		--acceptvalidcerts \
+		--pinfile=$datadir/.hbci-pinfile \
+		getsysid \
+		-b $blz
+	rc=$? ; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 getsysid. Proceeding anyway.\n" "$rc"
+	fi
+
+	aqhbci-tool4 \
+		--noninteractive \
+		--acceptvalidcerts \
+		--pinfile=$datadir/.hbci-pinfile \
+		getkeys \
+		-b $blz
+	rc=$? ; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 getkeys. Proceeding anyway.\n" "$rc"
+	fi
+
+	aqhbci-tool4 \
+		--noninteractive \
+		--acceptvalidcerts \
+		--pinfile=$datadir/.hbci-pinfile \
+		getaccounts \
+		-b $blz
+	rc=$? ; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 getaccounts. aqhbci-config dump follows.\n" "$rc"
+		aqhbci-tool4 \
+			listusers
+		aqhbci-tool4 \
+			listaccounts
+		return 1
+	fi
+
+	return 0
+}
+
+##### aqsetup ################################################################
+function aqsetup () {
+	local line pin u blz parm
+	local account_nr=0
+	local accounts_blz=( )
+	local accounts_user=( )
+	
+	while read line ; do
+		if [ "${#line}" == "0" ] ; then
+			continue;	# ignore blank lines
+		elif [ ${line:0:1} == "#" ] ; then 
+			continue;	# ignore comment lines
+		fi
+		case $line in
+			PIN_* )
+				# HBCI with german BLZ and account number
+#				pin=$(trim "${line#*=}")
+#				pin=${pin%\"}
+#				pin=${pin#\"}
+				line=$(trim "${line%%=*}")
+				line=${line##PIN_}
+				u=${line#*_}
+				blz=${line%_*}
+				#DEBUG printf "DEBUG: PIN blz=%s u=%s\n" "$blz" "$u"
+
+				accounts_blz[$account_nr]="$blz"
+				accounts_user[$account_nr]="$u" 
+				(( account_nr ++ ))
+				;;
+				
+			SETUP_* )
+				parm=$(trim "${line#*=}")
+				parm=${parm%\"}
+				parm=${parm#\"}
+				line=$(trim "${line%%=*}")
+				line=${line##SETUP_}
+				u=${line#*_}
+				blz=${line%_*}
+				#DEBUG printf "DEBUG: SETUP blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
+				
+				eval "SETUP_$blz_$u=\"\$parm\"" 
+				;;
+			* )
+				printf "Warning: Ignoring unknown HBCI config Line %s\n" "$line"
+				;;
+		esac
+	done <$datadir/.hbci-pinfile
+	(( account_nr -- ))
+
+	for i in $(seq 0  $account_nr) ; do 
+		blz=${accounts_blz[$i]}
+		u=${accounts_user[$i]}
+		eval parm=\"\$SETUP_$blz_$u\"
+		aqsetup_acc "$blz" "$u" "$parm"|| return 1
+	done			
+
+	return 0
+}
+
 ##### Main ###################################################################
-aqb=/usr/bin/aqbanking-cli
 fnt=/usr/local/bin/fntxt2sql
 datadir=/finance
 
@@ -161,22 +294,39 @@ else
 	printf "using existing database %s.\n" "$MYSQL_DATABASE"
 fi
 
+aqsetup || exit 1
+
 test -d $datadir/inbound.aqb      || mkdir $datadir/inbound.aqb
 test -d $datadir/inbound.aqb-tran || mkdir $datadir/inbound.aqb-tran
 test -d $datadir/inbound.aqb-bal  || mkdir $datadir/inbound.aqb-bal
 test -d $datadir/store.aqb        || mkdir $datadir/store.aqb
 
-$aqb  -P $datadir/.hbci-pinfile -n request --balance --transactions \
-    -c ~/inbound.aqb/`date +\%Y\%m\%d-\%H\%M\%S.\%N`
+printf "Loading transactions and balances \n"
+aqbanking-cli \
+	--noninteractive \
+	--acceptvalidcerts \
+	--pinfile=$datadir/.hbci-pinfile \
+	request \
+	--balance \
+	--transactions \
+    -c $datadir/inbound.aqb/`date +\%Y\%m\%d-\%H\%M\%S.\%N`
+if [ "$?" != 0 ] ; then
+	printf "Error %s in aqbanking-cli request --balance --transactions\n" "$?"
+	exit 1
+fi
 
+printf "processing transactions and balances \n"
 for f in $datadir/inbound.aqb/* ; do 
     fnam=$(basename $f)
-    $aqb listtrans -c $f -o $datadir/inbound.aqb-tran/$fnam && \
-    $aqb listbal   -c $f -o $datadir/inbound.aqb-bal/$fnam  && \
+    aqbanking-cli listtrans -c $f -o $datadir/inbound.aqb-tran/$fnam && \
+    aqbanking-cli listbal   -c $f -o $datadir/inbound.aqb-bal/$fnam  && \
     mv $f $datadir/store.aqb 
     done
 
-/usr/local/bin/finance -mysql
+printf "importing transactions and balances into database (disabled)\n"
+#/usr/local/bin/finance -mysql
 
+printf "sending alert EMail (disabled)\n"
 #/usr/local/bin/mail.sh
 
+exit 0
