@@ -166,6 +166,7 @@ function aqsetup () {
 	local accounts_blz=( )
 	local accounts_user=( )
 	
+	# Read .hbci-pinfile
 	while read line ; do
 		if [ "${#line}" == "0" ] ; then
 			continue;	# ignore blank lines
@@ -208,11 +209,38 @@ function aqsetup () {
 	done <$datadir/.hbci-pinfile
 	(( account_nr -- ))
 
+	# read configuration of aqhbci
+	users=$(aqhbci-tool4 \
+		--noninteractive \
+		listusers ) || return 1
+	while read line ; do
+		# line looks like
+		# User 1: Bank: de/50010517 User Id: 1234567890 Customer Id: 12345678901234
+		printf "DEBUG: Line \"%s\"\n" "$line"
+		if [ -z "$line" ] ; then
+			continue
+		fi
+		blz=${line##*Bank: }
+		blz=${blz%% User Id:*}
+		blz=${blz##de/}
+		u=${line##*User Id: }
+		u=${u%% Customer Id: *}
+		printf "DEBUG: SETUP blz=%s u=%s\n" "$blz" "$u"
+		eval "AQCONF_$blz_$u=1" 
+	done <<<$users
+
+	# Now configure each account in pinfile but not yet in aqhbci
 	for i in $(seq 0  $account_nr) ; do 
 		blz=${accounts_blz[$i]}
 		u=${accounts_user[$i]}
 		eval parm=\"\$SETUP_$blz_$u\"
-		aqsetup_acc "$blz" "$u" "$parm"|| return 1
+		eval aqconf=\"\$AQCONF_$blz_$u\"
+		if [ -z "$aqconf" ] ; then
+			aqsetup_acc "$blz" "$u" "$parm" || return 1
+		else
+			printf "Reusing existing HBCI configuration for BLZ %s User %s\n" \
+				"$blz" "$u"
+		fi
 	done			
 
 	return 0

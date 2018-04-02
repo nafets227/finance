@@ -14,6 +14,7 @@ function test_dbconnect {
 	local CMD_PW	
 	if [ -z "$pw" ] ; then
 		CMD_PW=""
+		PRT_PW=""
 	else
 		CMD_PW="--password=$pw"
 	fi
@@ -109,7 +110,7 @@ if [ -e /etc/hbci.pinfile ] ; then
 fi   	
 
 # Start our just built container
-printf "Executing container start.\n"
+printf "Executing container 1st time - start.\n"
 DB_USERS="testuser1 testuser2"
 DB_testuser1_PASSWORD="dummypw"
 
@@ -127,8 +128,29 @@ docker run \
 	"nafets227/finance:local" \
 	|| exit 1
 
-printf "Executing container end.\n"
+printf "Executing container 1st time - end.\n"
 
 # Now check is results are what we expected.
 test_dbsetup
 
+# Start our just built container another time
+printf "Executing container 2nd time - start.\n"
+
+export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
+export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
+docker run \
+	-e MYSQL_HOST \
+	-e MYSQL_DATABASE \
+	-e MYSQL_USER \
+	-e MYSQL_PASSWORD \
+	-e MYSQL_ROOT_PASSWORD \
+	-e DB_USERS \
+	-e DB_testuser1_PASSWORD \
+	-v $(pwd)/testdata:/finance \
+	"nafets227/finance:local" \
+	|| exit 1
+
+printf "Executing container 2nd time - end.\n"
+
+# database should be still the same
+test_dbsetup
