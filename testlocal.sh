@@ -105,10 +105,7 @@ setup_testdb
 # prepare the filesystem (make it empty)
 test -d ./testdata  && rm -rf ./testdata
 mkdir ./testdata
-if [ -e /etc/hbci.pinfile ] ; then
-	printf "copying hbci.pinfile from /etc\n"
-	cp /etc/hbci.pinfile ./testdata/.hbci-pinfile
-fi   	
+cp .hbci-pinfile ./testdata/.hbci-pinfile || exit 1
 
 # Start our just built container
 printf "Executing container 1st time - start.\n"
