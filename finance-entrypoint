@@ -319,6 +319,11 @@ function import_handleDir
 	# get type from Extension
 	ftype=${scandir##*.}
 
+	# Create target directory if it does not exist
+	if [ ! -z $moveTo ] && [ ! -d $moveTo.$ftype ] ; then
+		mkdir $moveTo.$ftype || return 1
+	fi
+
 	for f in `ls -d $scandir/* 2>/dev/null`; do
 		case $ftype in 
 			aqb-tran | aqb-bal | aqm | btx)
@@ -326,7 +331,8 @@ function import_handleDir
 					printf "Importing file %s\n" "$f"
 					fntxt2sql \
 						-$ftype \
-						-f $f-mysql \
+						-f $f \
+						-mysql \
 						-mysql_host $MYSQL_HOST \
 						-mysql_database $MYSQL_DATABASE \
 						-mysql_user $MYSQL_USER \
@@ -343,7 +349,8 @@ function import_handleDir
 					printf "Importing HBCI directory %s\n" "$f"
 					$fntxt2sql \
 						-$ftype \
-						-f $f-mysql \
+						-f $f \
+						-mysql \
 						-mysql_host $MYSQL_HOST \
 						-mysql_database $MYSQL_DATABASE \
 						-mysql_user $MYSQL_USER \
@@ -366,7 +373,8 @@ function import_handleDir
 		
 		if [ ! -z $moveTo ]; then
 			if [ "$rc" == 0 ]; then
-				mv --backup=numbered $f $moveTo.$ftype/
+				mv --backup=numbered $f $moveTo.$ftype/ || return 1
+				printf "Moved imported file %s to %s\n" "$f" "$moveTo.$ftype"
 			else
 				printf "Import of $f failed (RC=%s).\n" "$rc"
 			fi 
@@ -486,7 +494,7 @@ for f in $datadir/inbound.aqb/* ; do
     done
 
 printf "Importing transactions and balances into database (disabled)\n"
-#import
+import
 
 printf "Sending alert EMail (disabled)\n"
 #alert
