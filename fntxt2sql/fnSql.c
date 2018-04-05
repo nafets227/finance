@@ -178,6 +178,18 @@ const char * const * getCreateSql(void)
 	static char achTempGrantUser[sizeof(achGrantUser)+100] = "";
 	static char achTempGrantView[sizeof(achGrantView)+100] = "";
 
+
+	/* Grants from vSrv Install script:
+		GRANT SELECT ON dbFinance.* to stefan;
+		GRANT INSERT, UPDATE on dbFinance.fn_manual_entry TO stefan;
+		GRANT INSERT,UPDATE(katg3, datum_kor, katg3_betrag, katg2,
+							katg, katg2_betrag)
+			  ON dbFinance.fn_entry TO stefan;
+		GRANT SELECT ON dbFinance.* TO finance;
+		GRANT SELECT,INSERT ON dbFinance.fn_entry TO finance;
+	*/
+
+
 // @TODO: Neue Tabelle mit Grant erzeugen
 //  create view fn_manual_entry as select * from fn_entry where ORIG_KTONR="Bar";
 // grant insert, update on fn_manual_entry to stefan
