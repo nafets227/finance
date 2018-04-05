@@ -100,7 +100,7 @@ const char * const * getCreateSql(void)
 
 	static const char achCreView[] = "CREATE VIEW %s_cat AS "
 		"( SELECT "
-	        "ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(DATUM_KOR, VALUTA) AS DATUM, "
+			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(DATUM_KOR, VALUTA) AS DATUM, "
 			"WAEHRUNG, "
 			"BETRAG - IFNULL(KATG2_BETRAG, 0) - IFNULL(KATG3_BETRAG, 0) - "
 			         "IFNULL(KATG4_BETRAG, 0) - IFNULL(KATG5_BETRAG, 0) AS BETRAG, "
@@ -109,12 +109,12 @@ const char * const * getCreateSql(void)
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
 			"substring_index(KATG, '/', 1) AS KATG, "
-                        "substring_index(katg, '/', 1) as KATG_L1, "
-                        "substring_index(katg, '/', 2) as KATG_L2, "
-                        "substring_index(katg, '/', 3) as KATG_L3 "
+			"substring_index(KATG, '/', 1) AS KATG_L1, "
+			"substring_index(KATG, '/', 2) AS KATG_L2, "
+			"substring_index(KATG, '/', 3) AS KATG_L3 "
 			"FROM %s ) "
 		"UNION ( SELECT "
-	        "ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(DATUM_KOR, VALUTA) AS DATUM, "
+			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(DATUM_KOR, VALUTA) AS DATUM, "
 			"WAEHRUNG, "
 			"KATG2_BETRAG, "
 			"BUCHUNGS_SL, REFERENZ, GV_CODE, PART_NAME1, "
@@ -122,11 +122,11 @@ const char * const * getCreateSql(void)
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
 			"substring_index(KATG2, '/', 1) AS KATG, "
-                        "substring_index(katg2, '/', 1) as KATG_L1, "
-                        "substring_index(katg2, '/', 2) as KATG_L2, "
-                        "substring_index(katg2, '/', 3) as KATG_L3 "
+			"substring_index(KATG2, '/', 1) AS KATG_L1, "
+			"substring_index(KATG2, '/', 2) AS KATG_L2, "
+			"substring_index(KATG2, '/', 3) AS KATG_L3 "
 			"FROM %s "
-			"WHERE KATG2_BETRAG <> 0 AND KATG2_BETRAG IS NOT NULL) "
+			"WHERE KATG2_BETRAG <> 0 AND KATG2_BETRAG IS NOT NULL ) "
 		"UNION ( SELECT "
 	        "ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(DATUM_KOR, VALUTA) AS DATUM, "
 			"WAEHRUNG, "
@@ -136,9 +136,9 @@ const char * const * getCreateSql(void)
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
 			"substring_index(KATG3, '/', 1) AS KATG, "
-                        "substring_index(katg3, '/', 1) as KATG_L1, "
-                        "substring_index(katg3, '/', 2) as KATG_L2, "
-                        "substring_index(katg3, '/', 3) as KATG_L3 "
+			"substring_index(katg3, '/', 1) as KATG_L1, "
+			"substring_index(katg3, '/', 2) as KATG_L2, "
+			"substring_index(katg3, '/', 3) as KATG_L3 "
 			"FROM %s "
 			"WHERE KATG3_BETRAG <> 0 AND KATG3_BETRAG IS NOT NULL ) "
 		"UNION ( SELECT "
@@ -150,11 +150,11 @@ const char * const * getCreateSql(void)
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
 			"substring_index(KATG4, '/', 1) AS KATG, "
-                        "substring_index(katg4, '/', 1) as KATG_L1, "
-                        "substring_index(katg4, '/', 2) as KATG_L2, "
-                        "substring_index(katg4, '/', 3) as KATG_L3 "
+			"substring_index(katg4, '/', 1) as KATG_L1, "
+			"substring_index(katg4, '/', 2) as KATG_L2, "
+			"substring_index(katg4, '/', 3) as KATG_L3 "
 			"FROM %s "
-			"WHERE KATG4_BETRAG <> 0 AND KATG4_BETRAG IS NOT NULL) "
+			"WHERE KATG4_BETRAG <> 0 AND KATG4_BETRAG IS NOT NULL ) "
 		"UNION ( SELECT "
 	        "ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(DATUM_KOR, VALUTA) AS DATUM, "
 			"WAEHRUNG, "
@@ -164,20 +164,26 @@ const char * const * getCreateSql(void)
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
 			"substring_index(KATG5, '/', 1) AS KATG, "
-                        "substring_index(katg5, '/', 1) as KATG_L1, "
-                        "substring_index(katg5, '/', 2) as KATG_L2, "
-                        "substring_index(katg5, '/', 3) as KATG_L3 "
+			"substring_index(katg5, '/', 1) as KATG_L1, "
+			"substring_index(katg5, '/', 2) as KATG_L2, "
+			"substring_index(katg5, '/', 3) as KATG_L3 "
 			"FROM %s "
-			"WHERE KATG5_BETRAG <> 0 AND KATG5_BETRAG IS NOT NULL) ";
+			"WHERE KATG5_BETRAG <> 0 AND KATG5_BETRAG IS NOT NULL ) ";
 	static const char achGrantUser[] =
-			"GRANT SELECT, UPDATE (katg2, katg, katg2_betrag, datum_kor) ON %s TO fin_user";
+			"GRANT SELECT, UPDATE ( "
+				"DATUM_KOR, KATG, "
+				"KATG2, KATG2_BETRAG, "
+				"KATG3, KATG3_BETRAG, "
+				"KATG4, KATG4_BETRAG, "
+				"KATG5, KATG5_BETRAG "
+			") ON %s TO fin_user";
 	static const char achGrantView[] =
 			"GRANT SELECT on %s_cat TO fin_user";
+
 	static char achTempCreTab[sizeof(achCreTab)+100] = "";
 	static char achTempCreView[sizeof(achCreView)+100] = "";
 	static char achTempGrantUser[sizeof(achGrantUser)+100] = "";
 	static char achTempGrantView[sizeof(achGrantView)+100] = "";
-
 
 	/* Grants from vSrv Install script:
 		GRANT SELECT ON dbFinance.* to stefan;
@@ -189,14 +195,18 @@ const char * const * getCreateSql(void)
 		GRANT SELECT,INSERT ON dbFinance.fn_entry TO finance;
 	*/
 
-
-// @TODO: Neue Tabelle mit Grant erzeugen
-//  create view fn_manual_entry as select * from fn_entry where ORIG_KTONR="Bar";
-// grant insert, update on fn_manual_entry to stefan
+	/* Grants from existing database on 5.4.2018
+		GRANT USAGE ON *.* TO 'stefan'@'%' IDENTIFIED BY PASSWORD 'secret';                      |
+		GRANT SELECT ON `dbFinance`.* TO 'stefan'@'%';
+		GRANT INSERT, UPDATE (katg3, datum_kor, katg3_betrag, katg2, katg, katg2_betrag)
+			ON `dbFinance`.`fn_entry` TO 'stefan'@'%';
+		GRANT INSERT, UPDATE ON `dbFinance`.`fn_manual_entry` TO 'stefan'@'%'
+	 */
 
 	static char const * apchTempResult[] = {
 		achTempCreTab, achTempCreView,
-		achTempGrantUser, achTempGrantView, NULL};
+		achTempGrantUser, achTempGrantView,
+		NULL};
 
 	snprintf(achTempCreTab , sizeof(achTempCreTab ), achCreTab,
 		config.achSqlTabName);
@@ -206,7 +216,7 @@ const char * const * getCreateSql(void)
 	    config.achSqlTabName, config.achSqlTabName);
 	snprintf(achTempGrantUser , sizeof(achTempGrantUser ), achGrantUser,
 		config.achSqlTabName);
-	snprintf(achTempGrantView , sizeof(achTempGrantView ), achGrantView,
+	snprintf(achTempGrantView, sizeof(achTempGrantView), achGrantView,
 		config.achSqlTabName);
 
 	return apchTempResult;
