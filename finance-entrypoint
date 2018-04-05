@@ -387,12 +387,13 @@ function import_handleDir
 ##### Alert ##################################################################
 # send balance and transactions via EMail
 function alert () {
-	myaccounts="12345 98765"
-	
-	for a in $myaccounts ; do
+	export LC_ALL=C
+	export MAILRC=/dev/null
+
+	for a in $MAIL_ACCOUNTS ; do
 		
 		Saldo=$(
-		mysql -s dbFinance <<-EOF
+		$MYSQL_CMD -s <<-EOF
 		SELECT datum, betrag
 		  FROM fn_entry 
 		 WHERE buchart = 'E' AND
@@ -400,15 +401,26 @@ function alert () {
 		         datum = ( SELECT MAX(DATUM) from fn_entry where orig_ktonr='$a');
 		EOF
 		)
+		if [ "$?" != "0" ] ; then return 1 ; fi
 		
-		( mysql dbFinance <<-EOF
+		
+		( $MYSQL_CMD <<-EOF
 		SELECT datum, betrag, part_name1, vzweck1, vzweck2
 		  FROM fn_entry
 		 WHERE buchart='B' AND
 		       orig_ktonr='$a' AND
 		       datum >= DATE_SUB(CURDATE(), INTERVAL 7 DAY);
 		EOF
-		) | mail -s "Kontoinfos $a: $Saldo" -r "finance <no-reply@mydomain.tld>" recipient@mydomain.tld
+		) | mail \
+			-n -Sv15-compat -Ssendwait -Snosave -Sexpandaddr=fail,-all,+addr \
+			-S 'smtp-auth=none' \
+        	-S "smtp=$MAIL_URL" \
+			-s "Account-info $a: $Saldo" \
+			-r "$MAIL_FROM" $MAIL_TO \
+			|| return 1
+        	# -SNosave is included in -d and generates error messages - so dont include it
+        	# -n -d -vv -Sv15-compat -Ssendwait -Sexpandaddr=fail,-all,+addr
+
 	done
 
 	return 0
@@ -433,6 +445,19 @@ elif [ ! -r $datadir/.hbci-pinfile ] ; then
 	printf "File %s/.hbci-pinfile must exist and be readable.\n" \
 		"$datadir"
 	exit 1
+fi
+
+if [ ! -z "$MAIL_TO" ] ; then
+	if [ -z "$MAIL_FROM" ] ; then
+		printf "Variable MAIL_FROM needs to be set if using Alerting indicated by MAIL_TO\n"
+		exit 1
+	elif [ -z "$MAIL_URL" ] ; then
+		printf "Variable MAIL_URL needs to be set if using Alerting indicated by MAIL_TO\n"
+		exit 1
+	elif [ -z "$MAIL_ACCOUNTS" ] ; then
+		printf "Variable MAIL_ACCOUNTS needs to be set if using Alerting indicated by MAIL_TO\n"
+		exit 1
+	fi
 fi
 
 MYSQL_CMD="mysql"
@@ -493,10 +518,12 @@ for f in $datadir/inbound.aqb/* ; do
     mv $f $datadir/store.aqb 
     done
 
-printf "Importing transactions and balances into database (disabled)\n"
-import
+printf "Importing transactions and balances into database\n"
+import || exit 1
 
-printf "Sending alert EMail (disabled)\n"
-#alert
+if [ ! -z "$MAIL_TO" ] ; then
+	printf "Sending alert EMail\n"
+	alert || exit 1
+fi
 
 exit 0

@@ -14,6 +14,7 @@ RUN \
         intltool \
         make \
         mariadb-clients \
+        s-nail \
         && \
     paccache -r -k0 && \
     rm -rf /usr/share/man/* && \

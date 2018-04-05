@@ -49,6 +49,10 @@ Typically the database is accessed from a database tool like Microsoft Access. I
 from accidently modifying any bookings their access rights are restricted. You need to list all userIDs in 
 the Environment variable DB_USERS, then start the container and it will grant the restricted rights.
 
+##Alerting
+If MAIL_TO is set, every run will send the bookings of the last 7 days plus the current balance ot MAIL_ACCOUNTS to MAIL_TO.
+The delivery will be based on SMTP to MAIL_URL. Authentication to the mail server is not yet supported.
+
 ## Environment Variables
 * MYSQL_HOST gives the DNS name or IP adress of the host that holds the database.
 * MYSQL_DATABASE name of the database
@@ -56,6 +60,10 @@ the Environment variable DB_USERS, then start the container and it will grant th
 * MYSQL_PASSWORD Password to connect to the database
 * DB_USERS List of users that should have "normal" access to the database
 * DB_xxx_PASSWORD password to set for user xxx. xxx must be in the DB_USERS
+* MAIL_TO Recipient(s) of Alerting E-Mails. If set, it also activates the alerting feature. 
+* MAIL_FROM sender of the Alerting E-Mails
+* MAIL_ACCOUNTS account numbers, separated by blanks, to be alerted.
+* MAIL_URL Server where to deliver the Alerting E-Mails like 'smtp[s]://user:password@some.host:port' 
 
 ## Advanced features
 fntxt2sql program supports more than mySql targets, have a look into its C sourceode. However, the scripts of this
