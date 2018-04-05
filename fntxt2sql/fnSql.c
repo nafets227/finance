@@ -98,7 +98,7 @@ const char * const * getCreateSql(void)
 		"INDEX (KATG5)"
 		") CHARSET=utf8";
 
-	static const char achCreView[] = "CREATE VIEW %s_cat AS "
+	static const char achCreViewCat[] = "CREATE VIEW %s_cat AS "
 		"( SELECT "
 			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(DATUM_KOR, VALUTA) AS DATUM, "
 			"WAEHRUNG, "
@@ -108,6 +108,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
+		// @TODO: use full KATG field includding slashed
 			"substring_index(KATG, '/', 1) AS KATG, "
 			"substring_index(KATG, '/', 1) AS KATG_L1, "
 			"substring_index(KATG, '/', 2) AS KATG_L2, "
@@ -121,6 +122,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
+		// @TODO: use full KATG field includding slashed
 			"substring_index(KATG2, '/', 1) AS KATG, "
 			"substring_index(KATG2, '/', 1) AS KATG_L1, "
 			"substring_index(KATG2, '/', 2) AS KATG_L2, "
@@ -135,6 +137,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
+		// @TODO: use full KATG field includding slashed
 			"substring_index(KATG3, '/', 1) AS KATG, "
 			"substring_index(katg3, '/', 1) as KATG_L1, "
 			"substring_index(katg3, '/', 2) as KATG_L2, "
@@ -149,6 +152,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
+		// @TODO: use full KATG field includding slashed
 			"substring_index(KATG4, '/', 1) AS KATG, "
 			"substring_index(katg4, '/', 1) as KATG_L1, "
 			"substring_index(katg4, '/', 2) as KATG_L2, "
@@ -163,13 +167,19 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
+		// @TODO: use full KATG field includding slashed
 			"substring_index(KATG5, '/', 1) AS KATG, "
 			"substring_index(katg5, '/', 1) as KATG_L1, "
 			"substring_index(katg5, '/', 2) as KATG_L2, "
 			"substring_index(katg5, '/', 3) as KATG_L3 "
 			"FROM %s "
 			"WHERE KATG5_BETRAG <> 0 AND KATG5_BETRAG IS NOT NULL ) ";
-	static const char achGrantUser[] =
+	static const char achCreViewManual[] = "CREATE VIEW %s_manual AS "
+		"SELECT * "
+			"FROM %s "
+			"WHERE ORIG_KTONR = 'Bar' ";
+
+	static const char achGrantTab[] =
 			"GRANT SELECT, UPDATE ( "
 				"DATUM_KOR, KATG, "
 				"KATG2, KATG2_BETRAG, "
@@ -177,13 +187,17 @@ const char * const * getCreateSql(void)
 				"KATG4, KATG4_BETRAG, "
 				"KATG5, KATG5_BETRAG "
 			") ON %s TO fin_user";
-	static const char achGrantView[] =
+	static const char achGrantViewCat[] =
 			"GRANT SELECT on %s_cat TO fin_user";
+	static const char achGrantViewManual[] =
+			"GRANT SELECT,INSERT,UPDATE on %s_manual TO fin_user";
 
 	static char achTempCreTab[sizeof(achCreTab)+100] = "";
-	static char achTempCreView[sizeof(achCreView)+100] = "";
-	static char achTempGrantUser[sizeof(achGrantUser)+100] = "";
-	static char achTempGrantView[sizeof(achGrantView)+100] = "";
+	static char achTempCreViewCat[sizeof(achCreViewCat)+100] = "";
+	static char achTempCreViewManual[sizeof(achCreViewManual)+100] = "";
+	static char achTempGrantTab[sizeof(achGrantTab)+100] = "";
+	static char achTempGrantViewCat[sizeof(achGrantViewCat)+100] = "";
+	static char achTempGrantViewManual[sizeof(achGrantViewManual)+100] = "";
 
 	/* Grants from vSrv Install script:
 		GRANT SELECT ON dbFinance.* to stefan;
@@ -204,19 +218,23 @@ const char * const * getCreateSql(void)
 	 */
 
 	static char const * apchTempResult[] = {
-		achTempCreTab, achTempCreView,
-		achTempGrantUser, achTempGrantView,
+		achTempCreTab, achTempCreViewCat, achTempCreViewManual,
+		achTempGrantTab, achTempGrantViewCat, achTempGrantViewManual,
 		NULL};
 
 	snprintf(achTempCreTab , sizeof(achTempCreTab ), achCreTab,
 		config.achSqlTabName);
-	snprintf(achTempCreView, sizeof(achTempCreView), achCreView,
+	snprintf(achTempCreViewCat, sizeof(achTempCreViewCat), achCreViewCat,
 		config.achSqlTabName, config.achSqlTabName,
 	    config.achSqlTabName, config.achSqlTabName,
 	    config.achSqlTabName, config.achSqlTabName);
-	snprintf(achTempGrantUser , sizeof(achTempGrantUser ), achGrantUser,
+	snprintf(achTempCreViewManual , sizeof(achTempCreViewManual ), achCreViewManual,
+	    config.achSqlTabName, config.achSqlTabName);
+	snprintf(achTempGrantTab , sizeof(achTempGrantTab ), achGrantTab,
 		config.achSqlTabName);
-	snprintf(achTempGrantView, sizeof(achTempGrantView), achGrantView,
+	snprintf(achTempGrantViewCat, sizeof(achTempGrantViewCat), achGrantViewCat,
+		config.achSqlTabName);
+	snprintf(achTempGrantViewManual, sizeof(achTempGrantViewManual), achGrantViewManual,
 		config.achSqlTabName);
 
 	return apchTempResult;
