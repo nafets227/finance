@@ -92,9 +92,9 @@ if [ -z "$MAIL_URL" ] && [ ! -z "$BASEURL" ] ; then
 	printf "Using BASEURL %s for MAIL_URL => %s\n" "$BASEURL" "$MAIL_URL"
 fi
 
-if [ -z "$TEST_MAIL_HELO" ] && [ ! -z "$BASEURL" ] ; then
-	TEST_MAIL_HELO="finance-testlocal.${BASEURL#www.}"
-	printf "Using BASEURL %s for MAIL_URL => %s\n" "$BASEURL" "$MAIL_URL"
+if [ -z "$MAIL_HOSTNAME" ] && [ ! -z "$BASEURL" ] ; then
+	MAIL_HOSTNAME="finance-testlocal.${BASEURL#www.}"
+	printf "Using BASEURL %s for MAIL_URL => %s\n" "$BASEURL" "$MAIL_HOSTNAME"
 fi
 
 
@@ -125,12 +125,7 @@ DB_testuser1_PASSWORD="dummypw"
 
 export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
 export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
-export MAIL_TO MAIL_FROM MAIL_URL MAIL_ACCOUNTS
-if [ -z "$TEST_MAIL_HELO" ] ; then
-	DOCKER_ARG_MAILHELO=""
-else
-	DOCKER_ARG_MAILHELO="--hostname $TEST_MAIL_HELO"
-fi
+export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
 docker run \
 	-e MYSQL_HOST \
 	-e MYSQL_DATABASE \
@@ -142,9 +137,9 @@ docker run \
 	-e MAIL_TO \
 	-e MAIL_FROM \
 	-e MAIL_URL \
+	-e MAIL_HOSTNAME \
 	-e MAIL_ACCOUNTS \
 	-v $(pwd)/testdata:/finance \
-	$DOCKER_ARG_MAILHELO \
 	"nafets227/finance:local" \
 	|| exit 1
 
@@ -169,9 +164,9 @@ docker run \
 	-e MAIL_TO \
 	-e MAIL_FROM \
 	-e MAIL_URL \
+	-e MAIL_HOSTNAME \
 	-e MAIL_ACCOUNTS \
 	-v $(pwd)/testdata:/finance \
-	$DOCKER_ARG_MAILHELO \
 	"nafets227/finance:local" \
 	|| exit 1
 

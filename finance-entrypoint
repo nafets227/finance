@@ -415,6 +415,7 @@ function alert () {
 			-n -Sv15-compat -Ssendwait -Snosave -Sexpandaddr=fail,-all,+addr \
 			-S 'smtp-auth=none' \
         	-S "smtp=$MAIL_URL" \
+        	-S "hostname=$MAIL_HOSTNAME" \
 			-s "Account-info $a: $Saldo" \
 			-r "$MAIL_FROM" $MAIL_TO \
 			|| return 1
@@ -457,6 +458,9 @@ if [ ! -z "$MAIL_TO" ] ; then
 	elif [ -z "$MAIL_ACCOUNTS" ] ; then
 		printf "Variable MAIL_ACCOUNTS needs to be set if using Alerting indicated by MAIL_TO\n"
 		exit 1
+	fi
+	if [ -z "$MAIL_HOSTNAME" ] ; then
+		MAIL_HOSTNAME="$(hostname)"
 	fi
 fi
 
