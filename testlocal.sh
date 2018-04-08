@@ -56,6 +56,7 @@ function setup_testdb () {
 		GRANT select ON $MYSQL_DATABASE.* TO testusershouldbedeleted;
 		DROP TABLE IF EXISTS fn_entry;
 		DROP VIEW IF EXISTS fn_entry_cat;
+		DROP VIEW IF EXISTS fn_entry_manual;
 		DROP USER IF EXISTS testuser1;
 		DROP USER IF EXISTS testuser2;
 		EOF
