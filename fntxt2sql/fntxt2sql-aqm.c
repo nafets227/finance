@@ -124,6 +124,7 @@ int processAqmBuchung(const AqmBuchung aqmBuchung)
 {
 	char *pc = (char*)aqmBuchung.vzweck;
 	int i = 0;
+	int iRc;
 	Buchung buchung;
 
 	debug_printf(dbg_in, "processAqmBuchung.\n");
@@ -163,9 +164,9 @@ int processAqmBuchung(const AqmBuchung aqmBuchung)
 			buchung.betrag, buchung.waehrung, buchung.datum,
 			buchung.gv_code, buchung.primanota);
 
-	writeRecord(buchung);
+	iRc = writeRecord(buchung);
 
-	return 0;
+	return iRc;
 }
 
 //****************************************************************************

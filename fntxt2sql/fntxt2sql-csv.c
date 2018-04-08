@@ -137,6 +137,7 @@ int parseCsv(char *pchBuffer, CsvBuchung *csvBuchung)
 int processCsvSaldo(const CsvBuchung csvBuchung)
 {
 	Buchung buchung;
+	int iRc;
 
 	memset(&buchung, '\0', sizeof(buchung));
 
@@ -154,9 +155,9 @@ int processCsvSaldo(const CsvBuchung csvBuchung)
 	debug_printf(dbg_fld, "Schlussssaldo %+9.2f %s %s\n",
 			buchung.betrag, buchung.waehrung, buchung.datum);
 
-	writeRecord(buchung);
+	iRc = writeRecord(buchung);
 
-	return 0;
+	return iRc;
 }
 
 //****************************************************************************
@@ -211,6 +212,7 @@ int processCsvText(const char * pchVZweck, Buchung *pBuchung)
 int processCsvBuchung(const CsvBuchung csvBuchung)
 {
 	Buchung buchung;
+	int iRc;
 
 	debug_printf(dbg_in, "processCsvBuchung.\n");
 
@@ -231,9 +233,9 @@ int processCsvBuchung(const CsvBuchung csvBuchung)
 	debug_printf(dbg_fld, "Buchung %+9.2f %s %s %s\n",
 			buchung.betrag, buchung.waehrung, buchung.datum, buchung.vzweck[0]);
 
-	writeRecord(buchung);
+	iRc = writeRecord(buchung);
 
-	return 0;
+	return iRc;
 }
 
 //****************************************************************************

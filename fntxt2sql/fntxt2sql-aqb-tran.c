@@ -211,6 +211,7 @@ int processAqbBuchung(const AqbBuchung aqbBuchung)
 {
 	const char *pc = (const char*)0; 
 	int i = 0;
+	int iRc;
 	Buchung buchung;
 
 	debug_printf(dbg_in, "processAqbBuchung.\n");
@@ -242,9 +243,9 @@ int processAqbBuchung(const AqbBuchung aqbBuchung)
 			buchung.betrag, buchung.waehrung, buchung.datum,
 			buchung.gv_code, buchung.primanota);
 
-	writeRecord(buchung);
+	iRc = writeRecord(buchung);
 
-	return 0;
+	return iRc;
 }
 
 //****************************************************************************

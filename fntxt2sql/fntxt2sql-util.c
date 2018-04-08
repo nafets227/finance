@@ -537,7 +537,7 @@ int createTable(void)
 		for(i = 0; ppchStmts[i] != NULL; i++)
 		{
 			iRc = createMysqlTable(ppchStmts[i]);
-			if (iRc < 0)
+			if (iRc != 0)
 				break;
 		}
 		break;

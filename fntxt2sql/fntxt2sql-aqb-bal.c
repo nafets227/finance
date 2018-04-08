@@ -115,13 +115,15 @@ static int parseAqbBal(char *pchBuffer, Buchung *pBuchung)
 //****************************************************************************
 static int processAqbBal(const Buchung buchung)
 {
+	int iRc;
+
 	debug_printf(dbg_fld, "Saldo %+9.2f %s %s %s %s\n",
 			buchung.betrag, buchung.waehrung, buchung.datum,
 			buchung.gv_code, buchung.primanota);
 
-	writeRecord(buchung);
+	iRc = writeRecord(buchung);
 
-	return 0;
+	return iRc;
 
 }
 

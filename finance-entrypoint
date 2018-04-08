@@ -116,7 +116,7 @@ dbsetup_tables () {
 	
 	if [ "$dbexist" == "0" ] ; then
 		printf "Database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
-	fntxt2sql -cre -mysql \
+		fntxt2sql -cre -mysql \
 			-mysql_host $MYSQL_HOST \
 			-mysql_database $MYSQL_DATABASE \
 			-mysql_user $MYSQL_USER \
