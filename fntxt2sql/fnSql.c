@@ -260,24 +260,6 @@ const char * const * getCreateSql(void)
 	static char achTempGrantViewManual[sizeof(achGrantViewManual)+sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantViewBalance[sizeof(achGrantViewBalance)+sizeof(config.achSqlTabName)] = "";
 
-	/* Grants from vSrv Install script:
-		GRANT SELECT ON dbFinance.* to stefan;
-		GRANT INSERT, UPDATE on dbFinance.fn_manual_entry TO stefan;
-		GRANT INSERT,UPDATE(katg3, datum_kor, katg3_betrag, katg2,
-							katg, katg2_betrag)
-			  ON dbFinance.fn_entry TO stefan;
-		GRANT SELECT ON dbFinance.* TO finance;
-		GRANT SELECT,INSERT ON dbFinance.fn_entry TO finance;
-	*/
-
-	/* Grants from existing database on 5.4.2018
-		GRANT USAGE ON *.* TO 'stefan'@'%' IDENTIFIED BY PASSWORD 'secret';                      |
-		GRANT SELECT ON `dbFinance`.* TO 'stefan'@'%';
-		GRANT INSERT, UPDATE (katg3, datum_kor, katg3_betrag, katg2, katg, katg2_betrag)
-			ON `dbFinance`.`fn_entry` TO 'stefan'@'%';
-		GRANT INSERT, UPDATE ON `dbFinance`.`fn_manual_entry` TO 'stefan'@'%'
-	 */
-
 	static char const * apchTempResult[] = {
 		achTempCreTab, achTempCreViewCat, achTempCreViewManual, achTempCreViewBalance,
 		achTempGrantTab, achTempGrantViewCat, achTempGrantViewManual, achTempGrantViewBalance,
