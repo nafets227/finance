@@ -8,18 +8,6 @@
 #ifdef CONF_MYSQL	// Mysql konfiguriert
 #include <mysql/mysql.h>
 
-static const char *SRC_ID(void)
-{
-	static char achUtilID[256] = "";
-
-	if(achUtilID[0] == '\0')
-		strcpy(achUtilID, makeSourceDesc(
-				"$RCSfile: fntxt2sql-mysql.c,v $",
-		"$Revision: 1.12 $)"));
-	return achUtilID;
-}
-
-
 static MYSQL * pMysqlConn = NULL;
 
 static void printMysqlError(MYSQL * conn)
@@ -31,18 +19,23 @@ static void printMysqlError(MYSQL * conn)
 //****************************************************************************
 //***** Mysql initialisieren *************************************************
 //****************************************************************************
-int initMysql(const char const *pchHost, const char const *pchDb, const char *pchUser, const char *pchPassword)
+int initMysql(const char * const pchHost, const char * const pchDbParm,
+		const char * const pchUser, const char * const pchPassword)
 {
 	MYSQL *conn = NULL;
 	char *pchSocket;
+	const char *pchDb;
 	int iPort, iCliFlags;
 
 	conn = mysql_init(NULL);
 	if(conn == NULL)
 	{ fprintf(stderr, "Error in mysql_Init\n"); return -1; }
 
-	if (!pchDb || ! *pchDb)
+	if (!pchDbParm || ! *pchDbParm)
 		pchDb = "dbFinance";
+	else
+		pchDb = pchDbParm;
+
 	pchSocket = NULL;
 	iPort = 0;
 	iCliFlags = 0;
@@ -84,10 +77,6 @@ static int execSql(const char *pchStmt, MYSQL_RES ** ppResult)
 {
 	MYSQL_RES *pResult= NULL;
 	int iRc;
-
-	// JUst to prohibit compiler warning about unused SRC_ID
-	const char *pchTest = SRC_ID();
-	pchTest = NULL;
 
 	iRc = mysql_query(pMysqlConn, pchStmt);
 	debug_printf(dbg_sql, "DebugSQL: RC=%d \"%s\"\n", iRc, pchStmt);

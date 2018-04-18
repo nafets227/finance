@@ -164,7 +164,7 @@ static int hbci_comp_Textblk2(const void *pv1, const void*pv2)
 
 
 #define HBCI_ERR_WRONG_TYPE(value, expected)	 \
-	fprintf(stderr, #value " (%d) != " #expected " (%d)\n",(int)value, (int)expected)
+	fprintf(stderr, #value " (%d) != " #expected " (%d)\n",(int)(value->type), (int)expected)
 
 static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung, 
 		TextBlk *pTextBlk, long lCountTextBlk)
@@ -381,7 +381,7 @@ static int hbci_convertTextblk(pxval_t **pxValues, TextBlk *pTextBlk)
 
 	//  nZeile integer,
 	if(pxValues[5]->type != pxfShort || pxValues[5]->isnull != 0)
-	{ HBCI_ERR_WRONG_TYPE(pxValues[5]->type, pxfShort);  return -1;}
+	{ HBCI_ERR_WRONG_TYPE(pxValues[5], pxfShort);  return -1;}
 	debug_printf(dbg_fld, "nZeile: %d\n", (int)pxValues[5]->value.lval);
 	pTextBlk->nZeile = pxValues[5]->value.lval;
 

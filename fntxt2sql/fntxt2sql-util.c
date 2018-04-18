@@ -132,7 +132,7 @@ static void normalizeNum(char *pText, size_t size /* incl. termination \0 */)
 // Das hat aber nicht ausreichend geholfen.
 // Insbesondere bei SEPA Gutschriften des Kindergelds in 2013 meldet die
 // HVB ab 2014 einen Blank wo vorher keiner war.
-static void trimText( const char const * pchSource, char *pchDest )
+static void trimText( const char * const pchSource, char *pchDest )
 {
 	const char *pchActSource = pchSource;
 	char * pchActDest = pchDest;

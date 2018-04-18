@@ -216,7 +216,7 @@ int processCsvBuchung(const CsvBuchung csvBuchung)
 
 	debug_printf(dbg_in, "processCsvBuchung.\n");
 
-	memset(&buchung, sizeof(buchung), '\0');
+	memset(&buchung, '\0', sizeof(buchung));
 
 	buchung.buchart = 'B';
 	buchung.betrag = makeBetrag(csvBuchung.betrag);

@@ -192,12 +192,12 @@ const char * const * getCreateSql(void)
 	static const char achGrantViewManual[] =
 			"GRANT SELECT,INSERT,UPDATE on %s_manual TO fin_user";
 
-	static char achTempCreTab[sizeof(achCreTab)+100] = "";
-	static char achTempCreViewCat[sizeof(achCreViewCat)+100] = "";
-	static char achTempCreViewManual[sizeof(achCreViewManual)+100] = "";
-	static char achTempGrantTab[sizeof(achGrantTab)+100] = "";
-	static char achTempGrantViewCat[sizeof(achGrantViewCat)+100] = "";
-	static char achTempGrantViewManual[sizeof(achGrantViewManual)+100] = "";
+	static char achTempCreTab[sizeof(achCreTab)+sizeof(config.achSqlTabName)] = "";
+	static char achTempCreViewCat[sizeof(achCreViewCat)+6*sizeof(config.achSqlTabName)] = "";
+	static char achTempCreViewManual[sizeof(achCreViewManual)+2*sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantTab[sizeof(achGrantTab)+sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantViewCat[sizeof(achGrantViewCat)+sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantViewManual[sizeof(achGrantViewManual)+sizeof(config.achSqlTabName)] = "";
 
 	/* Grants from vSrv Install script:
 		GRANT SELECT ON dbFinance.* to stefan;

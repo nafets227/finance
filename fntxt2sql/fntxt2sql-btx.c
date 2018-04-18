@@ -29,7 +29,7 @@ static const char *pchBtxBuffer = NULL;
 static int        iBtxBufferLen = 0; 
 static int		  iBtxBufferPos = 0;
 
-static const char const *getLine()
+static const char * const getLine()
 {
 
 	char const *pch = NULL;
@@ -58,7 +58,7 @@ static void rewindLine()
 //****************************************************************************
 //***** Satz mit Auftragsreferenznummer bearbeiten ***************************
 //****************************************************************************
-int processAuftragsRef(const char const *pchBuffer)
+int processAuftragsRef(const char * const pchBuffer)
 {
 	// Dieses feld wird ignoriert.
 	debug_printf(dbg_fld, "AufRef %s\n", pchBuffer);
@@ -68,7 +68,7 @@ int processAuftragsRef(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Auftragsreferenznummer bearbeiten ***************************
 //****************************************************************************
-int processBezugsRef(const char const *pchBuffer)
+int processBezugsRef(const char * const pchBuffer)
 {
 	// Diese feld wird ignoriert.
 	debug_printf(dbg_fld, "BezRef %s\n", pchBuffer);
@@ -78,7 +78,7 @@ int processBezugsRef(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Auftragsreferenznummer bearbeiten ***************************
 //****************************************************************************
-int processKontobezeichnung(const char const *pchBuffer)
+int processKontobezeichnung(const char * const pchBuffer)
 {
 	if(pchBuffer[8] == '/')	// Durch / getrennte BLZ und KtoNr
 	{
@@ -114,7 +114,7 @@ int processKontobezeichnung(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Auftragsreferenznummer bearbeiten ***************************
 //****************************************************************************
-int processAuszugsnummer(const char const *pchBuffer)
+int processAuszugsnummer(const char * const pchBuffer)
 {
 	debug_printf(dbg_fld, "AuszNr %s\n", pchBuffer);
 	return 0;
@@ -123,7 +123,7 @@ int processAuszugsnummer(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Auftragsreferenznummer bearbeiten ***************************
 //****************************************************************************
-int processAnfangssaldo(const char const *pchBuffer)
+int processAnfangssaldo(const char * const pchBuffer)
 {
 	char achBuffer[32];
 	int rc;
@@ -175,7 +175,7 @@ int processAnfangssaldo(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Auftragsreferenznummer bearbeiten ***************************
 //****************************************************************************
-int processUmsatz(const char const *pchBuffer)
+int processUmsatz(const char * const pchBuffer)
 {
 	/* 	960902
 	0902
@@ -307,7 +307,7 @@ oder
 //****************************************************************************
 //***** Einzelnes Mehrzweck-Feld bearbeiten **********************************
 //****************************************************************************
-int processMehrzweckPart(const char const *pchBuffer)
+int processMehrzweckPart(const char * const pchBuffer)
 {
 	int iFeldNr = 	(pchBuffer[0] - '0') * 10 +
 	(pchBuffer[1] - '0') * 1;
@@ -421,7 +421,7 @@ int processMehrzweckPart(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Mehrzweck-Feld bearbeiten ***********************************
 //****************************************************************************
-int processMehrzweck(const char const *pchBuffer)
+int processMehrzweck(const char * const pchBuffer)
 {
 	char achMzwBuffer[350 + 1];
 	char *pchSource;
@@ -464,7 +464,7 @@ int processMehrzweck(const char const *pchBuffer)
 //****************************************************************************
 //***** Einzelnes ComDirect-Mehrzweck-Feld bearbeiten ************************
 //****************************************************************************
-int processComDirPart(const char const *pchBuffer)
+int processComDirPart(const char * const pchBuffer)
 {
 	int iFeldNr = 	(pchBuffer[0] - '0') * 10 +
 	(pchBuffer[1] - '0') * 1;
@@ -531,7 +531,7 @@ int processComDirPart(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit ComDirect Buchungstext bearbeiten ***************************
 //****************************************************************************
-int processComDirText(const char const *pchBuffer)
+int processComDirText(const char * const pchBuffer)
 {
 	char achCDirBuffer[350 + 1];
 	char const *pch;
@@ -570,7 +570,7 @@ int processComDirText(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Schlusssalso bearbeiten *************************************
 //****************************************************************************
-int processSchlusssaldo(const char const *pchBuffer)
+int processSchlusssaldo(const char * const pchBuffer)
 {
 	char achBuffer[32];
 	int rc;
@@ -621,7 +621,7 @@ int processSchlusssaldo(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Zwischensaldo bearbeiten ************************************
 //****************************************************************************
-int processZwischensaldo(const char const *pchBuffer)
+int processZwischensaldo(const char * const pchBuffer)
 {
 	char achBuffer[32];
 	int rc;
@@ -672,7 +672,7 @@ int processZwischensaldo(const char const *pchBuffer)
 //****************************************************************************
 //***** Satz mit Auftragsreferenznummer bearbeiten ***************************
 //****************************************************************************
-int processValSaldo(const char const *pchBuffer)
+int processValSaldo(const char * const pchBuffer)
 {
 	//	strncpy(buchung.origkto, pchBuffer, sizeof(buchung.origkto)-1);
 	debug_printf(dbg_fld, "ValSaldo %s\n", pchBuffer);
@@ -704,7 +704,7 @@ int processEndBuchung()
 //****************************************************************************
 //***** Einen Satz einer Btx-Txt Datei behandeln *****************************
 //****************************************************************************
-static int processBtxRecord(const char const * pchBuffer)
+static int processBtxRecord(const char * const pchBuffer)
 {
 	debug_printf(dbg_in, "processBtxRecord(\"%s\")\n", pchBuffer);
 
