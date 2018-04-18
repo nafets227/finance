@@ -57,6 +57,7 @@ function setup_testdb () {
 		DROP TABLE IF EXISTS fn_entry;
 		DROP VIEW IF EXISTS fn_entry_cat;
 		DROP VIEW IF EXISTS fn_entry_manual;
+		DROP VIEW IF EXISTS fn_entry_balance;
 		DROP USER IF EXISTS testuser1;
 		DROP USER IF EXISTS testuser2;
 		EOF

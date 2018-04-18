@@ -178,6 +178,63 @@ const char * const * getCreateSql(void)
 		"SELECT * "
 			"FROM %s "
 			"WHERE ORIG_KTONR = 'Bar' ";
+	static const char achCreViewBalance[] = "CREATE VIEW %s_balance AS "
+		"SELECT "
+			"ORIG_KTONR, JAHR, MONAT, "
+			"SALDO_DAY, SALDO, SALDO + "
+			"(	SELECT ifnull(sum(s1.betrag),0) "
+				"FROM fn_entry s1 "
+				"WHERE "
+					"s1.orig_ktonr=l0.orig_ktonr "
+	       			"AND s1.datum_kor is not null "
+					"AND s1.datum_kor <= l0.saldo_day "
+					"AND s1.datum > l0.saldo_day "
+				") - ("
+				"SELECT ifnull(sum(s2.betrag),0) "
+				"FROM fn_entry s2 "
+				"WHERE "
+					"s2.orig_ktonr=l0.orig_ktonr "
+					"AND s2.datum_kor is not null "
+					"AND s2.datum_kor > l0.saldo_day "
+					"AND s2.datum <= l0.saldo_day "
+				") as saldo_corrected "
+		"FROM ( "
+			"SELECT DISTINCT "
+				"orig_ktonr, "
+				"year(datum) as jahr, "
+				"month(datum) as monat, "
+				"last_value(datum) OVER ( "
+					"partition by orig_ktonr, jahr, monat "
+	       			"order by orig_ktonr, datum, buchart desc "
+					"rows between unbounded preceding and unbounded following "
+					") as saldo_day, "
+				"last_value(saldo) OVER ( "
+					"partition by orig_ktonr, jahr, monat "
+	       			"order by orig_ktonr, datum, buchart desc "
+					"rows between unbounded preceding and unbounded following "
+					") as saldo "
+			"FROM ( "
+				"SELECT "
+					"*, "
+					"sum(betrag) OVER ( "
+						"partition by orig_ktonr, saldo_partition "
+		       			"order by orig_ktonr, datum, buchart desc "
+						"rows between unbounded preceding and current row "
+						") as saldo "
+				"FROM ( "
+					"SELECT "
+						"*, "
+						"sum(if(buchart='E',1,0)) OVER ( "
+							"partition by orig_ktonr "
+							"order by orig_ktonr, datum, buchart desc "
+							") as saldo_partition "
+					"FROM %s "
+					"WHERE buchart='B' OR weekday(datum) = 5 "
+					") as l2 "
+				") as l1 "
+			"ORDER BY orig_ktonr, datum, buchart desc "
+			") as l0 "
+		"ORDER BY orig_ktonr, jahr, monat";
 
 	static const char achGrantTab[] =
 			"GRANT SELECT, UPDATE ( "
@@ -191,13 +248,17 @@ const char * const * getCreateSql(void)
 			"GRANT SELECT on %s_cat TO fin_user";
 	static const char achGrantViewManual[] =
 			"GRANT SELECT,INSERT,UPDATE on %s_manual TO fin_user";
+	static const char achGrantViewBalance[] =
+			"GRANT SELECT on %s_balance TO fin_user";
 
 	static char achTempCreTab[sizeof(achCreTab)+sizeof(config.achSqlTabName)] = "";
 	static char achTempCreViewCat[sizeof(achCreViewCat)+6*sizeof(config.achSqlTabName)] = "";
 	static char achTempCreViewManual[sizeof(achCreViewManual)+2*sizeof(config.achSqlTabName)] = "";
+	static char achTempCreViewBalance[sizeof(achCreViewBalance)+2*sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantTab[sizeof(achGrantTab)+sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantViewCat[sizeof(achGrantViewCat)+sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantViewManual[sizeof(achGrantViewManual)+sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantViewBalance[sizeof(achGrantViewBalance)+sizeof(config.achSqlTabName)] = "";
 
 	/* Grants from vSrv Install script:
 		GRANT SELECT ON dbFinance.* to stefan;
@@ -218,8 +279,8 @@ const char * const * getCreateSql(void)
 	 */
 
 	static char const * apchTempResult[] = {
-		achTempCreTab, achTempCreViewCat, achTempCreViewManual,
-		achTempGrantTab, achTempGrantViewCat, achTempGrantViewManual,
+		achTempCreTab, achTempCreViewCat, achTempCreViewManual, achTempCreViewBalance,
+		achTempGrantTab, achTempGrantViewCat, achTempGrantViewManual, achTempGrantViewBalance,
 		NULL};
 
 	snprintf(achTempCreTab , sizeof(achTempCreTab ), achCreTab,
@@ -230,11 +291,15 @@ const char * const * getCreateSql(void)
 	    config.achSqlTabName, config.achSqlTabName);
 	snprintf(achTempCreViewManual , sizeof(achTempCreViewManual ), achCreViewManual,
 	    config.achSqlTabName, config.achSqlTabName);
+	snprintf(achTempCreViewBalance , sizeof(achTempCreViewBalance ), achCreViewBalance,
+	    config.achSqlTabName, config.achSqlTabName);
 	snprintf(achTempGrantTab , sizeof(achTempGrantTab ), achGrantTab,
 		config.achSqlTabName);
 	snprintf(achTempGrantViewCat, sizeof(achTempGrantViewCat), achGrantViewCat,
 		config.achSqlTabName);
 	snprintf(achTempGrantViewManual, sizeof(achTempGrantViewManual), achGrantViewManual,
+		config.achSqlTabName);
+	snprintf(achTempGrantViewBalance, sizeof(achTempGrantViewBalance), achGrantViewBalance,
 		config.achSqlTabName);
 
 	return apchTempResult;
