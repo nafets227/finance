@@ -53,7 +53,7 @@ static void sqlPrintDoubleField(char *out, const double value)
 const char * const * getCreateSql(void)
 {
 	static const char achCreTab[] =
-		"CREATE TABLE %s ("
+		"CREATE TABLE IF NOT EXISTS %s ("
 		"ID"          " INT"          " PRIMARY KEY AUTO_INCREMENT" ","
 		"ORIG_KTONR"  " CHAR(10)"     " NOT NULL"                   ","
 		"ORIG_BLZ"    " CHAR(8)"      " NOT NULL"                   ","
@@ -98,7 +98,7 @@ const char * const * getCreateSql(void)
 		"INDEX (KATG5)"
 		") CHARSET=utf8";
 
-	static const char achCreViewCat[] = "CREATE VIEW %s_cat AS "
+	static const char achCreViewCat[] = "CREATE OR REPLACE VIEW %s_cat AS "
 		"( SELECT "
 			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(DATUM_KOR, VALUTA) AS DATUM, "
 			"WAEHRUNG, "
@@ -174,11 +174,11 @@ const char * const * getCreateSql(void)
 			"substring_index(katg5, '/', 3) as KATG_L3 "
 			"FROM %s "
 			"WHERE KATG5_BETRAG <> 0 AND KATG5_BETRAG IS NOT NULL ) ";
-	static const char achCreViewManual[] = "CREATE VIEW %s_manual AS "
+	static const char achCreViewManual[] = "CREATE OR REPLACE VIEW %s_manual AS "
 		"SELECT * "
 			"FROM %s "
 			"WHERE ORIG_KTONR = 'Bar' ";
-	static const char achCreViewBalance[] = "CREATE VIEW %s_balance AS "
+	static const char achCreViewBalance[] = "CREATE OR REPLACE VIEW %s_balance AS "
 		"SELECT "
 			"ORIG_KTONR, JAHR, MONAT, "
 			"SALDO_DAY, SALDO, SALDO + "

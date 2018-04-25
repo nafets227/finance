@@ -102,33 +102,16 @@ function dbsetup_users () {
 
 ##### dbsetup_tables #########################################################
 dbsetup_tables () {
-	dbexist=$($MYSQL_CMD -N <<-EOF
-	SELECT COUNT(*) 
-		FROM information_schema.tables
-		WHERE table_schema="$MYSQL_DATABASE" AND table_name="fn_entry";
-		EOF
-		)
-	if [ "$?" != "0" ] ; then 
-		printf "Error connecting to datatabase %s on %s (User %s PW %s)\n" \
-			"$MYSQL_HOST" "$MYSQL_HOST" "$MYSQL_USER" "$MYSQL_PASSWORD"
+	printf "Creating/Updating database %s.\n" "$MYSQL_DATABASE"
+	fntxt2sql -cre -mysql \
+		-mysql_host $MYSQL_HOST \
+		-mysql_database $MYSQL_DATABASE \
+		-mysql_user $MYSQL_USER \
+		-mysql_password $MYSQL_PASSWORD
+	if [ "$?" != "0" ] ; then
+		printf "Error creating/updating database.\n"
 		exit 1
 	fi
-	
-	if [ "$dbexist" == "0" ] ; then
-		printf "Database %s is empty, will create tables etc.\n" "$MYSQL_DATABASE"
-		fntxt2sql -cre -mysql \
-			-mysql_host $MYSQL_HOST \
-			-mysql_database $MYSQL_DATABASE \
-			-mysql_user $MYSQL_USER \
-			-mysql_password $MYSQL_PASSWORD
-		if [ "$?" != "0" ] ; then
-			printf "Error creating tables.\n"
-			exit 1
-		fi
-	else
-		printf "Reusing existing database %s.\n" "$MYSQL_DATABASE"
-	fi
-
 }
 
 ##### aqsetup ################################################################
