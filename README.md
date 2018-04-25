@@ -10,6 +10,7 @@ the data.
 ## Limitations
 * Only PIN access is currently supported, no HBCI Keys
 * Only tested with german banks that have a "BLZ". 
+* Only MariaDB is tested, MySQL should also work. Main divergence from Standard SQL is that tinance uses the "IF EXISTS" claus in CREATE TABLE and similar commands.
 
 ## AqBanking setup
 AqBanking setup is expected to be mounted into the container via Docker-Volume at /finance. finance container
