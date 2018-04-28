@@ -1,5 +1,8 @@
 # finance CHANGELOG
 
+## 0.3.2 (2018-04-28)
+* Ignore accounts that AqBanking cannot handle (thanks to Michael Bladowski) 
+
 ## 0.3.1 (2018-04-26)
 * Use noted balance if booked balance is not available. 
   Fixes [#1](https://github.com/nafets227/finance/issues/1)
