@@ -1,5 +1,8 @@
 # finance CHANGELOG
 
+## 0.3.3 (2018-05.16)
+* revert order of bookings in Alert EMail
+
 ## 0.3.2 (2018-04-28)
 * Ignore accounts that AqBanking cannot handle (thanks to Michael Bladowski) 
 
