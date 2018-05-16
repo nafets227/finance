@@ -392,7 +392,8 @@ function alert () {
 		  FROM fn_entry
 		 WHERE buchart='B' AND
 		       orig_ktonr='$a' AND
-		       datum >= DATE_SUB(CURDATE(), INTERVAL 7 DAY);
+		       datum >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+		  ORDER BY datum DESC, betrag;
 		EOF
 		) | mail \
 			-n -Sv15-compat -Ssendwait -Snosave -Sexpandaddr=fail,-all,+addr \
