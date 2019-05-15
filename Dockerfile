@@ -6,20 +6,20 @@ LABEL Description="Finance Container"
 VOLUME /finance
 
 RUN \
-    pacman -S --needed --noconfirm \
-        aqbanking \
-        autoconf \
-        automake \
-        gcc \
-        intltool \
-        make \
-        mariadb-clients \
-        s-nail \
-        && \
-    paccache -r -k0 && \
-    rm -rf /usr/share/man/* && \
-    rm -rf /tmp/* && \
-    rm -rf /var/tmp/*
+	pacman -S --needed --noconfirm \
+		aqbanking \
+		autoconf \
+		automake \
+		gcc \
+		intltool \
+		make \
+		mariadb-clients \
+		s-nail \
+		&& \
+	paccache -r -k0 && \
+	rm -rf /usr/share/man/* && \
+	rm -rf /tmp/* && \
+	rm -rf /var/tmp/*
 
 RUN \
 	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf
@@ -34,9 +34,10 @@ RUN \
 	cd pxlib-0.6.6 && \
 	touch config.rpath && \
 	autoreconf && \
-	./configure --prefix=/usr/local \
-              --with-gsf \
-              --disable-static && \
+	./configure \
+		--prefix=/usr/local \
+		--with-gsf \
+		--disable-static && \
 	make install && \
 	ldconfig && \
 	cd /finance && \
@@ -57,8 +58,8 @@ RUN \
 # copy and install additional scripts
 COPY finance-root-wrapper finance-entrypoint /usr/local/bin/
 RUN \
-    chown root:root /usr/local/bin/* && \
-    chmod 755 /usr/local/bin/*
+	chown root:root /usr/local/bin/* && \
+	chmod 755 /usr/local/bin/*
 
 ENTRYPOINT [ "/usr/local/bin/finance-root-wrapper" ]
 
