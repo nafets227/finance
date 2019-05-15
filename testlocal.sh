@@ -121,6 +121,7 @@ mkdir ./testdata
 cp .hbci-pinfile ./testdata/.hbci-pinfile || exit 1
 
 # Start our just built container
+[ -z "$DNS" ] || DNS_PARM="--dns $DNS"
 printf "Executing container 1st time - start.\n"
 DB_USERS="testuser1 testuser2"
 DB_testuser1_PASSWORD="dummypw"
@@ -129,6 +130,7 @@ export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
 export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
 export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
 docker run \
+	$DNS_PARM \
 	-e MYSQL_HOST \
 	-e MYSQL_DATABASE \
 	-e MYSQL_USER \
@@ -156,6 +158,7 @@ printf "Executing container 2nd time - start.\n"
 export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
 export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
 docker run \
+	$DNS_PARM \
 	-e MYSQL_HOST \
 	-e MYSQL_DATABASE \
 	-e MYSQL_USER \
