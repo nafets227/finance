@@ -1,4 +1,4 @@
-FROM pritunl/archlinux
+FROM archlinux/base
 
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Container"
@@ -6,20 +6,38 @@ LABEL Description="Finance Container"
 VOLUME /finance
 
 RUN \
+	set -x && \
+	pacman -Suy --noconfirm && \
 	pacman -S --needed --noconfirm \
 		aqbanking \
 		autoconf \
 		automake \
+		bind-tools \
 		gcc \
+		gettext \
+		grep \
 		intltool \
+		iputils \
 		make \
 		mariadb-clients \
 		s-nail \
 		&& \
-	paccache -r -k0 && \
-	rm -rf /usr/share/man/* && \
-	rm -rf /tmp/* && \
-	rm -rf /var/tmp/*
+	if [ "$DEBUG" == "1" ] ; then \
+		echo deleting files not needed: && \
+		find \
+			/var/lib/pacman \
+			/var/cache/pacman \
+			/usr/share/man \
+			/tmp \
+			/var/tmp \
+			-type f ; \
+	fi && \
+	rm -rf \
+		/var/lib/pacman \
+		/var/cache/pacman \
+		/usr/share/man/* \
+		/tmp/* \
+		/var/tmp/*
 
 RUN \
 	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf
@@ -29,6 +47,7 @@ RUN \
 
 # download, compile and install pxlib, a paradox DB library
 RUN \
+	set -x && \
 	cd /finance && \
 	curl -L http://downloads.sourceforge.net/sourceforge/pxlib/pxlib-0.6.6.tar.gz | tar xvz && \
 	cd pxlib-0.6.6 && \

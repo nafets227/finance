@@ -448,6 +448,16 @@ if [ ! -z "$MAIL_TO" ] ; then
 	fi
 fi
 
+if ! ping  -c 1 $MYSQL_HOST ; then
+	printf "MYSQL_HOST %s is not reachable.\n" "$MYSQL_HOST"
+	set -x
+	cat /etc/resolv.conf
+	dig $MYSQL_HOST
+	ping -c 1 $MYSQL_HOST
+	set +x
+	exit 1 
+fi
+
 MYSQL_CMD="mysql"
 MYSQL_CMD="$MYSQL_CMD --host=$MYSQL_HOST"
 MYSQL_CMD="$MYSQL_CMD --user=$MYSQL_USER"
