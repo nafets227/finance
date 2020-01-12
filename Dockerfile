@@ -9,9 +9,7 @@ RUN \
 
 RUN \
 	set -x && \
-	pacman -Suy --noconfirm && \
-	pacman -S --needed --noconfirm \
-		intltool \
+	pacman -Suy --needed --noconfirm \
 		mariadb-clients
 
 USER jenkins
@@ -86,8 +84,7 @@ VOLUME /finance
 
 RUN \
 	set -x && \
-	pacman -Suy --noconfirm && \
-	pacman -S --needed --noconfirm \
+	pacman -Suy --needed --noconfirm \
 		bind-tools \
 		gettext \
 		grep \
