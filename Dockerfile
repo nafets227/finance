@@ -1,11 +1,30 @@
-FROM nafets227/archbuildpkg:latest AS builder
+FROM nafets227/archbuildpkg:latest AS aqbanking-builder
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
-LABEL Description="Finance Build Container"
+LABEL Description="Finance Build Container for aqbanking"
+
+USER jenkins
+
+# download, compile and install aqbanking and gwenhywfar git versions
+# standard Arch Linux versions are too old for PSD2
+RUN \
+	set -x && \
+	cd /home/jenkins && \
+	/usr/bin/git clone https://aur.archlinux.org/gwenhywfar-git.git  && \
+	\
+	cd gwenhywfar-git && \
+	makepkg --sync --install --rmdeps --clean --noconfirm
 
 RUN \
 	set -x && \
-	mkdir /finance && \
-	chown jenkins /finance
+	cd /home/jenkins && \
+	/usr/bin/git clone https://aur.archlinux.org/aqbanking-git.git && \
+	cd aqbanking-git && \
+	makepkg --sync --install --rmdeps --clean --noconfirm
+
+##############################################################################
+FROM nafets227/archbuildpkg:latest AS finance-builder
+MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
+LABEL Description="Finance Build Container"
 
 RUN \
 	set -x && \
@@ -16,61 +35,44 @@ USER jenkins
 # download, compile and install pxlib, a paradox DB library
 RUN \
 	set -x && \
-	cd /finance && \
+	cd /home/jenkins && \
 	curl -L http://downloads.sourceforge.net/sourceforge/pxlib/pxlib-0.6.6.tar.gz | tar xvz && \
 	cd pxlib-0.6.6 && \
 	touch config.rpath && \
 	autoreconf && \
 	./configure \
 		--prefix=/usr/local \
+		--exec-prefix=/home/jenkins/pxlib.install \
 		--with-gsf \
 		--disable-static && \
 	make
+
 USER root
 RUN \
 	set -x && \
-	cd /finance/pxlib-0.6.6 && \
+	cd /home/jenkins/pxlib-0.6.6 && \
 	sudo make install && \
-	tar cv \
-		--exclude /usr/local/include \
-		-f /finance/pxlib-installed.tar \
-		/usr/local
+	cp -ar /home/jenkins/pxlib.install/* /usr/local
 
 USER jenkins
-# download, compile and install aqbanking and gwenhywfar git versions
-# standard Arch Linux versions are too old for PSD2
-RUN \
-	set -x && \
-	cd /finance && \
-	/usr/bin/git clone https://aur.archlinux.org/gwenhywfar-git.git  && \
-	\
-	cd gwenhywfar-git && \
-	makepkg --sync --install --rmdeps --clean --noconfirm
-
-RUN \
-	set -x && \
-	cd /finance && \
-	/usr/bin/git clone https://aur.archlinux.org/aqbanking-git.git && \
-	cd aqbanking-git && \
-	makepkg --sync --install --rmdeps --clean --noconfirm
 
 # copy, compile and install fntxt2sql
 RUN \
-	mkdir /finance/fntxt2sql
+	mkdir /home/jenkins/fntxt2sql
 
-COPY fntxt2sql/* /finance/fntxt2sql/
+COPY fntxt2sql/* /home/jenkins/fntxt2sql/
 
 RUN \
-	cd /finance/fntxt2sql && \
+	cd /home/jenkins/fntxt2sql && \
 	make
 
+ARG DEBUG=0
 RUN \
 	if [ "$DEBUG" == "1" ] ; then \
 		ls -lA \
-			/finance \
-			/finance/gwenhywfar-git \
-			/finance/aqbanking-git \
-			/finance/fntxt2sql \
+			/home/jenkins \
+			/home/jenkins/pxlib.install \
+			/home/jenkins/fntxt2sql \
 		; \
 	fi
 
@@ -82,6 +84,7 @@ LABEL Description="Finance Container"
 
 VOLUME /finance
 
+ARG DEBUG=0
 RUN \
 	set -x && \
 	pacman -Suy --needed --noconfirm \
@@ -91,13 +94,10 @@ RUN \
 		iputils \
 		mariadb-clients \
 		s-nail \
-		sudo \
-		tar \
 		&& \
 	if [ "$DEBUG" == "1" ] ; then \
 		echo deleting files not needed: && \
 		find \
-			/var/lib/pacman \
 			/var/cache/pacman \
 			/usr/share/man \
 			/tmp \
@@ -116,13 +116,12 @@ RUN \
 	useradd -d /finance -U finance && \
 	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf
 
-COPY --from=builder /finance/pxlib-installed.tar /
-COPY --from=builder /finance/gwenhywfar-git/*.pkg.tar.* /
-COPY --from=builder /finance/aqbanking-git/*.pkg.tar.* /
-COPY --from=builder /finance/fntxt2sql/fntxt2sql /usr/local/bin
+COPY --from=aqbanking-builder /home/jenkins/gwenhywfar-git/*.pkg.tar.* /
+COPY --from=aqbanking-builder /home/jenkins/aqbanking-git/*.pkg.tar.* /
+COPY --from=finance-builder /home/jenkins/pxlib.install /usr/local
+COPY --from=finance-builder /home/jenkins/fntxt2sql/fntxt2sql /usr/local/bin
 
 RUN \
-	tar xvf /pxlib-installed.tar && \
 	ldconfig && \
 	pacman -U --needed --noconfirm /*.pkg.tar.*
 
