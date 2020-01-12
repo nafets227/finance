@@ -7,7 +7,10 @@ VOLUME /finance
 
 RUN \
 	set -x && \
-	pacman -Suy --noconfirm && \
+	pacman -Sy --noconfirm && \
+	pacman -S --needed --noconfirm libarchive && \
+	pacman -S --needed --noconfirm archlinux-keyring && \
+	pacman -Su --noconfirm && \
 	pacman -S --needed --noconfirm \
 		aqbanking \
 		autoconf \
