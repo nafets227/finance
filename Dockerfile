@@ -86,10 +86,7 @@ VOLUME /finance
 
 RUN \
 	set -x && \
-	pacman -Sy --noconfirm && \
-	pacman -S --needed --noconfirm libarchive && \
-	pacman -S --needed --noconfirm archlinux-keyring && \
-	pacman -Su --noconfirm && \
+	pacman -Suy --noconfirm && \
 	pacman -S --needed --noconfirm \
 		bind-tools \
 		gettext \
