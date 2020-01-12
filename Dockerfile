@@ -12,18 +12,13 @@ RUN \
 	pacman -S --needed --noconfirm archlinux-keyring && \
 	pacman -Su --noconfirm && \
 	pacman -S --needed --noconfirm \
-		aqbanking \
-		autoconf \
-		automake \
 		bind-tools \
-		gcc \
 		gettext \
 		grep \
-		intltool \
 		iputils \
-		make \
 		mariadb-clients \
 		s-nail \
+		sudo \
 		&& \
 	if [ "$DEBUG" == "1" ] ; then \
 		echo deleting files not needed: && \
@@ -36,7 +31,6 @@ RUN \
 			-type f ; \
 	fi && \
 	rm -rf \
-		/var/lib/pacman \
 		/var/cache/pacman \
 		/usr/share/man/* \
 		/tmp/* \
@@ -46,11 +40,23 @@ RUN \
 	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf
 	
 RUN \
-	useradd -d /finance -U finance
+	set -x && \
+	useradd -d /finance -U finance && \
+	useradd -d /var/tmp/aur -U aur && \
+	echo "aur ALL = NOPASSWD: /usr/bin/pacman" \
+		>/etc/sudoers.d/nafetsde-aur
 
 # download, compile and install pxlib, a paradox DB library
 RUN \
 	set -x && \
+	pacman -Sy --noconfirm && \
+	pacman -S --needed --noconfirm \
+		autoconf \
+		automake \
+		gcc \
+		intltool \
+		make \
+		&& \
 	cd /finance && \
 	curl -L http://downloads.sourceforge.net/sourceforge/pxlib/pxlib-0.6.6.tar.gz | tar xvz && \
 	cd pxlib-0.6.6 && \
@@ -63,7 +69,31 @@ RUN \
 	make install && \
 	ldconfig && \
 	cd /finance && \
-	rm -rf /finance/pxlib-0.6.6
+	rm -rf /finance/pxlib-0.6.6 && \
+	pacman -R --nosave --recursive --noconfirm \
+		autoconf \
+		automake \
+		gcc \
+		make && \
+	rm -rf \
+		/var/cache/pacman \
+		/usr/share/man/* \
+		/tmp/* \
+		/var/tmp/*
+
+# download, compile and install aqbanking and gwenhywfar git versions
+# standard Arch Linux versions are too old for PSD2
+USER aur
+RUN \
+	set -x && \
+	sudo pacman -Sy --noconfirm && \
+	sudo pacman -S --needed --noconfirm base-devel git && \
+	/usr/bin/git clone https://aur.archlinux.org/gwenhywfar-git.git /var/tmp/aur/gwenhywfar-git && \
+	cd /var/tmp/aur/gwenhywfar-git && makepkg --sync --install --rmdeps --clean --noconfirm && \
+	/usr/bin/git clone https://aur.archlinux.org/aqbanking-git.git /var/tmp/aur/aqbanking-git && \
+	cd /var/tmp/aur/aqbanking-git && makepkg --sync --install --rmdeps --clean --noconfirm
+	# sudo pacman -R --nosave --recursive --noconfirm base-devel git --ignore findutils --ignore sudo && \
+USER root
 
 # copy, compile and install fntxt2sql	
 RUN \
