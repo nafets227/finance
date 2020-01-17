@@ -120,12 +120,12 @@ function aqsetup () {
 	local account_nr=0
 	local accounts_blz=( )
 	local accounts_user=( )
-	
+
 	# Read .hbci-pinfile
 	while read line ; do
 		if [ "${#line}" == "0" ] ; then
 			continue;	# ignore blank lines
-		elif [ ${line:0:1} == "#" ] ; then 
+		elif [ ${line:0:1} == "#" ] ; then
 			continue;	# ignore comment lines
 		fi
 		case $line in
@@ -141,10 +141,35 @@ function aqsetup () {
 				#DEBUG printf "DEBUG: PIN blz=%s u=%s\n" "$blz" "$u"
 
 				accounts_blz[$account_nr]="$blz"
-				accounts_user[$account_nr]="$u" 
+				accounts_user[$account_nr]="$u"
 				(( account_nr ++ ))
 				;;
-				
+
+			URL_* )
+				parm=$(trim "${line#*=}")
+				parm=${parm%\"}
+				parm=${parm#\"}
+				line=$(trim "${line%%=*}")
+				line=${line##URL_}
+				u=${line#*_}
+				blz=${line%_*}
+				#DEBUG printf "DEBUG: URL blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
+
+				eval "URL_$blz_$u=\"\$parm\""
+				;;
+			TANMODE_* )
+				parm=$(trim "${line#*=}")
+				parm=${parm%\"}
+				parm=${parm#\"}
+				line=$(trim "${line%%=*}")
+				line=${line##TANMODE_}
+				u=${line#*_}
+				blz=${line%_*}
+				#DEBUG printf "DEBUG: TANMODE blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
+
+				eval "TANMODE_$blz_$u=\"\$parm\""
+				;;
+
 			SETUP_* )
 				parm=$(trim "${line#*=}")
 				parm=${parm%\"}
@@ -154,8 +179,8 @@ function aqsetup () {
 				u=${line#*_}
 				blz=${line%_*}
 				#DEBUG printf "DEBUG: SETUP blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
-				
-				eval "SETUP_$blz_$u=\"\$parm\"" 
+
+				eval "SETUP_$blz_$u=\"\$parm\""
 				;;
 			* )
 				printf "Warning: Ignoring unknown HBCI config Line %s in %s\n" \
@@ -166,9 +191,11 @@ function aqsetup () {
 	(( account_nr -- ))
 
 	# read configuration of aqhbci
-	users=$(aqhbci-tool4 \
-		--noninteractive \
-		listusers ) || return 1
+	users=$(aqhbci_wrapper listusers )
+	rc$=$?
+	# if list is empty rc=4 is set, so we ignore it.
+	if [ $rc == 4 ] && [ -z "$users" ] ; then rc=0; fi
+	[ $rc != 0 ] && return 1
 	while read line ; do
 		# line looks like
 		# User 1: Bank: de/50010517 User Id: 1234567890 Customer Id: 12345678901234
@@ -182,74 +209,96 @@ function aqsetup () {
 		u=${line##*User Id: }
 		u=${u%% Customer Id: *}
 		#DEBUG printf "DEBUG: SETUP blz=%s u=%s\n" "$blz" "$u"
-		eval "AQCONF_$blz_$u=1" 
+		eval "AQCONF_$blz_$u=1"
 	done <<<$users
 
 	# Now configure each account in pinfile but not yet in aqhbci
-	for i in $(seq 0  $account_nr) ; do 
+	for i in $(seq 0 $account_nr) ; do
 		blz=${accounts_blz[$i]}
 		u=${accounts_user[$i]}
-		eval parm=\"\$SETUP_$blz_$u\"
+		eval url=\"\$URL_$blz_$u\"
+		eval tanmode=\"\$TANMODE_$blz_$u\"
+		eval setup=\"\$SETUP_$blz_$u\"
 		eval aqconf=\"\$AQCONF_$blz_$u\"
 		if [ -z "$aqconf" ] ; then
-			aqsetup_acc "$blz" "$u" "$parm" || return 1
+			aqsetup_acc "$blz" "$u" "$url" "$tanmode" "$setup" || return 1
 		else
 			printf "Reusing existing HBCI configuration for BLZ %s User %s\n" \
 				"$blz" "$u"
 		fi
-	done			
+	done
 
 	return 0
+}
+
+# @TODO support PayPal, see
+# https://www.aquamaniac.de/rdm/projects/aqbanking/wiki/Paypal_einrichten
+
+function aqhbci_wrapper () {
+	#DEBUG
+	printf " ---------- aqhbci-tool4 %s\n" "$*" >&2
+	aqhbci-tool4 \
+		--noninteractive \
+		--acceptvalidcerts \
+		--pinfile=$datadir/.hbci-pinfile \
+		"$@"
+	rc=$?; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 %s\n" "$*" >&2
+		return $rc
+	fi
 }
 
 ##### aqsetup_acc ############################################################
 function aqsetup_acc () {
 	local blz="$1"
 	local u="$2"
-	local parm="$3"
+	local url="$3"
+	local tanmode="$4"
+	local parm="$5"
 
-	printf "Configuring HBCI for BLZ %s User %s setup=\"%s\"\n" \
-		"$blz" "$u" "$parm"
-			
-	aqhbci-tool4 \
-		--noninteractive \
-		adduser \
+	printf "Configuring HBCI for BLZ %s User %s tanmode=%s url=%s setup=%s\n" \
+		"$blz" "$u" "$tanmode" "$url" "$parm"
+
+	aqhbci_wrapper adduser \
 		-b $blz \
 		-N $u \
 		-u $u \
 		-t pintan \
-		$parm
-	rc=$?; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 adduser\n" "$rc"
+		--context=1 \
+		-s $url \
+		--hbciversion=300 \
+		$parm \
+		|| return 1
+
+	# find unique userid
+	sed_regex='s#User [^:]*: '
+	sed_regex+="Bank: de/$blz "
+	sed_regex+="User Id: $u "
+	sed_regex+="Customer Id: $u "
+	sed_regex+='Unique Id: '
+	uu=$(	aqhbci-tool4 --noninteractive listusers \
+		| sed -n "${sed_regex}\\(.*\\)#\\1#p"
+		)
+	rc=$? ; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqhbci-tool4 listusers.\n" "$rc"
 		return 1
 	fi
 
-	aqhbci-tool4 \
-		--noninteractive \
-		--acceptvalidcerts \
-		--pinfile=$datadir/.hbci-pinfile \
-		getsysid \
-		-b $blz
-	rc=$? ; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 getsysid. Proceeding anyway.\n" "$rc"
+	aqhbci_wrapper getbankinfo -u "$uu" || return 1
+	aqhbci_wrapper getsysid -u "$uu" || return 1
+# @TODO is getkeys still needed ???
+	aqhbci_wrapper setitanmode -u "$uu" -m "$tanmode"
+	if [ $? != 0 ] ; then
+		printf "Following itan modes are available:\n" &&
+		aqhbci-tool4 \
+			--noninteractive \
+			listitanmodes \
+			-u "$uu"
+		return 1
 	fi
+	aqhbci_wrapper setTanMediumId -u "$uu" -m "nafets227/finance"
 
-	aqhbci-tool4 \
-		--noninteractive \
-		--acceptvalidcerts \
-		--pinfile=$datadir/.hbci-pinfile \
-		getkeys \
-		-b $blz
-	rc=$? ; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 getkeys. Proceeding anyway.\n" "$rc"
-	fi
-
-	aqhbci-tool4 \
-		--noninteractive \
-		--acceptvalidcerts \
-		--pinfile=$datadir/.hbci-pinfile \
-		getaccounts \
-		-b $blz
+	aqhbci_wrapper getaccounts -u "$uu"
 	rc=$? ; if [ "$rc" != 0 ] ; then
 		printf "Error %s in aqhbci-tool4 getaccounts. aqhbci-config dump follows.\n" "$rc"
 		aqhbci-tool4 \
@@ -258,6 +307,39 @@ function aqsetup_acc () {
 			listaccounts
 		return 1
 	fi
+
+	# read accounts just added
+	# Since aqhbci does not allow to select by user we selct by bank.
+	# If accounts was already added with a different user results are unknown.
+	accs=$(aqhbci_wrapper listaccounts -v ) || return 1
+	while read line ; do
+		# line looks like
+		# Account 0: Bank: 70020270 Account Number: 4840199334  SubAccountId: EUR \
+		# Account Type: bank LocalUniqueId: 5
+
+		#DEBUG printf "DEBUG: Line \"%s\"\n" "$line"
+		if [ -z "$line" ] ; then
+			continue
+		fi
+		acc_blz=${line##*Bank: }
+		acc_blz=${acc_blz%% Account Number:*}
+		acc_nr=${line##*Account Number: }
+		acc_nr=${acc_nr%%  SubAccountId:*}
+		acc_id=${line##*LocalUniqueId: }
+		if [ "$acc_blz" == "$blz" ] ; then
+			printf "Adding new account %s id=%s for bank %s\n" \
+				"$acc_nr" "$acc_id" "$acc_blz"
+			aqhbci_wrapper getaccsepa -a "$acc_id" &&
+			aqhbci_wrapper getbankinfo -u "$uu" &&
+			aqhbci_wrapper getaccsepa -a "$acc_id" &&
+			/bin/true || return 1
+		#DEBUG else
+		# printf "ignoring account %s id=%s for bank %s\n" \
+		#	"$acc_nr" "$acc_id" "$acc_blz"
+		fi
+	done <<<$accs
+
+	aqhbci_wrapper getaccounts -u "$uu" || return 1
 
 	return 0
 }
