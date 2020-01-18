@@ -84,19 +84,19 @@ test_dbsetup () {
 }
 
 ##### Main ###################################################################
-if [ -z "$MYSQL_HOST" ] && [ ! -z "$BASEURL" ] ; then
-	printf "Using BASEURL %s for MYSQL_HOST\n" "$BASEURL"
-	MYSQL_HOST="$BASEURL"
+if [ -z "$MYSQL_HOST" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+	MYSQL_HOST="www.$KUBE_BASEDOM"
+	printf "Using KUBE_BASEDOM to set MYSQL_HOST to %s\n" "$MYSQL_HOST"
 fi
 
-if [ -z "$MAIL_URL" ] && [ ! -z "$BASEURL" ] ; then
-	MAIL_URL="smtp://mail.${BASEURL#www.}"
-	printf "Using BASEURL %s for MAIL_URL => %s\n" "$BASEURL" "$MAIL_URL"
+if [ -z "$MAIL_URL" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+	MAIL_URL="smtp://www.$KUBE_BASEDOM"
+	printf "Using KUBE_BASEDOM to set MAIL_URL to %s\n" "$MAIL_URL"
 fi
 
-if [ -z "$MAIL_HOSTNAME" ] && [ ! -z "$BASEURL" ] ; then
-	MAIL_HOSTNAME="finance-testlocal.${BASEURL#www.}"
-	printf "Using BASEURL %s for MAIL_URL => %s\n" "$BASEURL" "$MAIL_HOSTNAME"
+if [ -z "$MAIL_HOSTNAME" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+	MAIL_HOSTNAME="finance-testlocal.$KUBE_BASEDOM"
+	printf "Using KUBE_BASEDOM to set MAIL_URL to %s\n" "$MAIL_HOSTNAME"
 fi
 
 
@@ -106,6 +106,13 @@ if [ -z "$MYSQL_HOST" ] ||
    [ -z "$MYSQL_PASSWORD" ] ||
    [ -z "$MYSQL_ROOT_PASSWORD" ] ; then
 	printf "Error: Not all required Environment Variables are set.\n"
+	printf "\tMYSQL_HOST=%s\n" "$MYSQL_HOST"
+	printf "\tMYSQL_DATABASE=%s\n" "$MYSQL_DATABASE"
+	printf "\tMYSQL_USER=%s\n" "$MYSQL_USER"
+	printf "\tMYSQL_PASSWORD=%s\n" "$MYSQL_PASSWORD"
+	printf "\tMYSQL_ROOT_PASSWORD=%s\n" "$MYSQL_ROOT_PASSWORD"
+	printf "\tKUBE_BASEDOM=%s\n" "$KUBE_BASEDOM"
+	printf "\tKUBE_BASEDOM would set default for MYSQL_HOST, MAIL_URL and MAIL_HOSTNAME\n"
 	exit 1
 fi
 
