@@ -570,10 +570,10 @@ dbsetup_tables || exit 1
 
 aqsetup || exit 1
 
-test -d $datadir/inbound.aqb      || mkdir $datadir/inbound.aqb
-test -d $datadir/inbound.aqb-tran || mkdir $datadir/inbound.aqb-tran
-test -d $datadir/inbound.aqb-bal  || mkdir $datadir/inbound.aqb-bal
-test -d $datadir/store.aqb        || mkdir $datadir/store.aqb
+test -d $datadir/inbound.aqb6      || mkdir $datadir/inbound.aqb6
+test -d $datadir/inbound.aqb6-tran || mkdir $datadir/inbound.aqb6-tran
+test -d $datadir/inbound.aqb6-bal  || mkdir $datadir/inbound.aqb6-bal
+test -d $datadir/store.aqb6        || mkdir $datadir/store.aqb6
 
 printf "Loading transactions and balances \n"
 aqbanking-cli \
@@ -584,18 +584,20 @@ aqbanking-cli \
 	--balance \
 	--transactions \
 	--ignoreUnsupported \
-	-c $datadir/inbound.aqb/$(date +\%Y\%m\%d-\%H\%M\%S.\%N) \
+	-c $datadir/inbound.aqb6/$(date +\%Y\%m\%d-\%H\%M\%S.\%N) \
 	--fromdate=$(date +%Y%m%d -d @$(( $(date +%s) - ( 90 * 24 * 3600 ) )))
 rc=$? ; if [ "$rc" != 0 ] ; then
 	printf "Error %s in aqbanking-cli request --balance --transactions\n" "$rc"
 	exit 1
 fi
 
+# @TODO change to aqb6. Check for formatstring (new option inaqb6) and
+# also modify fntxt2sql to the new format
 printf "Processing transactions and balances \n"
 for f in $datadir/inbound.aqb/* ; do 
     fnam=$(basename $f)
-    aqbanking-cli listtrans -c $f -o $datadir/inbound.aqb-tran/$fnam && \
-    aqbanking-cli listbal   -c $f -o $datadir/inbound.aqb-bal/$fnam  && \
+    aqbanking-cli listtrans -c $f >$datadir/inbound.aqb-tran/$fnam && \
+    aqbanking-cli listbal   -c $f >$datadir/inbound.aqb-bal/$fnam  && \
     mv $f $datadir/store.aqb 
     done
 
