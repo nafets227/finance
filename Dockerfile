@@ -2,6 +2,10 @@ FROM nafets227/archbuildpkg:latest AS aqbanking-builder
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Build Container for aqbanking"
 
+RUN \
+	set -x && \
+	pacman -Suy --needed --noconfirm
+
 USER jenkins
 
 # download, compile and install aqbanking and gwenhywfar git versions
