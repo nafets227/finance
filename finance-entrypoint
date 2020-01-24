@@ -192,7 +192,7 @@ function aqsetup () {
 
 	# read configuration of aqhbci
 	users=$(aqhbci_wrapper listusers )
-	rc$=$?
+	rc=$?
 	# if list is empty rc=4 is set, so we ignore it.
 	if [ $rc == 4 ] && [ -z "$users" ] ; then rc=0; fi
 	[ $rc != 0 ] && return 1
