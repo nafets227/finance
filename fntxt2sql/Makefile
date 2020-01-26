@@ -59,7 +59,7 @@ all: fntxt2sql
 
 fntxt2sql: fntxt2sql.o \
 	       fntxt2sql-btx.o fntxt2sql-csv.o fntxt2sql-aqm.o \
-	       fntxt2sql-aqb-tran.o fntxt2sql-aqb-bal.o \
+	       fntxt2sql-aqb-tran.o fntxt2sql-aqb-bal.o fntxt2sql-aqb6.o \
 	       fntxt2sql-hbci.o \
 	       fntxt2sql-util.o fntxt2sql-mysql.o fnSql.o
 	$(LINK.o) -o $@ $(LIBS) $^  
@@ -81,6 +81,9 @@ fntxt2sql-aqb-tran.o: fntxt2sql-aqb-tran.c fntxt2sql.h
 
 fntxt2sql-aqb-bal.o: fntxt2sql-aqb-bal.c fntxt2sql.h
 	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqb-bal.c
+
+fntxt2sql-aqb6.o: fntxt2sql-aqb6.c fntxt2sql.h
+	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqb6.c
 
 fntxt2sql-hbci.o: fntxt2sql-hbci.c fntxt2sql.h
 	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-hbci.c

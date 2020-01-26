@@ -50,7 +50,8 @@ typedef struct _Config {
 		old_inpAqb = 4,
 		inpBtx     = 5,
 		inpAqbTran = 6,
-		inpAqbBal  = 7
+		inpAqbBal  = 7,
+		inpAqb6    = 8
 		} inputFormat; // Input Format
 	char achCodePage[20];
 } Config;
@@ -107,6 +108,11 @@ int convertCP(char * pch, const char * pchSourceCp, const char *pchDestCp);
 //***** Functions from fntxt2sql-btx.c ***************************************
 //****************************************************************************
 int processBtxFile(FILE * file);
+
+//****************************************************************************
+//***** Functions from fntxt2sql-aqb6.c **********************************
+//****************************************************************************
+int processAqb6File(char *pchFileName);
 
 //****************************************************************************
 //***** Functions from fntxt2sql-csv.c ***************************************

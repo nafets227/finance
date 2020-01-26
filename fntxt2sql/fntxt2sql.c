@@ -45,20 +45,25 @@ int processFile(char *achInpFileName)
 	int iRc;
 	FILE * inpFile = 0;
 
-	if(achInpFileName[0] == '\0')
-		inpFile = stdin;
-	else
+	if (config.inputFormat != inpAqb6)
 	{
-		if( (inpFile = fopen(achInpFileName, "r")) == NULL)
+		if(achInpFileName[0] == '\0')
+			inpFile = stdin;
+		else
 		{
-			printf("Error %d opening File %s\n",
-					errno, achInpFileName);
-			return -1;
-		}
+			if( (inpFile = fopen(achInpFileName, "r")) == NULL)
+			{
+				printf("Error %d opening File %s\n",
+						errno, achInpFileName);
+				return -1;
+			}
 
+		}
 	}
 
-	if(config.inputFormat == inpBtx)
+	if (config.inputFormat == inpAqb6)
+		iRc = processAqb6File(achInpFileName);
+	else if(config.inputFormat == inpBtx)
 		iRc = processBtxFile(inpFile);
 	else
 	{
@@ -144,6 +149,10 @@ int main(int argc, char *argv[])
 		else if(!strcasecmp(argv[iActArg], "/AQB-BAL") ||
 				!strcasecmp(argv[iActArg], "-AQB-BAL")     )
 			config.inputFormat = inpAqbBal;
+
+		else if(!strcasecmp(argv[iActArg], "/AQB6") ||
+				!strcasecmp(argv[iActArg], "-AQB6")     )
+			config.inputFormat = inpAqb6;
 
 		else if(!strcasecmp(argv[iActArg], "/BTX") ||
 				!strcasecmp(argv[iActArg], "-BTX")     )
