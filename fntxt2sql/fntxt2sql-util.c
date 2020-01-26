@@ -579,6 +579,17 @@ char* makeDatum(const char *pchBuffer)
 		achDatum[ 9] = *(pchActBuffer+3);
 		break;
 
+	case 8:		// JJJJMMTT
+		achDatum[0] = *(pchActBuffer+0);
+		achDatum[1] = *(pchActBuffer+1);
+		achDatum[2] = *(pchActBuffer+2);
+		achDatum[3] = *(pchActBuffer+3);
+		achDatum[5] = *(pchActBuffer+4);
+		achDatum[6] = *(pchActBuffer+5);
+		achDatum[8] = *(pchActBuffer+6);
+		achDatum[9] = *(pchActBuffer+7);
+		break;
+
 	case 10:
 		if(*(pchActBuffer+2) == '.' && *(pchActBuffer+5) == '.') //TT.MM.JJJJ
 		{

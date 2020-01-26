@@ -39,7 +39,7 @@ endif
 
 ifneq ($(CONF_AQB6),0)
 CFLAGS+=-DCONF_AQB6 -I/usr/include/aqbanking6 -I/usr/include/gwenhywfar5
-LIBS+=-laqbanking
+LIBS+=-laqbanking -lgwenhywfar
 endif
 
 # Debugging/profiling version?
