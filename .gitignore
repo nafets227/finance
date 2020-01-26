@@ -2,3 +2,4 @@
 testdata
 /proddata/
 /.hbci-pinfile
+fntxt2sql/*.o
