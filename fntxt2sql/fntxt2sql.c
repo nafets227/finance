@@ -60,11 +60,12 @@ int processFile(char *achInpFileName)
 
 		}
 	}
-
-	if (config.inputFormat == inpAqb6)
-		iRc = processAqb6File(achInpFileName);
-	else if(config.inputFormat == inpBtx)
+	if(config.inputFormat == inpBtx)
 		iRc = processBtxFile(inpFile);
+#ifdef CONF_AQB6
+	else if (config.inputFormat == inpAqb6)
+		iRc = processAqb6File(achInpFileName);
+#endif // CONF_AQB6
 	else
 	{
 		while((iRc = readFile(inpFile)) == 0)
@@ -150,9 +151,11 @@ int main(int argc, char *argv[])
 				!strcasecmp(argv[iActArg], "-AQB-BAL")     )
 			config.inputFormat = inpAqbBal;
 
+#ifdef CONF_AQB6
 		else if(!strcasecmp(argv[iActArg], "/AQB6") ||
 				!strcasecmp(argv[iActArg], "-AQB6")     )
 			config.inputFormat = inpAqb6;
+#endif // CONF_AQB6
 
 		else if(!strcasecmp(argv[iActArg], "/BTX") ||
 				!strcasecmp(argv[iActArg], "-BTX")     )

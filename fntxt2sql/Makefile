@@ -9,6 +9,7 @@
 DEBUG=1
 CONF_MYSQL=1
 CONF_HBCIPX=1
+CONF_AQB6=1
 
 #
 # End of user serviceable parts.  From here on anything is my fault
@@ -34,6 +35,11 @@ ifneq ($(CONF_HBCIPX),0)
 CFLAGS+=-DCONF_HBCIPX
 LIBS+=-lpx
 #LIBS+=/usr/local/lib/libpx.so
+endif
+
+ifneq ($(CONF_AQB6),0)
+CFLAGS+=-DCONF_AQB6 -I/usr/include/aqbanking6 -I/usr/include/gwenhywfar5
+LIBS+=-laqbanking
 endif
 
 # Debugging/profiling version?
