@@ -1,84 +1,77 @@
-FROM nafets227/archbuildpkg:latest AS aqbanking-builder
+FROM gcc:latest AS builder
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Build Container for aqbanking"
 
+# install prerequisited
 RUN \
 	set -x && \
-	pacman -Suy --needed --noconfirm
+	apt-get update && \
+	apt-get install -y --no-install-recommends \
+		intltool \
+		libgcrypt20-dev \
+		libgnutls28-dev \
+		libxmlsec1-dev
 
-USER jenkins
-
-# download, compile and install aqbanking and gwenhywfar git versions
-# standard Arch Linux versions are too old for PSD2
+# gwenhywfar
 RUN \
 	set -x && \
-	cd /home/jenkins && \
-	/usr/bin/git clone https://aur.archlinux.org/gwenhywfar-git.git  && \
-	\
-	cd gwenhywfar-git && \
-	makepkg --sync --install --rmdeps --clean --noconfirm
+	git clone https://github.com/aqbanking/gwenhywfar && \
+	cd gwenhywfar && \
+	git checkout tags/5.1.3 && \
+	make -f Makefile.cvs && \
+	./configure \
+		--with-guis="cpp" \
+		--enable-error-on-warning \
+		--disable-network-checks && \
+	make && \
+	make install && \
+	make DESTDIR=$PWD/dist install
 
+# aqbanking
+RUN \
+	export LD_LIBRARY_PATH=/usr/local/lib && \
+	set -x && \
+	git clone https://github.com/aqbanking/aqbanking && \
+	cd aqbanking && \
+	git checkout tags/6.0.2 && \
+	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
+	./configure && \
+	make typedefs && \
+	make typefiles && \
+	make && \
+	make install && \
+	make DESTDIR=$PWD/dist install
+
+# pxlib, a paradox DB library
 RUN \
 	set -x && \
-	cd /home/jenkins && \
-	/usr/bin/git clone https://aur.archlinux.org/aqbanking-git.git && \
-	cd aqbanking-git && \
-	makepkg --sync --install --rmdeps --clean --noconfirm
-
-##############################################################################
-FROM nafets227/archbuildpkg:latest AS finance-builder
-MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
-LABEL Description="Finance Build Container"
-
-RUN \
-	set -x && \
-	pacman -Suy --needed --noconfirm \
-		mariadb-clients
-
-USER jenkins
-# download, compile and install pxlib, a paradox DB library
-RUN \
-	set -x && \
-	cd /home/jenkins && \
 	curl -L http://downloads.sourceforge.net/sourceforge/pxlib/pxlib-0.6.6.tar.gz | tar xvz && \
 	cd pxlib-0.6.6 && \
 	touch config.rpath && \
 	autoreconf && \
 	./configure \
 		--prefix=/usr/local \
-		--exec-prefix=/home/jenkins/pxlib.install \
 		--with-gsf \
 		--disable-static && \
-	make
+	make && \
+	make install && \
+	make DESTDIR=$PWD/dist install
 
-USER root
+# fntxt2sql
 RUN \
-	set -x && \
-	cd /home/jenkins/pxlib-0.6.6 && \
-	sudo make install && \
-	cp -ar /home/jenkins/pxlib.install/* /usr/local
-
-USER jenkins
-
-# copy, compile and install fntxt2sql
+	mkdir /fntxt2sql
+COPY fntxt2sql/* /fntxt2sql/
 RUN \
-	mkdir /home/jenkins/fntxt2sql
+	cd fntxt2sql && \
+	make clean && \
+	make && \
+	mkdir -p dist/usr/local/bin && \
+	cp -a fntxt2sql  dist/usr/local/bin/
 
-COPY fntxt2sql/* /home/jenkins/fntxt2sql/
-
+# list results
 RUN \
-	cd /home/jenkins/fntxt2sql && \
-	make
-
-ARG DEBUG=0
-RUN \
-	if [ "$DEBUG" == "1" ] ; then \
-		ls -lA \
-			/home/jenkins \
-			/home/jenkins/pxlib.install \
-			/home/jenkins/fntxt2sql \
-		; \
-	fi
+	echo "Results in Builder container:" && \
+	ls -lR /*/dist
 
 ##############################################################################
 FROM archlinux/base
@@ -98,6 +91,7 @@ RUN \
 		iputils \
 		mariadb-clients \
 		s-nail \
+		xmlsec \
 		&& \
 	if [ "$DEBUG" == "1" ] ; then \
 		echo deleting files not needed: && \
@@ -115,25 +109,25 @@ RUN \
 		/tmp/* \
 		/var/tmp/*
 
-RUN \
-	set -x && \
-	useradd -d /finance -U finance && \
-	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf
-
-COPY --from=aqbanking-builder /home/jenkins/gwenhywfar-git/*.pkg.tar.* /
-COPY --from=aqbanking-builder /home/jenkins/aqbanking-git/*.pkg.tar.* /
-COPY --from=finance-builder /home/jenkins/pxlib.install /usr/local
-COPY --from=finance-builder /home/jenkins/fntxt2sql/fntxt2sql /usr/local/bin
-
-RUN \
-	ldconfig && \
-	pacman -U --needed --noconfirm /*.pkg.tar.*
+COPY --from=builder /gwenhywfar/dist/usr/local /usr/local
+COPY --from=builder /aqbanking/dist /
+COPY --from=builder /pxlib-0.6.6/dist /
+COPY --from=builder /fntxt2sql/dist /
 
 # copy and install additional scripts
 COPY finance-root-wrapper finance-entrypoint /usr/local/bin/
+
 RUN \
+	set -x && \
+	useradd -d /finance -U finance && \
+	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf && \
+	ldconfig && \
 	chown root:root /usr/local/bin/* && \
 	chmod 755 /usr/local/bin/*
 
-ENTRYPOINT [ "/usr/local/bin/finance-root-wrapper" ]
+# list results
+RUN \
+	echo "Installed following files to /usr/local: " && \
+	ls -lR /usr/local
 
+ENTRYPOINT [ "/usr/local/bin/finance-root-wrapper" ]

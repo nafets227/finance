@@ -25,6 +25,7 @@ BINDIR  = /home/finance/bin
 #
 CC=gcc
 CFLAGS=-pipe -Wall
+LIBS=-L/usr/local/lib
 
 ifneq ($(CONF_MYSQL),0)
 CFLAGS+=-DCONF_MYSQL
@@ -39,6 +40,7 @@ endif
 
 ifneq ($(CONF_AQB6),0)
 CFLAGS+=-DCONF_AQB6 -I/usr/include/aqbanking6 -I/usr/include/gwenhywfar5
+CFLAGS+=-I/usr/local/include/aqbanking6 -I/usr/local/include/gwenhywfar5
 LIBS+=-laqbanking -lgwenhywfar
 endif
 

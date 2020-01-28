@@ -96,7 +96,7 @@ fi
 
 if [ -z "$MAIL_HOSTNAME" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
 	MAIL_HOSTNAME="finance-testlocal.$KUBE_BASEDOM"
-	printf "Using KUBE_BASEDOM to set MAIL_URL to %s\n" "$MAIL_HOSTNAME"
+	printf "Using KUBE_BASEDOM to set MAIL_HOSTNAME to %s\n" "$MAIL_HOSTNAME"
 fi
 
 
