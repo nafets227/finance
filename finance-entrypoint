@@ -391,7 +391,7 @@ function import_handleDir
 
 	for f in `ls -d $scandir/* 2>/dev/null`; do
 		case $ftype in 
-			aqb-tran | aqb-bal | aqm | btx)
+			aqb6 | aqb-tran | aqb-bal | aqm | btx)
 				if [ -f $f ]; then
 					printf "Importing file %s\n" "$f"
 					fntxt2sql \
