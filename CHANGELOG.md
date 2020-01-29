@@ -1,5 +1,12 @@
 # finance CHANGELOG
 
+## 0.5-BETA1
+* Fix type in script (thankt to Alexander Gross)
+* Implement Import of aqb6 download data into Database
+* Dont use aqbanking and gwenhywfar packages but build them.
+  This allow to specify the version to use instead of using the latest
+  package version.
+
 ## 0.5-ALPHA2
 * Fixed Bug in Building the container
 
@@ -8,7 +15,7 @@
 * limit download of transfers to last 90 days to avoid strong authentication
   as required by PSD2
 * Build in separate Build Containers to keep the image smaller
-
+* Import of downloaded data into database not yet implemented
 
 ## 0.4.1 (2019-10-02)
 * Do not exit when DB Server does not respond to ping
