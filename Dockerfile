@@ -1,61 +1,13 @@
-FROM gcc:latest AS builder
+FROM alpine:edge AS builder
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Build Container for aqbanking"
 
-# install prerequisited
 RUN \
-	set -x && \
-	apt-get update && \
-	apt-get install -y --no-install-recommends \
-		intltool \
-		libgcrypt20-dev \
-		libgnutls28-dev \
-		libxmlsec1-dev
-
-# gwenhywfar
-RUN \
-	set -x && \
-	git clone https://github.com/aqbanking/gwenhywfar && \
-	cd gwenhywfar && \
-	git checkout tags/5.1.3 && \
-	make -f Makefile.cvs && \
-	./configure \
-		--with-guis="cpp" \
-		--enable-error-on-warning \
-		--disable-network-checks && \
-	make && \
-	make install && \
-	make DESTDIR=$PWD/dist install
-
-# aqbanking
-RUN \
-	export LD_LIBRARY_PATH=/usr/local/lib && \
-	set -x && \
-	git clone https://github.com/aqbanking/aqbanking && \
-	cd aqbanking && \
-	git checkout tags/6.0.2 && \
-	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
-	./configure && \
-	make typedefs && \
-	make typefiles && \
-	make && \
-	make install && \
-	make DESTDIR=$PWD/dist install
-
-# pxlib, a paradox DB library
-RUN \
-	set -x && \
-	curl -L http://downloads.sourceforge.net/sourceforge/pxlib/pxlib-0.6.6.tar.gz | tar xvz && \
-	cd pxlib-0.6.6 && \
-	touch config.rpath && \
-	autoreconf && \
-	./configure \
-		--prefix=/usr/local \
-		--with-gsf \
-		--disable-static && \
-	make && \
-	make install && \
-	make DESTDIR=$PWD/dist install
+	apk add --no-cache --update \
+		aqbanking-dev \
+		gwenhywfar-dev \
+		mysql-dev \
+		build-base
 
 # fntxt2sql
 RUN \
@@ -64,7 +16,7 @@ COPY fntxt2sql/* /fntxt2sql/
 RUN \
 	cd fntxt2sql && \
 	make clean && \
-	make && \
+	make CONF_HBCIPX=0 && \
 	mkdir -p dist/usr/local/bin && \
 	cp -a fntxt2sql  dist/usr/local/bin/
 
@@ -74,7 +26,7 @@ RUN \
 	ls -lR /*/dist
 
 ##############################################################################
-FROM archlinux/base
+FROM alpine:edge
 
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Container"
@@ -84,19 +36,21 @@ VOLUME /finance
 ARG DEBUG=0
 RUN \
 	set -x && \
-	pacman -Suy --needed --noconfirm \
-		bind-tools \
+	apk add --no-cache --update \
+		bash \
+		aqbanking \
+		findutils \
 		gettext \
 		grep \
 		iputils \
-		mariadb-clients \
+		mariadb-client \
+		mariadb-connector-c \
 		s-nail \
 		xmlsec \
 		&& \
 	if [ "$DEBUG" == "1" ] ; then \
 		echo deleting files not needed: && \
 		find \
-			/var/cache/pacman \
 			/usr/share/man \
 			/tmp \
 			/var/tmp \
@@ -104,24 +58,20 @@ RUN \
 		; \
 	fi && \
 	rm -rf \
-		/var/cache/pacman \
 		/usr/share/man/* \
 		/tmp/* \
 		/var/tmp/*
 
-COPY --from=builder /gwenhywfar/dist/usr/local /usr/local
-COPY --from=builder /aqbanking/dist /
-COPY --from=builder /pxlib-0.6.6/dist /
 COPY --from=builder /fntxt2sql/dist /
 
 # copy and install additional scripts
 COPY finance-root-wrapper finance-entrypoint /usr/local/bin/
 
+	# echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf && \
+	# ldconfig && \
 RUN \
 	set -x && \
-	useradd -d /finance -U finance && \
-	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf && \
-	ldconfig && \
+	adduser -D -h /finance finance finance && \
 	chown root:root /usr/local/bin/* && \
 	chmod 755 /usr/local/bin/*
 

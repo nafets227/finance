@@ -25,7 +25,7 @@ BINDIR  = /home/finance/bin
 #
 CC=gcc
 CFLAGS=-pipe -Wall
-LIBS=-L/usr/local/lib
+LIBS=-L/usr/lib
 
 ifneq ($(CONF_MYSQL),0)
 CFLAGS+=-DCONF_MYSQL
@@ -40,15 +40,14 @@ endif
 
 ifneq ($(CONF_AQB6),0)
 CFLAGS+=-DCONF_AQB6 -I/usr/include/aqbanking6 -I/usr/include/gwenhywfar5
-CFLAGS+=-I/usr/local/include/aqbanking6 -I/usr/local/include/gwenhywfar5
 LIBS+=-laqbanking -lgwenhywfar
 endif
 
 # Debugging/profiling version?
 ifneq ($(DEBUG), 0)
   # Flags for developer's version
-  CFLAGS+=-g -pg -DDEBUG
-  LDFLAGS+=-pg
+  CFLAGS+=-g -DDEBUG
+  LDFLAGS+=-g
 else
   # Flags for production version
   CFLAGS+=-O
@@ -66,7 +65,7 @@ export CFLAGS
 all: fntxt2sql
 
 fntxt2sql: fntxt2sql.o \
-	       fntxt2sql-btx.o fntxt2sql-csv.o fntxt2sql-aqm.o \
+	       fntxt2sql-csv.o fntxt2sql-aqm.o \
 	       fntxt2sql-aqb-tran.o fntxt2sql-aqb-bal.o fntxt2sql-aqb6.o \
 	       fntxt2sql-hbci.o \
 	       fntxt2sql-util.o fntxt2sql-mysql.o fnSql.o
@@ -75,8 +74,10 @@ fntxt2sql: fntxt2sql.o \
 fntxt2sql.o: fntxt2sql.c fntxt2sql.h
 	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql.c
 
-fntxt2sql-btx.o: fntxt2sql-btx.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-btx.c
+# fntxt2sql-btx.c:795:15: error: dereferencing pointer to incomplete type 'FILE' {aka 'struct _IO_FILE'}
+#   795 |  if(fstat(file->_fileno, &fileStat) != 0)
+# fntxt2sql-btx.o: fntxt2sql-btx.c fntxt2sql.h
+# 	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-btx.c
 
 fntxt2sql-csv.o: fntxt2sql-csv.c fntxt2sql.h
 	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-csv.c

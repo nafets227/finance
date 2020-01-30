@@ -61,7 +61,8 @@ int processFile(char *achInpFileName)
 		}
 	}
 	if(config.inputFormat == inpBtx)
-		iRc = processBtxFile(inpFile);
+		// TODO iRc = processBtxFile(inpFile);
+		iRc = 0;
 #ifdef CONF_AQB6
 	else if (config.inputFormat == inpAqb6)
 		iRc = processAqb6File(achInpFileName);
