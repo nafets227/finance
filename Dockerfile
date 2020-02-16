@@ -68,11 +68,6 @@ RUN \
 	mkdir -p dist/usr/local/bin && \
 	cp -a fntxt2sql  dist/usr/local/bin/
 
-# list results
-RUN \
-	echo "Results in Builder container:" && \
-	ls -lR /*/dist
-
 ##############################################################################
 FROM archlinux/base
 
@@ -124,10 +119,5 @@ RUN \
 	ldconfig && \
 	chown root:root /usr/local/bin/* && \
 	chmod 755 /usr/local/bin/*
-
-# list results
-RUN \
-	echo "Installed following files to /usr/local: " && \
-	ls -lR /usr/local
 
 ENTRYPOINT [ "/usr/local/bin/finance-root-wrapper" ]
