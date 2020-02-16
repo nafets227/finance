@@ -792,7 +792,7 @@ int processBtxFile(FILE * file)
 
 	//***** allocate Memory to hold the complete file ************************
 #ifndef CYGWIN
-	if(fstat(file->_fileno, &fileStat) != 0)
+	if(fstat(fileno(file), &fileStat) != 0)
 #else
 	if(fstat(file->_file, &fileStat) != 0)
 #endif

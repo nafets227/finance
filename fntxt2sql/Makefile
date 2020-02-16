@@ -70,7 +70,7 @@ fntxt2sql: fntxt2sql.o \
 	       fntxt2sql-aqb-tran.o fntxt2sql-aqb-bal.o fntxt2sql-aqb6.o \
 	       fntxt2sql-hbci.o \
 	       fntxt2sql-util.o fntxt2sql-mysql.o fnSql.o
-	$(LINK.o) -o $@ $(LIBS) $^  
+	$(LINK.o) -o $@ $^ $(LIBS)
 
 fntxt2sql.o: fntxt2sql.c fntxt2sql.h
 	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql.c
