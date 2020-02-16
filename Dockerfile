@@ -62,6 +62,7 @@ RUN \
 	mkdir /fntxt2sql
 COPY fntxt2sql/* /fntxt2sql/
 RUN \
+	set -x && \
 	cd fntxt2sql && \
 	make clean && \
 	make && \
