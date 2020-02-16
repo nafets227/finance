@@ -17,7 +17,7 @@ RUN \
 	set -x && \
 	git clone https://github.com/aqbanking/gwenhywfar && \
 	cd gwenhywfar && \
-	git checkout tags/5.1.3 && \
+	git checkout tags/5.2.0 && \
 	make -f Makefile.cvs && \
 	./configure \
 		--with-guis="cpp" \
@@ -33,7 +33,7 @@ RUN \
 	set -x && \
 	git clone https://github.com/aqbanking/aqbanking && \
 	cd aqbanking && \
-	git checkout tags/6.0.2 && \
+	git checkout tags/6.1.0 && \
 	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
 	./configure && \
 	make typedefs && \
@@ -45,8 +45,8 @@ RUN \
 # pxlib, a paradox DB library
 RUN \
 	set -x && \
-	curl -L http://downloads.sourceforge.net/sourceforge/pxlib/pxlib-0.6.6.tar.gz | tar xvz && \
-	cd pxlib-0.6.6 && \
+	curl -L http://downloads.sourceforge.net/sourceforge/pxlib/pxlib-0.6.8.tar.gz | tar xvz && \
+	cd pxlib-0.6.8 && \
 	touch config.rpath && \
 	autoreconf && \
 	./configure \
@@ -106,7 +106,7 @@ RUN \
 
 COPY --from=builder /gwenhywfar/dist/usr/local /usr/local
 COPY --from=builder /aqbanking/dist /
-COPY --from=builder /pxlib-0.6.6/dist /
+COPY --from=builder /pxlib-0.6.8/dist /
 COPY --from=builder /fntxt2sql/dist /
 
 # copy and install additional scripts
