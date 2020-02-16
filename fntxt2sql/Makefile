@@ -6,7 +6,7 @@
 
 # Standard Configuration (may be overwritten by command-line args to make
 # e.g. for Release use: make DEBUG=0
-DEBUG=1
+DEBUG=0
 CONF_MYSQL=1
 CONF_HBCIPX=1
 CONF_AQB6=1

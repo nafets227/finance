@@ -23,7 +23,6 @@ int initMysql(const char * const pchHost, const char * const pchDbParm,
 		const char * const pchUser, const char * const pchPassword)
 {
 	MYSQL *conn = NULL;
-	char *pchSocket;
 	const char *pchDb;
 	int iPort, iCliFlags;
 
@@ -36,17 +35,16 @@ int initMysql(const char * const pchHost, const char * const pchDbParm,
 	else
 		pchDb = pchDbParm;
 
-	pchSocket = NULL;
 	iPort = 0;
 	iCliFlags = 0;
 	pMysqlConn = mysql_real_connect(conn, pchHost, pchUser, pchPassword, pchDb,
-			iPort, pchSocket, iCliFlags);
+			iPort, NULL, iCliFlags);
 	if(pMysqlConn == NULL)
 	{
 		printMysqlError(conn); mysql_close(conn);
 		fprintf(stderr, "\tTried Host \"%s\", User \"%s\", Passwd \"%s\", "
-				"Db \"%s\", Port %d, Socket \"%s\", Clientflag %d.\n",
-				pchHost, pchUser, pchPassword, pchDb, iPort, pchSocket,
+				"Db \"%s\", Port %d, Clientflag %d.\n",
+				pchHost, pchUser, pchPassword, pchDb, iPort, 
 				iCliFlags);
 		return -1; 
 	}
