@@ -1,5 +1,10 @@
 # finance CHANGELOG
 
+## 0.5-BETA2
+* Switch to Alping linux, reducing Image size from >1GB to ~90MB
+* Bump to AqBanking 6.1.0
+* fn_entry_balance now includes bank code number (#13)
+
 ## 0.5-BETA1
 * Fix type in script (thankt to Alexander Gross)
 * Implement Import of aqb6 download data into Database
