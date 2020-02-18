@@ -1,16 +1,43 @@
-FROM gcc:latest AS builder
+FROM alpine:latest AS builder
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Build Container for aqbanking"
 
 # install prerequisited
 RUN \
 	set -x && \
-	apt-get update && \
-	apt-get install -y --no-install-recommends \
+	apk add \
+		autoconf \
+		automake \
+		bash \
+		build-base \
+		bzip2 \
+		curl \
+		gettext-dev \
+		glib-dev \
+		git \
+		gmp-dev \
+		gnutls-dev \
 		intltool \
-		libgcrypt20-dev \
-		libgnutls28-dev \
-		libxmlsec1-dev
+		libffi-dev \
+		libgcrypt-dev \
+		libressl \
+		libressl-dev \
+		libtool \
+		libxslt-dev \
+		libxml2-dev \
+		mysql-dev
+	#----- end for alpine
+
+# compile xmlsec to work around https://bugs.alpinelinux.org/issues/9110
+RUN cd /tmp && \
+    wget http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.26.tar.gz && \
+    tar -xvf xmlsec1-1.2.26.tar.gz  && \
+    cd xmlsec1-1.2.26 && \
+    ./configure --enable-crypto-dl=no && \
+    make && \
+    make install && \
+    cd .. \
+    && rm -rf /tmp/xmlsec*
 
 # gwenhywfar
 RUN \
@@ -18,6 +45,7 @@ RUN \
 	git clone https://github.com/aqbanking/gwenhywfar && \
 	cd gwenhywfar && \
 	git checkout tags/5.2.0 && \
+	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
 	make -f Makefile.cvs && \
 	./configure \
 		--with-guis="cpp" \
@@ -29,11 +57,11 @@ RUN \
 
 # aqbanking
 RUN \
-	export LD_LIBRARY_PATH=/usr/local/lib && \
 	set -x && \
 	git clone https://github.com/aqbanking/aqbanking && \
 	cd aqbanking && \
 	git checkout tags/6.1.0 && \
+	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
 	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
 	./configure && \
 	make typedefs && \
@@ -70,7 +98,7 @@ RUN \
 	cp -a fntxt2sql  dist/usr/local/bin/
 
 ##############################################################################
-FROM archlinux/base
+FROM alpine:edge
 
 MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Container"
@@ -80,19 +108,24 @@ VOLUME /finance
 ARG DEBUG=0
 RUN \
 	set -x && \
-	pacman -Suy --needed --noconfirm \
-		bind-tools \
+	apk add --no-cache --update \
+		bash \
+		ca-certificates \
+		findutils \
 		gettext \
 		grep \
 		iputils \
-		mariadb-clients \
+		mariadb-client \
+		mariadb-connector-c \
 		s-nail \
 		xmlsec \
+		gmp \
+		gnutls \
 		&& \
 	if [ "$DEBUG" == "1" ] ; then \
 		echo deleting files not needed: && \
 		find \
-			/var/cache/pacman \
+			/var/cache/apk \
 			/usr/share/man \
 			/tmp \
 			/var/tmp \
@@ -100,7 +133,7 @@ RUN \
 		; \
 	fi && \
 	rm -rf \
-		/var/cache/pacman \
+		/var/cache/apk/* \
 		/usr/share/man/* \
 		/tmp/* \
 		/var/tmp/*
@@ -115,9 +148,7 @@ COPY finance-root-wrapper finance-entrypoint /usr/local/bin/
 
 RUN \
 	set -x && \
-	useradd -d /finance -U finance && \
-	echo /usr/local/lib >/etc/ld.so.conf.d/finance.conf && \
-	ldconfig && \
+	adduser -D -h /finance finance finance && \
 	chown root:root /usr/local/bin/* && \
 	chmod 755 /usr/local/bin/*
 
