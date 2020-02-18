@@ -438,7 +438,7 @@ function import_handleDir
 		
 		if [ ! -z $moveTo ]; then
 			if [ "$rc" == 0 ]; then
-				mv --backup=numbered $f $moveTo.$ftype/ || return 1
+				mv -n $f $moveTo.$ftype/ || return 1
 				printf "Moved imported file %s to %s\n" "$f" "$moveTo.$ftype"
 			else
 				printf "Import of $f failed (RC=%s).\n" "$rc"
