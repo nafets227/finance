@@ -594,7 +594,7 @@ fi
 # @TODO change to aqb6. Check for formatstring (new option inaqb6) and
 # also modify fntxt2sql to the new format
 printf "Processing transactions and balances \n"
-for f in $datadir/inbound.aqb/* ; do 
+for f in $(ls $datadir/inbound.aqb/* 2>/dev/null) ; do
     fnam=$(basename $f)
     aqbanking-cli listtrans -c $f >$datadir/inbound.aqb-tran/$fnam && \
     aqbanking-cli listbal   -c $f >$datadir/inbound.aqb-bal/$fnam  && \
