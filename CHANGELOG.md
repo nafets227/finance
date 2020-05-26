@@ -1,5 +1,6 @@
 # finance CHANGELOG
 
+## 0.5
 ## 0.5-BETA2
 * Switch to Alping linux, reducing Image size from >1GB to ~90MB
 * Bump to AqBanking 6.1.0
