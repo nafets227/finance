@@ -1,5 +1,11 @@
 # finance CHANGELOG
 
+## 0.5.1
+* ease testing with testlocal [ test | bash | initdata | initdb ]
+* Bump to aqbanking 6.2.1
+* bump to gwenhywfar 5.3.0
+* bump to xmlsec1 1.2.30
+
 ## 0.5
 ## 0.5-BETA2
 * Switch to Alping linux, reducing Image size from >1GB to ~90MB
