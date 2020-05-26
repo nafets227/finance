@@ -99,8 +99,10 @@ exec_container () {
 	export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
 	export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
 	[ -z "$DNS" ] || DNS_PARM="--dns $DNS"
+	[ -z "$1" ] || ENTRY_PARM="-ti --entrypoint $1"
 	docker run \
 		$DNS_PARM \
+		$ENTRY_PARM \
 		-e MYSQL_HOST \
 		-e MYSQL_DATABASE \
 		-e MYSQL_USER \
@@ -177,7 +179,17 @@ case $action in
 		# database should be still the same
 		test_dbsetup || exit 1
 		;;
+	bash )
+		exec_container "/bin/bash"
+		;;
+	initdata )
+		setup_testdata || exit 1
+		;;
+	initdb )
+		setup_testdb || exit 1
+		;;
 	*)
 		printf "Error: Unknown action %s\n" "$action"
+		printf "Valid actions: test bash initdata initdb\n"
 		;;
 esac
