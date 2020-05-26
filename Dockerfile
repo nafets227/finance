@@ -30,9 +30,9 @@ RUN \
 
 # compile xmlsec to work around https://bugs.alpinelinux.org/issues/9110
 RUN cd /tmp && \
-    wget http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.26.tar.gz && \
-    tar -xvf xmlsec1-1.2.26.tar.gz  && \
-    cd xmlsec1-1.2.26 && \
+    wget http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.30.tar.gz && \
+    tar -xvf xmlsec1-1.2.30.tar.gz  && \
+    cd xmlsec1-1.2.30 && \
     ./configure --enable-crypto-dl=no && \
     make && \
     make install && \
@@ -44,7 +44,7 @@ RUN \
 	set -x && \
 	git clone https://github.com/aqbanking/gwenhywfar && \
 	cd gwenhywfar && \
-	git checkout tags/5.2.0 && \
+	git checkout tags/5.3.0 && \
 	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
 	make -f Makefile.cvs && \
 	./configure \
@@ -60,7 +60,7 @@ RUN \
 	set -x && \
 	git clone https://github.com/aqbanking/aqbanking && \
 	cd aqbanking && \
-	git checkout tags/6.1.0 && \
+	git checkout tags/6.2.1 && \
 	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
 	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
 	./configure && \
