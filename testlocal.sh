@@ -71,6 +71,16 @@ function setup_testdb () {
 	return 0	
 }
 
+##### Setup Test data directory for Tests ####################################
+function setup_testdata () {
+	# prepare the filesystem (make it empty)
+	test -d ./testdata  && rm -rf ./testdata
+	mkdir ./testdata
+	cp .hbci-pinfile ./testdata/.hbci-pinfile || return 1
+
+	return 0
+}
+
 #### Test DB Setup ###########################################################
 test_dbsetup () {
 	printf "Testing DB Setup start.\n"
@@ -83,6 +93,30 @@ test_dbsetup () {
 	return 0
 }
 
+#### Start container #########################################################
+exec_container () {
+	export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
+	export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
+	export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
+	[ -z "$DNS" ] || DNS_PARM="--dns $DNS"
+	docker run \
+		$DNS_PARM \
+		-e MYSQL_HOST \
+		-e MYSQL_DATABASE \
+		-e MYSQL_USER \
+		-e MYSQL_PASSWORD \
+		-e MYSQL_ROOT_PASSWORD \
+		-e DB_USERS \
+		-e DB_testuser1_PASSWORD \
+		-e MAIL_TO \
+		-e MAIL_FROM \
+		-e MAIL_URL \
+		-e MAIL_HOSTNAME \
+		-e MAIL_ACCOUNTS \
+		-v $(pwd)/testdata:/finance \
+		"nafets227/finance:local" \
+	|| return 1
+}
 ##### Main ###################################################################
 if [ -z "$MYSQL_HOST" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
 	MYSQL_HOST="www.$KUBE_BASEDOM"
@@ -98,7 +132,6 @@ if [ -z "$MAIL_HOSTNAME" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
 	MAIL_HOSTNAME="finance-testlocal.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_HOSTNAME to %s\n" "$MAIL_HOSTNAME"
 fi
-
 
 if [ -z "$MYSQL_HOST" ] ||
    [ -z "$MYSQL_DATABASE" ] ||
@@ -119,70 +152,32 @@ fi
 # Build
 docker build . -t nafets227/finance:local || exit 1
 
-# prepare the database to have the right testcases
-setup_testdb
+action=${1:-test}
+case $action in
+	test )
+		# prepare the database to have the right testcases
+		setup_testdb || exit 1
+		setup_testdata || exit 1
 
-# prepare the filesystem (make it empty)
-test -d ./testdata  && rm -rf ./testdata
-mkdir ./testdata
-cp .hbci-pinfile ./testdata/.hbci-pinfile || exit 1
+		# Start our just built container
+		printf "Executing container 1st time - start.\n"
+		DB_USERS="testuser1 testuser2"
+		DB_testuser1_PASSWORD="dummypw"
+		exec_container
+		printf "Executing container 1st time - end.\n"
 
-# Start our just built container
-[ -z "$DNS" ] || DNS_PARM="--dns $DNS"
-printf "Executing container 1st time - start.\n"
-DB_USERS="testuser1 testuser2"
-DB_testuser1_PASSWORD="dummypw"
+		# Now check is results are what we expected.
+		test_dbsetup || exit 1
 
-export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
-export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
-export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
-docker run \
-	$DNS_PARM \
-	-e MYSQL_HOST \
-	-e MYSQL_DATABASE \
-	-e MYSQL_USER \
-	-e MYSQL_PASSWORD \
-	-e MYSQL_ROOT_PASSWORD \
-	-e DB_USERS \
-	-e DB_testuser1_PASSWORD \
-	-e MAIL_TO \
-	-e MAIL_FROM \
-	-e MAIL_URL \
-	-e MAIL_HOSTNAME \
-	-e MAIL_ACCOUNTS \
-	-v $(pwd)/testdata:/finance \
-	"nafets227/finance:local" \
-	|| exit 1
+		# Start our just built container another time
+		printf "Executing container 2nd time - start.\n"
+		exec_container
+		printf "Executing container 2nd time - end.\n"
 
-printf "Executing container 1st time - end.\n"
-
-# Now check is results are what we expected.
-test_dbsetup
-
-# Start our just built container another time
-printf "Executing container 2nd time - start.\n"
-
-export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
-export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
-docker run \
-	$DNS_PARM \
-	-e MYSQL_HOST \
-	-e MYSQL_DATABASE \
-	-e MYSQL_USER \
-	-e MYSQL_PASSWORD \
-	-e MYSQL_ROOT_PASSWORD \
-	-e DB_USERS \
-	-e DB_testuser1_PASSWORD \
-	-e MAIL_TO \
-	-e MAIL_FROM \
-	-e MAIL_URL \
-	-e MAIL_HOSTNAME \
-	-e MAIL_ACCOUNTS \
-	-v $(pwd)/testdata:/finance \
-	"nafets227/finance:local" \
-	|| exit 1
-
-printf "Executing container 2nd time - end.\n"
-
-# database should be still the same
-test_dbsetup
+		# database should be still the same
+		test_dbsetup || exit 1
+		;;
+	*)
+		printf "Error: Unknown action %s\n" "$action"
+		;;
+esac
