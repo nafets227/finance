@@ -296,7 +296,7 @@ function aqsetup_acc () {
 			-u "$uu"
 		return 1
 	fi
-	aqhbci_wrapper setTanMediumId -u "$uu" -m "nafets227/finance"
+	# aqhbci_wrapper setTanMediumId -u "$uu" -m "tobedefined"
 
 	aqhbci_wrapper getaccounts -u "$uu"
 	rc=$? ; if [ "$rc" != 0 ] ; then
