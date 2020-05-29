@@ -99,7 +99,12 @@ exec_container () {
 	export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
 	export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
 	[ -z "$DNS" ] || DNS_PARM="--dns $DNS"
-	[ -z "$1" ] || ENTRY_PARM="-ti --entrypoint $1"
+	if [ "$1" == "-ti" ] ; then
+		ENTRY_PARM="-ti"
+	elif [ ! -z "$1" ] ; then
+		ENTRY_PARM="-ti --entrypoint $1"
+	fi
+	shift
 	docker run \
 		$DNS_PARM \
 		$ENTRY_PARM \
@@ -116,7 +121,7 @@ exec_container () {
 		-e MAIL_HOSTNAME \
 		-e MAIL_ACCOUNTS \
 		-v $(pwd)/testdata:/finance \
-		"nafets227/finance:local" \
+		"nafets227/finance:local" "$@" \
 	|| return 1
 }
 ##### Main ###################################################################
@@ -155,6 +160,7 @@ fi
 docker build . -t nafets227/finance:local || exit 1
 
 action=${1:-test}
+shift
 case $action in
 	test )
 		# prepare the database to have the right testcases
@@ -179,6 +185,9 @@ case $action in
 		# database should be still the same
 		test_dbsetup || exit 1
 		;;
+	exec )
+		exec_container "-ti" "$@"
+		;;
 	bash )
 		exec_container "/bin/bash"
 		;;
@@ -188,6 +197,7 @@ case $action in
 	initdb )
 		setup_testdb || exit 1
 		;;
+
 	*)
 		printf "Error: Unknown action %s\n" "$action"
 		printf "Valid actions: test bash initdata initdb\n"

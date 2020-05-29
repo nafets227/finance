@@ -20,4 +20,8 @@ find /finance -name .hbci-pinfile -maxdepth 1 -perm /u=wx -exec chmod u-wx {} ";
 
 printf "Switching to restricted user finance\n"
 cd /finance
-su finance -c /usr/local/bin/finance-entrypoint
+
+cat >/tmp/finance-tmp <<-EOF
+	/usr/local/bin/finance-entrypoint "$@"
+	EOF
+su finance /tmp/finance-tmp

@@ -4,7 +4,6 @@
 # 
 # Execute automatic tasks for finance
 
-
 ##### trim ###################################################################
 function trim {
 	if [ $# -ne 1 ] ; then
@@ -530,6 +529,12 @@ if [ ! -z "$MAIL_TO" ] ; then
 	fi
 fi
 
+if [ "${1:0:10}" == "--fromdate" ] ; then
+	fromdate="${1:11}"
+else
+	fromdate=$(date +%Y%m%d -d @$(( $(date +%s) - ( 90 * 24 * 3600 ) )))
+fi
+
 if ! ping  -c 1 $MYSQL_HOST ; then
 	printf "Warning: MYSQL_HOST %s is not pingable.\n" "$MYSQL_HOST"
 	set -x
@@ -585,7 +590,7 @@ aqbanking-cli \
 	--transactions \
 	--ignoreUnsupported \
 	-c $datadir/inbound.aqb6/$(date +\%Y\%m\%d-\%H\%M\%S.\%N) \
-	--fromdate=$(date +%Y%m%d -d @$(( $(date +%s) - ( 90 * 24 * 3600 ) )))
+	--fromdate=$fromdate
 rc=$? ; if [ "$rc" != 0 ] ; then
 	printf "Error %s in aqbanking-cli request --balance --transactions\n" "$rc"
 	exit 1
