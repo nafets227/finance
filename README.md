@@ -89,3 +89,5 @@ to MAIL_URL. Authentication to the mail server is not yet supported.
 fntxt2sql program supports more than mySql targets, have a look into its C
 sourcecode. However, the scripts of this container only support importing into
 a Mysql/Mariadb database.
+
+If you need to get information where the bank requests to enter a mobile pin, please try to use ./testlocal exec. Common case is to load bookings older than 90 day with ./testlocal exec --fromdate=yyyymmdd.
