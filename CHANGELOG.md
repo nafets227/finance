@@ -1,5 +1,8 @@
 # finance CHANGELOG
 
+## Next
+* Support Non-compliant ING Diba
+
 ## 0.5.1
 * ease testing with testlocal [ test | bash | initdata | initdb ]
 * Bump to aqbanking 6.2.1

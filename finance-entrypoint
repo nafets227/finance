@@ -255,8 +255,22 @@ function aqsetup_acc () {
 	local tanmode="$4"
 	local parm="$5"
 
+	local disable_getbankinfo disable_getsysid disable_setitanmode
 	printf "Configuring HBCI for BLZ %s User %s tanmode=%s url=%s setup=%s\n" \
 		"$blz" "$u" "$tanmode" "$url" "$parm"
+
+	if [ "$blz" == "50010517" ] ; then
+		# Special handline of ING-Diba Germany
+		# They are not PSD2 compliant, one can only read balances and
+		# transactions, but its enough for us.
+		# Unidentified getbankinfo is not working, so we need to disable it
+		disable_getbankinfo="1"
+		disable_getsysid="1"
+		if [ -z "$tanmode" ] ; then
+			disable_setitanmode="1"
+		fi
+		printf "\tApplying special handling for ING-Diba\n"
+	fi
 
 	aqhbci_wrapper adduser \
 		-b $blz \
@@ -283,19 +297,25 @@ function aqsetup_acc () {
 		return 1
 	fi
 
-	aqhbci_wrapper getbankinfo -u "$uu" || return 1
-	aqhbci_wrapper getsysid -u "$uu" || return 1
-# @TODO is getkeys still needed ???
-	aqhbci_wrapper setitanmode -u "$uu" -m "$tanmode"
-	if [ $? != 0 ] ; then
-		printf "Following itan modes are available:\n" &&
-		aqhbci-tool4 \
-			--noninteractive \
-			listitanmodes \
-			-u "$uu"
-		return 1
+	if [ -z "$disable_getbankinfo" ] ; then
+		aqhbci_wrapper getbankinfo -u "$uu" || return 1
 	fi
-	# aqhbci_wrapper setTanMediumId -u "$uu" -m "tobedefined"
+
+	if [ -z "$disable_getsysid" ] ; then
+		aqhbci_wrapper getsysid -u "$uu" || return 1
+	fi
+
+	if [ -z "$disable_setitanmode" ] ; then
+		aqhbci_wrapper setitanmode -u "$uu" -m "$tanmode"
+		if [ $? != 0 ] ; then
+			printf "Following itan modes are available:\n" &&
+			aqhbci-tool4 \
+				--noninteractive \
+				listitanmodes \
+				-u "$uu"
+			return 1
+		fi
+	fi
 
 	aqhbci_wrapper getaccounts -u "$uu"
 	rc=$? ; if [ "$rc" != 0 ] ; then
@@ -328,16 +348,18 @@ function aqsetup_acc () {
 		if [ "$acc_blz" == "$blz" ] ; then
 			printf "Adding new account %s id=%s for bank %s\n" \
 				"$acc_nr" "$acc_id" "$acc_blz"
-			aqhbci_wrapper getaccsepa -a "$acc_id" &&
-			aqhbci_wrapper getbankinfo -u "$uu" &&
-			aqhbci_wrapper getaccsepa -a "$acc_id" &&
-			/bin/true || return 1
+			aqhbci_wrapper getaccsepa -a "$acc_id" || return 1
+			if [ -z "$disable_getbankinfo" ] ; then
+				aqhbci_wrapper getbankinfo -u "$uu" || return 1
+				aqhbci_wrapper getaccsepa -a "$acc_id" || return 1
+			fi
 		#DEBUG else
 		# printf "ignoring account %s id=%s for bank %s\n" \
 		#	"$acc_nr" "$acc_id" "$acc_blz"
 		fi
 	done <<<$accs
 
+	# unclear why needed another time, but without it it does not work.
 	aqhbci_wrapper getaccounts -u "$uu" || return 1
 
 	return 0
