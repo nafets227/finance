@@ -1,7 +1,8 @@
 # finance CHANGELOG
 
-## Next
+## 0.6
 * Support Non-compliant ING Diba
+* Allow interactive input of TAN
 
 ## 0.5.1
 * ease testing with testlocal [ test | bash | initdata | initdb ]
@@ -11,12 +12,12 @@
 
 ## 0.5
 ## 0.5-BETA2
-* Switch to Alping linux, reducing Image size from >1GB to ~90MB
+* Switch to Alpine linux, reducing Image size from >1GB to ~90MB
 * Bump to AqBanking 6.1.0
 * fn_entry_balance now includes bank code number (#13)
 
 ## 0.5-BETA1
-* Fix type in script (thankt to Alexander Gross)
+* Fix typo in script (thanks to Alexander Gross)
 * Implement Import of aqb6 download data into Database
 * Dont use aqbanking and gwenhywfar packages but build them.
   This allow to specify the version to use instead of using the latest
