@@ -4,6 +4,10 @@
 * Bump to aqbanking 6.3.0
 * Bump to gwenhywfar 5.6.0
 * use xmlsec from alpine linux
+* stop using Docker Hub Builds, that are no longer free of charge
+* Move default location for Docker Images is ghcr.io/nafets227/finance
+* Keep updating deprecated location docker.io/nafets227/finance
+  Only Releases are forwarded, forwarding may stop at any time
 
 ## 0.6
 * Support Non-compliant ING Diba
