@@ -20,24 +20,12 @@ RUN \
 		intltool \
 		libffi-dev \
 		libgcrypt-dev \
-		libressl \
-		libressl-dev \
 		libtool \
 		libxslt-dev \
 		libxml2-dev \
-		mysql-dev
+		mysql-dev \
+		xmlsec-dev
 	#----- end for alpine
-
-# compile xmlsec to work around https://bugs.alpinelinux.org/issues/9110
-RUN cd /tmp && \
-    wget http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.30.tar.gz && \
-    tar -xvf xmlsec1-1.2.30.tar.gz  && \
-    cd xmlsec1-1.2.30 && \
-    ./configure --enable-crypto-dl=no && \
-    make && \
-    make install && \
-    cd .. \
-    && rm -rf /tmp/xmlsec*
 
 # gwenhywfar
 RUN \
