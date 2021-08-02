@@ -1,5 +1,4 @@
 FROM alpine:latest AS builder
-MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
 LABEL Description="Finance Build Container for aqbanking"
 
 # install prerequisited
@@ -88,7 +87,7 @@ RUN \
 ##############################################################################
 FROM alpine:edge
 
-MAINTAINER Stefan Schallenberg aka nafets227 <infos@nafets.de>
+LABEL org.opencontainers.image.authors="Stefan Schallenberg aka nafets227 <infos@nafets.de>"
 LABEL Description="Finance Container"
 
 VOLUME /finance
