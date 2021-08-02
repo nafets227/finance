@@ -612,7 +612,8 @@ aqbanking-cli \
 	--transactions \
 	--ignoreUnsupported \
 	-c $datadir/inbound.aqb6/$(date +\%Y\%m\%d-\%H\%M\%S.\%N) \
-	--fromdate=$fromdate
+	--fromdate=$fromdate \
+	--number=0
 rc=$? ; if [ "$rc" != 0 ] ; then
 	printf "Error %s in aqbanking-cli request --balance --transactions\n" "$rc"
 	exit 1
