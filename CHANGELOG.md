@@ -1,5 +1,10 @@
 # finance CHANGELOG
 
+## 0.6.1
+* Bump to aqbanking 6.3.0
+* Bump to gwenhywfar 5.6.0
+* use xmlsec from alpine linux
+
 ## 0.6
 * Support Non-compliant ING Diba
 * Allow interactive input of TAN
