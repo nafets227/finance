@@ -4,7 +4,7 @@ name: Docker-publish
 on:
   push:
     tags: 
-      - 'v*.*.*'
+      - '*.*.*'
 
 
 jobs:
