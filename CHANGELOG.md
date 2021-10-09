@@ -1,5 +1,15 @@
 # finance CHANGELOG
 
+## 0.7
+* allow interactive input of tan received from 2-factor (see README)
+* Bump to aqbanking 6.3.2
+* Bump to gwnhywfar 5.7.3
+* suppress warning printed by find on wrong order of parms (--maxdepth)
+
+Known Bug:
+* Initialising from scratch fails. It seems an aqbanking bug
+  (reported to AqBanking, see https://www.aquamaniac.de/rdm/issues/244)
+
 ## 0.6.1
 * Bump to aqbanking 6.3.0
 * Bump to gwenhywfar 5.6.0
