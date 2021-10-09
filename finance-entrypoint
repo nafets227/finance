@@ -237,7 +237,7 @@ function aqhbci_wrapper () {
 	#DEBUG
 	printf " ---------- aqhbci-tool4 %s\n" "$*" >&2
 	aqhbci-tool4 \
-		--noninteractive \
+		$taninteractive \
 		--acceptvalidcerts \
 		--pinfile=$datadir/.hbci-pinfile \
 		"$@"
@@ -551,11 +551,19 @@ if [ ! -z "$MAIL_TO" ] ; then
 	fi
 fi
 
-if [ "${1:0:10}" == "--fromdate" ] ; then
-	fromdate="${1:11}"
-else
-	fromdate=$(date +%Y%m%d -d @$(( $(date +%s) - ( 90 * 24 * 3600 ) )))
-fi
+fromdate=$(date +%Y%m%d -d @$(( $(date +%s) - ( 90 * 24 * 3600 ) )))
+taninteractive="--noninteractive"
+while [ "$#" -gt 0 ] ; do
+	if [ "${1:0:10}" == "--fromdate" ] ; then
+		fromdate="${1:11}"
+	elif [ "$1" == "--taninteractive" ] ; then
+		taninteractive=""
+	else
+		printf "Error: Unknown parameter %s\n" "$1"
+		exit 1
+	fi
+	shift
+done
 
 if ! ping  -c 1 $MYSQL_HOST ; then
 	printf "Warning: MYSQL_HOST %s is not pingable.\n" "$MYSQL_HOST"
@@ -604,7 +612,7 @@ test -d $datadir/store.aqb6        || mkdir $datadir/store.aqb6
 
 printf "Loading transactions and balances \n"
 aqbanking-cli \
-	--noninteractive \
+	$taninteractive \
 	--acceptvalidcerts \
 	--pinfile=$datadir/.hbci-pinfile \
 	request \

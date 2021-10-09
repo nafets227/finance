@@ -91,3 +91,6 @@ sourcecode. However, the scripts of this container only support importing into
 a Mysql/Mariadb database.
 
 If you need to get information where the bank requests to enter a mobile pin, please try to use ./testlocal exec. Common case is to load bookings older than 90 day with ./testlocal exec --fromdate=yyyymmdd.
+
+If your bank, as e.g. HypoVereinsbank, does no longer support logging on
+without 2 factor authorisation, you can try with ./testlocal exec --taninteractive. This allows you to enter the tan received via 2nd factor.
