@@ -171,7 +171,7 @@ case $action in
 		printf "Executing container 1st time - start.\n"
 		DB_USERS="testuser1 testuser2"
 		DB_testuser1_PASSWORD="dummypw"
-		exec_container
+		exec_container "$@"
 		printf "Executing container 1st time - end.\n"
 
 		# Now check is results are what we expected.
@@ -179,7 +179,7 @@ case $action in
 
 		# Start our just built container another time
 		printf "Executing container 2nd time - start.\n"
-		exec_container
+		exec_container "$@"
 		printf "Executing container 2nd time - end.\n"
 
 		# database should be still the same
@@ -189,7 +189,7 @@ case $action in
 		exec_container "-ti" "$@"
 		;;
 	bash )
-		exec_container "/bin/bash"
+		exec_container "/bin/bash" "$@"
 		;;
 	initdata )
 		setup_testdata || exit 1
