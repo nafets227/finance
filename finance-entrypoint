@@ -233,16 +233,32 @@ function aqsetup () {
 # @TODO support PayPal, see
 # https://www.aquamaniac.de/rdm/projects/aqbanking/wiki/Paypal_einrichten
 
+function aqbanking_wrapper () {
+	#DEBUG
+	printf " ---------- aqbanking-cli %s\n" "$*" >&2
+	[ "$1" == "--noninteractive" ] && shift
+	aqbanking-cli \
+		$taninteractive \
+		--acceptvalidcerts \
+		--pinfile=$datadir/.hbci-pinfile \
+		"$@"
+	rc=$?; if [ "$rc" != 0 ] ; then
+		printf "Error %s in aqbanking-clie %s\n" "$rc" "$*" >&2
+		return $rc
+	fi
+}
+
 function aqhbci_wrapper () {
 	#DEBUG
 	printf " ---------- aqhbci-tool4 %s\n" "$*" >&2
+	[ "$1" == "--noninteractive" ] && shift
 	aqhbci-tool4 \
 		$taninteractive \
 		--acceptvalidcerts \
 		--pinfile=$datadir/.hbci-pinfile \
 		"$@"
 	rc=$?; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 %s\n" "$*" >&2
+		printf "Error %s in aqhbci-tool4 %s\n" "$rc" "$*" >&2
 		return $rc
 	fi
 }
@@ -289,13 +305,11 @@ function aqsetup_acc () {
 	sed_regex+="User Id: $u "
 	sed_regex+="Customer Id: $u "
 	sed_regex+='Unique Id: '
-	uu=$(	aqhbci-tool4 --noninteractive listusers \
+	uu=$(
+		set -o pipefail
+		aqhbci_wrapper --noninteractive listusers \
 		| sed -n "${sed_regex}\\(.*\\)#\\1#p"
-		)
-	rc=$? ; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 listusers.\n" "$rc"
-		return 1
-	fi
+		) || return 1
 
 	if [ -z "$disable_getbankinfo" ] ; then
 		aqhbci_wrapper getbankinfo -u "$uu" || return 1
@@ -309,7 +323,7 @@ function aqsetup_acc () {
 		aqhbci_wrapper setitanmode -u "$uu" -m "$tanmode"
 		if [ $? != 0 ] ; then
 			printf "Following itan modes are available:\n" &&
-			aqhbci-tool4 \
+			aqhbci_wrapper \
 				--noninteractive \
 				listitanmodes \
 				-u "$uu"
@@ -320,9 +334,9 @@ function aqsetup_acc () {
 	aqhbci_wrapper getaccounts -u "$uu"
 	rc=$? ; if [ "$rc" != 0 ] ; then
 		printf "Error %s in aqhbci-tool4 getaccounts. aqhbci-config dump follows.\n" "$rc"
-		aqhbci-tool4 \
+		aqhbci_wrapper \
 			listusers
-		aqhbci-tool4 \
+		aqhbci_wrapper \
 			listaccounts
 		return 1
 	fi
@@ -611,28 +625,22 @@ test -d $datadir/inbound.aqb6-bal  || mkdir $datadir/inbound.aqb6-bal
 test -d $datadir/store.aqb6        || mkdir $datadir/store.aqb6
 
 printf "Loading transactions and balances \n"
-aqbanking-cli \
-	$taninteractive \
-	--acceptvalidcerts \
-	--pinfile=$datadir/.hbci-pinfile \
+aqbanking_wrapper \
 	request \
 	--balance \
 	--transactions \
 	--ignoreUnsupported \
 	-c $datadir/inbound.aqb6/$(date +\%Y\%m\%d-\%H\%M\%S.\%N) \
-	--fromdate=$fromdate
-rc=$? ; if [ "$rc" != 0 ] ; then
-	printf "Error %s in aqbanking-cli request --balance --transactions\n" "$rc"
-	exit 1
-fi
+	--fromdate=$fromdate \
+	|| exit 1
 
 # @TODO change to aqb6. Check for formatstring (new option inaqb6) and
 # also modify fntxt2sql to the new format
 printf "Processing transactions and balances \n"
 for f in $(ls $datadir/inbound.aqb/* 2>/dev/null) ; do
     fnam=$(basename $f)
-    aqbanking-cli listtrans -c $f >$datadir/inbound.aqb-tran/$fnam && \
-    aqbanking-cli listbal   -c $f >$datadir/inbound.aqb-bal/$fnam  && \
+    aqbanking_wrapper listtrans -c $f >$datadir/inbound.aqb-tran/$fnam && \
+    aqbanking_wrapper listbal   -c $f >$datadir/inbound.aqb-bal/$fnam  && \
     mv $f $datadir/store.aqb 
     done
 
