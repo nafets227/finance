@@ -4,8 +4,7 @@ name: Docker-publish
 on:
   push:
     tags: 
-      - '*.*.*'
-
+      - '*'
 
 jobs:
   docker-build-publish:

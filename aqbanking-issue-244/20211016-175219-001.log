@@ -1,0 +1,104 @@
+mode: pintan
+rdhtype: 1
+hbciVersion: 300
+tokenType: pintan
+crypt: no
+sender: user
+gwenhywfar: 5.7.3.0
+aqhbci: 6.3.2.0stable
+appname: 32F8A67FE34B57AB8D7E4FE70
+appversion: 6.3
+size: 84
+
+HKIDN:2:2+280:70020270+9999999999+0+0'HKVVB:3:3+0+0+1+32F8A67FE34B57AB8D7E4FE70+6.3'
+mode: pintan
+rdhtype: 1
+hbciVersion: 300
+tokenType: pintan
+crypt: yes
+sender: user
+gwenhywfar: 5.7.3.0
+aqhbci: 6.3.2.0stable
+appname: 32F8A67FE34B57AB8D7E4FE70
+appversion: 6.3
+size: 127
+
+HNHBK:1:3+000000000127+300+0+1'HKIDN:2:2+280:70020270+9999999999+0+0'HKVVB:3:3+0+0+1+32F8A67FE34B57AB8D7E4FE70+6.3'HNHBS:4:1+1'
+mode: pintan
+rdhtype: 1
+hbciVersion: 300
+tokenType: pintan
+crypt: yes
+sender: bank
+gwenhywfar: 5.7.3.0
+aqhbci: 6.3.2.0stable
+appname: 32F8A67FE34B57AB8D7E4FE70
+appversion: 6.3
+size: 7072
+
+HNHBK:1:3+000000007072+300+20211016195222003084v1ZG2YNckB+1+20211016195222003084v1ZG2YNckB:1'HIRMG:2:2+0020::Dialoginitialisierung erfolgreich.+0010::Nachricht entgegengenommen.'HIRMS:3:2:2+0020::Information fehlerfrei entgegengenommen.'HIRMS:4:2:3+1040::BPD nicht mehr aktuell. Aktuelle Version folgt.+1050::UPD nicht mehr aktuell. Aktuelle Version folgt.'HIBPA:5:3:3+75+280:70020270+HypoVereinsbank+0+1+220:300+0+0+0'HIKOM:6:4:3+280:70020270+1+2:hbci.hypovereinsbank.de+3:https?://hbci-01.hypovereinsbank.de/bank/hbci'HISHV:7:3:3+N+RDH:1:3:5:9:10+RAH:9:10+PIN:1'HIKPV:8:1:3+6:1:1:1'HIPINS:9:1:3+1+1+1+6:10:6:Onlinenummer:Onlinenummer:HKPAE:J:DKPAE:J:HKPSP:N:DKPSP:N:HKTLF:J:DKTLF:J:HKTSP:N:DKTSP:N:HKTAZ:N:DKTAZ:N:HKPRO:N:HKKAZ:N:HKSAL:N:HKVDB:J:HKKDM:J:HKAUB:J:BKTAB:N:BKTAL:N:BKTAS:J:BKXTA:J:HKWPD:N:XKDAT:N:XKDOB:N:HKTAN:N:XKDTB:N:XKDTD:J:XKDTF:J:XKDTL:J:HKSPA:N:HKCCS:J:HKCSE:J:HKCSB:N:HKCSL:J:HKCCM:J:HKCME:J:HKDME:J:HKBME:J:HKCUB:N:HKCUM:J:HKDSB:N:HKDSW:J:HKCDE:J:HKCDB:N:HKCDL:J:HKCDN:J:HKCDU:J:XKMIB:N:HKCSU:J:XKDPB:N:HKIPZ:J:HKIPS:N:HKFPB:N:HKBAZ:N:HKZDA:J:HKZDF:J:HKZDL:J:HKFDL:N:HKFDA:N:HKWDU:N:HKWSO:N'DIPINS:10:1:3+1+1+DKPAE:J:DKPSP:N:DKTLF:J:DKTSP:N:DKTAZ:N:HKPRO:N:HKKAZ:N:HKSAL:N:HKVDB:J:HKKDM:J:HKAUB:J:BKTAB:N:BKTAL:N:BKTAS:J:BKXTA:J:HKWPD:N:XKDAT:N:XKDOB:N:HKTAN:N:XKDTB:N:XKDTD:J:XKDTF:J:XKDTL:J:HKSPA:N:HKCCS:J:HKCSE:J:HKCSB:N:HKCSL:J:HKCCM:J:HKCME:J:HKDME:J:HKBME:J:HKCUB:N:HKCUM:J:HKDSB:N:HKDSW:J:HKCDE:J:HKCDB:N:HKCDL:J:HKCDN:J:HKCDU:J:XKMIB:N:HKCSU:J:XKDPB:N:HKIPZ:J:HKIPS:N:HKFPB:N:HKBAZ:N:HKZDA:J:HKZDF:J:HKZDL:J:HKFDL:N:HKFDA:N:HKWDU:N:HKWSO:N'HIPAES:11:1:3+1+1+1'DIPAES:12:1:3+1+1'HIPSPS:13:1:3+1+1+1'DIPSPS:14:1:3+1+1'HITLFS:15:1:3+1+1+1+2'DITLFS:16:1:3+1+1+J'HITSPS:17:1:3+1+1+1+0'DITSPS:18:1:3+1+1+N'HITAZS:19:1:3+1+1+1'DITAZS:20:1:3+1+1'HIPROS:21:2:3+999+1'HIPROS:22:3:3+999+1'HIPROS:23:4:3+999+1+1'HIKAZS:24:4:3+999+1+370:N'HIKAZS:25:5:3+999+1+370:N:N'HIKAZS:26:6:3+999+1+1+370:N:N'HISALS:27:3:3+999+1'HISALS:28:4:3+999+1'HISALS:29:5:3+999+1'HISALS:30:6:3+999+1+1'HIVDBS:31:1:3+999+1+2:Verrechnungsscheck ohne Talon:N:3:Verrechnungsscheck mit Talon:N:4:Barscheck ohne Talon:N:5:Barscheck mit Talon:N:6:Orderscheck ohne Talon:N:7:Orderscheck mit Talon:N'HIVDBS:32:2:3+999+1+2:Verrechnungsscheck ohne Talon:N:3:Verrechnungsscheck mit Talon:N:4:Barscheck ohne Talon:N:5:Barscheck mit Talon:N:6:Orderscheck ohne Talon:N:7:Orderscheck mit Talon:N'HIVDBS:33:3:3+999+1+1+2:Verrechnungsscheck ohne Talon:N:3:Verrechnungsscheck mit Talon:N:4:Barscheck ohne Talon:N:5:Barscheck mit Talon:N:6:Orderscheck ohne Talon:N:7:Orderscheck mit Talon:N'HIKDMS:34:2:3+999+1+350'HIKDMS:35:3:3+999+1+350'HIKDMS:36:4:3+999+1+350'HIKDMS:37:5:3+999+1+1+350'HIAUBS:38:3:3+999+1+1'HIAUBS:39:4:3+999+1+1'HIAUBS:40:5:3+999+1+1'HIAUBS:41:6:3+999+1+1+1'BITABS:42:1:3+999+1+14:HKAUB:HKCCS:HKCCM:HKCSE:HKCME:HKCDD:HKDME:HKBME:XKDTD:XKDTF:HKCUM:HKDSW:HKCDE:HKCDL:HKCDN:HKCDU:HKCSU:HKIPZ:HKZDF:HKZDA'BITALS:43:1:3+999+1'BITASS:44:1:3+999+1'HIWPDS:45:5:3+999+1+N:N:N'HIWPDS:46:6:3+999+1+1+N:N:N'XIDATS:47:1:3+999+1+1'XIDOBS:48:1:3+999+1+30:N:Zweitschrift:Reklamation:Nachforschung'HITANS:49:1:3+1+1+1+N:N:1:0:900:1:01:iTAN-Verfahren(indizierte TAN):6:1:indizierte TAN:256:1:N:N:903:2:03:mobileTAN-Verfahren:6:1:Freigabe durch mobileTAN:1::N:N:904:2:04:appTAN-Verfahren:6:1:Freigabe durch appTAN:1::N:N:905:2:MS1.0.0:photoTAN-Verfahren:6:1:Freigabe durch photoTAN:1::N:N'HITANS:50:4:3+1+1+1+N:N:1:900:1:01:::iTAN-Verfahren(indizierte TAN):6:1:indizierte TAN:256:1:N:4:0:N:N:N:N:N:00:0::903:2:03:::mobileTAN-Verfahren:6:1:Freigabe durch mobileTAN:1::N:1:0:N:N:N:N:N:00:0::904:2:04:::appTAN-Verfahren:6:1:Freigabe durch appTAN:1::N:1:0:N:N:N:N:N:00:0::905:2:MS1.0.0:::photoTAN-Verfahren:6:1:Freigabe durch photoTAN:1::N:1:0:N:N:N:N:N:00:0:'HITANS:51:5:3+1+1+1+N:N:1:900:1:01:::iTAN-Verfahren(indizierte TAN):6:1:indizierte TAN:256:1:N:4:0:N:0:0:N:N:00:0::903:2:03:::mobileTAN-Verfahren:6:1:Freigabe durch mobileTAN:1::N:1:0:N:0:0:N:N:00:0::904:2:04:::appTAN-Verfahren:6:1:Freigabe durch appTAN:1::N:1:0:N:0:0:N:N:00:0::905:2:MS1.0.0:::photoTAN-Verfahren:6:1:Freigabe durch photoTAN:1::N:1:0:N:0:0:N:N:00:0:'HITANS:52:6:3+1+1+1+N:N:1:900:1:01:::iTAN-Verfahren(indizierte TAN):6:1:indizierte TAN:256:N:4:N:0:0:N:N:00:0:N::903:2:03:::mobileTAN-Verfahren:6:1:Freigabe durch mobileTAN:1:N:1:N:0:0:N:N:00:0:N::904:2:04:::appTAN-Verfahren:6:1:Freigabe durch appTAN:1:N:1:N:0:0:N:N:00:0:N::905:2:MS1.0.0:::photoTAN-Verfahren:6:1:Freigabe durch photoTAN:1:N:1:N:0:0:N:N:00:0:N:'XIDTBS:53:2:3+999+1+1+J:J'XIDTDS:54:1:3+999+1+1+15:30'XIDTFS:55:1:3+999+1+1+15:30'XIDTLS:56:1:3+999+1+1'HISPAS:57:1:3+1+1+1+N:N:J:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02'HICCSS:58:1:3+999+1+1'HICSES:59:1:3+999+1+1+1:90'HICSBS:60:1:3+999+1+1+N:N'HICSLS:61:1:3+999+1+1+J'HICCMS:62:1:3+999+1+1+5000:J:J'HICMES:63:1:3+999+1+1+1:60:5000:J:J'HIDMES:64:1:3+999+1+1+1:60:1:60:5000:J:J'HIDMES:65:2:3+999+1+1+0;0;1;120000:0;0;60:5000:J:J::urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02'HIBMES:66:1:3+999+1+1+1:60:1:60:5000:J:J'HIBMES:67:2:3+999+1+1+0;1;120000:0;60:5000:J:J::urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02'HICUBS:68:1:3+999+1+1+N'HICUMS:69:1:3+999+1+1+ACCT:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'HIDSBS:70:1:3+999+1+1+N:J:56'HIDSWS:71:1:3+999+1+1+J'HICDES:72:1:3+999+1+1+2:1:365:0102030612:0102030405060708091011121314151617181920212223242526272829303199'HICDBS:73:1:3+999+1+1+N'HICDLS:74:1:3+999+1+1+1:365:N:J'HICDNS:75:1:3+999+1+1+0:1:365:J:J:J:J:N:N:N:N:J:0102030612:0102030405060708091011121314151617181920212223242526272829303199'HICDUS:76:1:3+999+1+1+1:1:365:1:N:N'XIMIBS:77:1:3+999+1+1+999'HICSUS:78:1:3+999+1+1+ACCT:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'XIDPBS:79:1:3+999+1+1'HIIPZS:80:1:3+990+1+1+:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'HIIPSS:81:1:3+990+1+1+3:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'HIFPBS:82:2:3+1+1+1+N:N:N'HIBAZS:83:1:3+999+1+1+N:N:N'HIZDAS:84:1:3+999+1+1+30'HIZDFS:85:1:3+999+1+1+30'HIZDLS:86:1:3+999+1+1'HIFDLS:87:3:3+999+1+1+N:370'HIFDAS:88:3:3+999+1+1+1;MT515;SRG 1998:1;MT536;SRG 1998:1;MT566;SRG 1999'HIWDUS:89:5:3+999+1+1+370'HIWSOS:90:5:3+999+1+1+N:J:370'HIUPA:91:4:3+9999999999+1+0'HIKIM:92:2:3+Information für appTAN Nutzer+Sehr geehrte appTAN Nutzer, bitte verwenden Sie immer die aktuellste Version der HVB mobile Banking App. Ihre Versionsnummer finden Sie in der App rechts unten unter "mehr"/"more", Impressum, scrollen Sie ganz nach unten. Diese sollte mindestens 5.0.1xxx sein. Haben Sie schon die neueste Version, dann loggen Sie sich bitte mindestens einmal in die HVB mobile Banking App ein, damit die Aktivierung der appTAN final abgeschlossen wird. Ihre HypoVereinsbank'HNHBS:93:1+1'
+mode: pintan
+rdhtype: 1
+hbciVersion: 300
+tokenType: pintan
+crypt: no
+sender: bank
+gwenhywfar: 5.7.3.0
+aqhbci: 6.3.2.0stable
+appname: 32F8A67FE34B57AB8D7E4FE70
+appversion: 6.3
+size: 7072
+
+HNHBK:1:3+000000007072+300+20211016195222003084v1ZG2YNckB+1+20211016195222003084v1ZG2YNckB:1'HIRMG:2:2+0020::Dialoginitialisierung erfolgreich.+0010::Nachricht entgegengenommen.'HIRMS:3:2:2+0020::Information fehlerfrei entgegengenommen.'HIRMS:4:2:3+1040::BPD nicht mehr aktuell. Aktuelle Version folgt.+1050::UPD nicht mehr aktuell. Aktuelle Version folgt.'HIBPA:5:3:3+75+280:70020270+HypoVereinsbank+0+1+220:300+0+0+0'HIKOM:6:4:3+280:70020270+1+2:hbci.hypovereinsbank.de+3:https?://hbci-01.hypovereinsbank.de/bank/hbci'HISHV:7:3:3+N+RDH:1:3:5:9:10+RAH:9:10+PIN:1'HIKPV:8:1:3+6:1:1:1'HIPINS:9:1:3+1+1+1+6:10:6:Onlinenummer:Onlinenummer:HKPAE:J:DKPAE:J:HKPSP:N:DKPSP:N:HKTLF:J:DKTLF:J:HKTSP:N:DKTSP:N:HKTAZ:N:DKTAZ:N:HKPRO:N:HKKAZ:N:HKSAL:N:HKVDB:J:HKKDM:J:HKAUB:J:BKTAB:N:BKTAL:N:BKTAS:J:BKXTA:J:HKWPD:N:XKDAT:N:XKDOB:N:HKTAN:N:XKDTB:N:XKDTD:J:XKDTF:J:XKDTL:J:HKSPA:N:HKCCS:J:HKCSE:J:HKCSB:N:HKCSL:J:HKCCM:J:HKCME:J:HKDME:J:HKBME:J:HKCUB:N:HKCUM:J:HKDSB:N:HKDSW:J:HKCDE:J:HKCDB:N:HKCDL:J:HKCDN:J:HKCDU:J:XKMIB:N:HKCSU:J:XKDPB:N:HKIPZ:J:HKIPS:N:HKFPB:N:HKBAZ:N:HKZDA:J:HKZDF:J:HKZDL:J:HKFDL:N:HKFDA:N:HKWDU:N:HKWSO:N'DIPINS:10:1:3+1+1+DKPAE:J:DKPSP:N:DKTLF:J:DKTSP:N:DKTAZ:N:HKPRO:N:HKKAZ:N:HKSAL:N:HKVDB:J:HKKDM:J:HKAUB:J:BKTAB:N:BKTAL:N:BKTAS:J:BKXTA:J:HKWPD:N:XKDAT:N:XKDOB:N:HKTAN:N:XKDTB:N:XKDTD:J:XKDTF:J:XKDTL:J:HKSPA:N:HKCCS:J:HKCSE:J:HKCSB:N:HKCSL:J:HKCCM:J:HKCME:J:HKDME:J:HKBME:J:HKCUB:N:HKCUM:J:HKDSB:N:HKDSW:J:HKCDE:J:HKCDB:N:HKCDL:J:HKCDN:J:HKCDU:J:XKMIB:N:HKCSU:J:XKDPB:N:HKIPZ:J:HKIPS:N:HKFPB:N:HKBAZ:N:HKZDA:J:HKZDF:J:HKZDL:J:HKFDL:N:HKFDA:N:HKWDU:N:HKWSO:N'HIPAES:11:1:3+1+1+1'DIPAES:12:1:3+1+1'HIPSPS:13:1:3+1+1+1'DIPSPS:14:1:3+1+1'HITLFS:15:1:3+1+1+1+2'DITLFS:16:1:3+1+1+J'HITSPS:17:1:3+1+1+1+0'DITSPS:18:1:3+1+1+N'HITAZS:19:1:3+1+1+1'DITAZS:20:1:3+1+1'HIPROS:21:2:3+999+1'HIPROS:22:3:3+999+1'HIPROS:23:4:3+999+1+1'HIKAZS:24:4:3+999+1+370:N'HIKAZS:25:5:3+999+1+370:N:N'HIKAZS:26:6:3+999+1+1+370:N:N'HISALS:27:3:3+999+1'HISALS:28:4:3+999+1'HISALS:29:5:3+999+1'HISALS:30:6:3+999+1+1'HIVDBS:31:1:3+999+1+2:Verrechnungsscheck ohne Talon:N:3:Verrechnungsscheck mit Talon:N:4:Barscheck ohne Talon:N:5:Barscheck mit Talon:N:6:Orderscheck ohne Talon:N:7:Orderscheck mit Talon:N'HIVDBS:32:2:3+999+1+2:Verrechnungsscheck ohne Talon:N:3:Verrechnungsscheck mit Talon:N:4:Barscheck ohne Talon:N:5:Barscheck mit Talon:N:6:Orderscheck ohne Talon:N:7:Orderscheck mit Talon:N'HIVDBS:33:3:3+999+1+1+2:Verrechnungsscheck ohne Talon:N:3:Verrechnungsscheck mit Talon:N:4:Barscheck ohne Talon:N:5:Barscheck mit Talon:N:6:Orderscheck ohne Talon:N:7:Orderscheck mit Talon:N'HIKDMS:34:2:3+999+1+350'HIKDMS:35:3:3+999+1+350'HIKDMS:36:4:3+999+1+350'HIKDMS:37:5:3+999+1+1+350'HIAUBS:38:3:3+999+1+1'HIAUBS:39:4:3+999+1+1'HIAUBS:40:5:3+999+1+1'HIAUBS:41:6:3+999+1+1+1'BITABS:42:1:3+999+1+14:HKAUB:HKCCS:HKCCM:HKCSE:HKCME:HKCDD:HKDME:HKBME:XKDTD:XKDTF:HKCUM:HKDSW:HKCDE:HKCDL:HKCDN:HKCDU:HKCSU:HKIPZ:HKZDF:HKZDA'BITALS:43:1:3+999+1'BITASS:44:1:3+999+1'HIWPDS:45:5:3+999+1+N:N:N'HIWPDS:46:6:3+999+1+1+N:N:N'XIDATS:47:1:3+999+1+1'XIDOBS:48:1:3+999+1+30:N:Zweitschrift:Reklamation:Nachforschung'HITANS:49:1:3+1+1+1+N:N:1:0:900:1:01:iTAN-Verfahren(indizierte TAN):6:1:indizierte TAN:256:1:N:N:903:2:03:mobileTAN-Verfahren:6:1:Freigabe durch mobileTAN:1::N:N:904:2:04:appTAN-Verfahren:6:1:Freigabe durch appTAN:1::N:N:905:2:MS1.0.0:photoTAN-Verfahren:6:1:Freigabe durch photoTAN:1::N:N'HITANS:50:4:3+1+1+1+N:N:1:900:1:01:::iTAN-Verfahren(indizierte TAN):6:1:indizierte TAN:256:1:N:4:0:N:N:N:N:N:00:0::903:2:03:::mobileTAN-Verfahren:6:1:Freigabe durch mobileTAN:1::N:1:0:N:N:N:N:N:00:0::904:2:04:::appTAN-Verfahren:6:1:Freigabe durch appTAN:1::N:1:0:N:N:N:N:N:00:0::905:2:MS1.0.0:::photoTAN-Verfahren:6:1:Freigabe durch photoTAN:1::N:1:0:N:N:N:N:N:00:0:'HITANS:51:5:3+1+1+1+N:N:1:900:1:01:::iTAN-Verfahren(indizierte TAN):6:1:indizierte TAN:256:1:N:4:0:N:0:0:N:N:00:0::903:2:03:::mobileTAN-Verfahren:6:1:Freigabe durch mobileTAN:1::N:1:0:N:0:0:N:N:00:0::904:2:04:::appTAN-Verfahren:6:1:Freigabe durch appTAN:1::N:1:0:N:0:0:N:N:00:0::905:2:MS1.0.0:::photoTAN-Verfahren:6:1:Freigabe durch photoTAN:1::N:1:0:N:0:0:N:N:00:0:'HITANS:52:6:3+1+1+1+N:N:1:900:1:01:::iTAN-Verfahren(indizierte TAN):6:1:indizierte TAN:256:N:4:N:0:0:N:N:00:0:N::903:2:03:::mobileTAN-Verfahren:6:1:Freigabe durch mobileTAN:1:N:1:N:0:0:N:N:00:0:N::904:2:04:::appTAN-Verfahren:6:1:Freigabe durch appTAN:1:N:1:N:0:0:N:N:00:0:N::905:2:MS1.0.0:::photoTAN-Verfahren:6:1:Freigabe durch photoTAN:1:N:1:N:0:0:N:N:00:0:N:'XIDTBS:53:2:3+999+1+1+J:J'XIDTDS:54:1:3+999+1+1+15:30'XIDTFS:55:1:3+999+1+1+15:30'XIDTLS:56:1:3+999+1+1'HISPAS:57:1:3+1+1+1+N:N:J:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02'HICCSS:58:1:3+999+1+1'HICSES:59:1:3+999+1+1+1:90'HICSBS:60:1:3+999+1+1+N:N'HICSLS:61:1:3+999+1+1+J'HICCMS:62:1:3+999+1+1+5000:J:J'HICMES:63:1:3+999+1+1+1:60:5000:J:J'HIDMES:64:1:3+999+1+1+1:60:1:60:5000:J:J'HIDMES:65:2:3+999+1+1+0;0;1;120000:0;0;60:5000:J:J::urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02'HIBMES:66:1:3+999+1+1+1:60:1:60:5000:J:J'HIBMES:67:2:3+999+1+1+0;1;120000:0;60:5000:J:J::urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02'HICUBS:68:1:3+999+1+1+N'HICUMS:69:1:3+999+1+1+ACCT:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'HIDSBS:70:1:3+999+1+1+N:J:56'HIDSWS:71:1:3+999+1+1+J'HICDES:72:1:3+999+1+1+2:1:365:0102030612:0102030405060708091011121314151617181920212223242526272829303199'HICDBS:73:1:3+999+1+1+N'HICDLS:74:1:3+999+1+1+1:365:N:J'HICDNS:75:1:3+999+1+1+0:1:365:J:J:J:J:N:N:N:N:J:0102030612:0102030405060708091011121314151617181920212223242526272829303199'HICDUS:76:1:3+999+1+1+1:1:365:1:N:N'XIMIBS:77:1:3+999+1+1+999'HICSUS:78:1:3+999+1+1+ACCT:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'XIDPBS:79:1:3+999+1+1'HIIPZS:80:1:3+990+1+1+:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'HIIPSS:81:1:3+990+1+1+3:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'HIFPBS:82:2:3+1+1+1+N:N:N'HIBAZS:83:1:3+999+1+1+N:N:N'HIZDAS:84:1:3+999+1+1+30'HIZDFS:85:1:3+999+1+1+30'HIZDLS:86:1:3+999+1+1'HIFDLS:87:3:3+999+1+1+N:370'HIFDAS:88:3:3+999+1+1+1;MT515;SRG 1998:1;MT536;SRG 1998:1;MT566;SRG 1999'HIWDUS:89:5:3+999+1+1+370'HIWSOS:90:5:3+999+1+1+N:J:370'HIUPA:91:4:3+9999999999+1+0'HIKIM:92:2:3+Information für appTAN Nutzer+Sehr geehrte appTAN Nutzer, bitte verwenden Sie immer die aktuellste Version der HVB mobile Banking App. Ihre Versionsnummer finden Sie in der App rechts unten unter "mehr"/"more", Impressum, scrollen Sie ganz nach unten. Diese sollte mindestens 5.0.1xxx sein. Haben Sie schon die neueste Version, dann loggen Sie sich bitte mindestens einmal in die HVB mobile Banking App ein, damit die Aktivierung der appTAN final abgeschlossen wird. Ihre HypoVereinsbank'HNHBS:93:1+1'
+mode: pintan
+rdhtype: 1
+hbciVersion: 300
+tokenType: pintan
+crypt: no
+sender: user
+gwenhywfar: 5.7.3.0
+aqhbci: 6.3.2.0stable
+appname: 32F8A67FE34B57AB8D7E4FE70
+appversion: 6.3
+size: 41
+
+HKEND:2:1+20211016195222003084v1ZG2YNckB'
+mode: pintan
+rdhtype: 1
+hbciVersion: 300
+tokenType: pintan
+crypt: yes
+sender: user
+gwenhywfar: 5.7.3.0
+aqhbci: 6.3.2.0stable
+appname: 32F8A67FE34B57AB8D7E4FE70
+appversion: 6.3
+size: 113
+
+HNHBK:1:3+000000000113+300+20211016195222003084v1ZG2YNckB+2'HKEND:2:1+20211016195222003084v1ZG2YNckB'HNHBS:3:1+2'
+mode: pintan
+rdhtype: 1
+hbciVersion: 300
+tokenType: pintan
+crypt: yes
+sender: bank
+gwenhywfar: 5.7.3.0
+aqhbci: 6.3.2.0stable
+appname: 32F8A67FE34B57AB8D7E4FE70
+appversion: 6.3
+size: 183
+
+HNHBK:1:3+000000000183+300+20211016195222003084v1ZG2YNckB+2+20211016195222003084v1ZG2YNckB:2'HIRMG:2:2+0010::Nachricht entgegengenommen.'HIRMS:3:2:2+0100::Dialog beendet.'HNHBS:4:1+2'
+mode: pintan
+rdhtype: 1
+hbciVersion: 300
+tokenType: pintan
+crypt: no
+sender: bank
+gwenhywfar: 5.7.3.0
+aqhbci: 6.3.2.0stable
+appname: 32F8A67FE34B57AB8D7E4FE70
+appversion: 6.3
+size: 183
+
+HNHBK:1:3+000000000183+300+20211016195222003084v1ZG2YNckB+2+20211016195222003084v1ZG2YNckB:2'HIRMG:2:2+0010::Nachricht entgegengenommen.'HIRMS:3:2:2+0100::Dialog beendet.'HNHBS:4:1+2'
