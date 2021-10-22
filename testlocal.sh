@@ -163,6 +163,12 @@ action=${1:-test}
 shift
 case $action in
 	test )
+		if [ "$1" == "--taninteractive" ] ; then
+			container_parms=( "-ti" "$@")
+		else
+			container_parms=( "" "$@")
+		fi
+
 		# prepare the database to have the right testcases
 		setup_testdb || exit 1
 		setup_testdata || exit 1
@@ -171,7 +177,7 @@ case $action in
 		printf "Executing container 1st time - start.\n"
 		DB_USERS="testuser1 testuser2"
 		DB_testuser1_PASSWORD="dummypw"
-		exec_container "$@"
+		exec_container "${container_parms[@]}"
 		printf "Executing container 1st time - end.\n"
 
 		# Now check is results are what we expected.
@@ -179,7 +185,7 @@ case $action in
 
 		# Start our just built container another time
 		printf "Executing container 2nd time - start.\n"
-		exec_container "$@"
+		exec_container "${container_parms[@]}"
 		printf "Executing container 2nd time - end.\n"
 
 		# database should be still the same
