@@ -7,8 +7,8 @@
 * suppress warning printed by find on wrong order of parms (--maxdepth)
 
 Known Bug:
-* Initialising from scratch fails. It seems an aqbanking bug
-  (reported to AqBanking, see https://www.aquamaniac.de/rdm/issues/244)
+* Initialising from scratch fails if bank requires a tan for getAccounts.
+  It is a confirmed aqbanking bug, see https://www.aquamaniac.de/rdm/issues/244
 
 ## 0.6.1
 * Bump to aqbanking 6.3.0
