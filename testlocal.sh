@@ -31,8 +31,8 @@ function test_dbconnect {
 		EOF
 	rc=$?
 	if [ $rc != "$rcexp" ] ; then
-		printf "ERR: Connecting to DB with user %s%s: RC=%s(Exp=%s)\n" \
-			"$user" "$PRT_PW" "$rc" "$rcexp"  
+		printf "ERR: Connecting to DB at %s with user %s%s: RC=%s(Exp=%s)\n" \
+			"$MYSQL_HOST" "$user" "$PRT_PW" "$rc" "$rcexp"  
 		return 1
 	fi
 	
