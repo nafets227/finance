@@ -106,7 +106,7 @@ int convertCP(char * pch, const char * pchSourceCp, const char *pchDestCp)
 //***** Satz normalisieren, d.h. fuehrende Nullen etc. ***********************
 //****************************************************************************
 static void normalizeNum(char *pText, size_t size /* incl. termination \0 */)
-{	
+{
 	int i;
 
 	if(*pText == '\0')	// never change empty fields
@@ -136,7 +136,7 @@ static void trimText( const char * const pchSource, char *pchDest )
 {
 	const char *pchActSource = pchSource;
 	char * pchActDest = pchDest;
-	
+
 	while(*pchActSource != '\0')
 	{
 		if(*pchActSource != ' ')	// NIcht blanks einfach kopieren und weiter
@@ -147,7 +147,7 @@ static void trimText( const char * const pchSource, char *pchDest )
 		pchActSource++;
 	}
 	*pchActDest = '\0';	// String Ende nicht vergessen!
-	
+
 	return;
 }
 // Codepage convertieren
@@ -169,18 +169,18 @@ static void normalizeText(char * pch)
 		}
 */
 	return;
-	
+
 /*
 	static const char *pchDestCp = "utf8";
 	static iconv_t *pConv = NULL;
-	
+
 	char achBuffer[1024];
 	size_t sInput, sOutput;
 	char *pchIn, *pchOut;
-	
+
 	if(pch == NULL || *pch == '\0')
 		return;
-	
+
 	if(pConv == NULL)
 	{
 		pConv=iconv_open(pchDestCp, config.achCodePage);
@@ -191,7 +191,7 @@ static void normalizeText(char * pch)
 			return;
 		}
 	}
-	
+
 	pchIn = pch;
 	pchOut = achBuffer;
 	sInput = strlen(pch);
@@ -225,11 +225,11 @@ static void normalizeRecord(Buchung *pBuchung)
 	}
 
 	iPos = strlen(pBuchung->butext);
-	if( pBuchung->butext[iPos-1] == ')' && 
+	if( pBuchung->butext[iPos-1] == ')' &&
 			pBuchung->butext[iPos-5] == '(' &&
 			pBuchung->butext[iPos-6] == ' ')
 		pBuchung->butext[iPos-6] = '\0';
-		
+
 	// Codepage conversion
 	normalizeText(pBuchung->butext);
 	normalizeText(pBuchung->part_name1);
@@ -240,19 +240,19 @@ static void normalizeRecord(Buchung *pBuchung)
 }
 
 /*****************************************************************************
- * compare a new (to be written) Record newBuch to a one read from the 
+ * compare a new (to be written) Record newBuch to a one read from the
  * database.
  * Return Values:
  *      < 0 : Records are to be treated as not equal
  *      = 0 : Error
  *      > 0 : Records are to be treated as equal.
- *  
- *      Return Code number (pos+neg) indicates which rule applied. 
+ *
+ *      Return Code number (pos+neg) indicates which rule applied.
  * 		Use this for output/debugging only!
  ****************************************************************************/
 int compareRecord(const Buchung newBuch, const Buchung existBuch)
 {
-	static const int 
+	static const int
 //		RC_orig_ktonr  =  10,
 		RC_orig_blz    =  20,
 //		RC_buchart     =  30,
@@ -273,12 +273,12 @@ int compareRecord(const Buchung newBuch, const Buchung existBuch)
 	int iPos;
 	int iRc = +1;
 
-	
+
 	if(strcmp(newBuch.orig_blz, existBuch.orig_blz))
 	{
-		if(  (  !strcmp(newBuch.orig_blz, "70020270") && 
-				!strcmp(existBuch.orig_blz, "70020001") ) || 
-			 (  !strcmp(newBuch.orig_blz, "70020001") && 
+		if(  (  !strcmp(newBuch.orig_blz, "70020270") &&
+				!strcmp(existBuch.orig_blz, "70020001") ) ||
+			 (  !strcmp(newBuch.orig_blz, "70020001") &&
 			    !strcmp(existBuch.orig_blz, "70020270") ) )
 		{
 			// Sicherstellen dass ein Mindest Anzahl von Feldern uebereinstimmen
@@ -292,12 +292,12 @@ int compareRecord(const Buchung newBuch, const Buchung existBuch)
 				// Hintergrund ist, dass die Hypo-Bank (70020001) auf die HVB
 				// (70020270) fusioniert wurde und dabei die Details der Buchungen
 				// von HVB anders geliefert werden als von Hypo-Bank.
-				return RC_orig_blz + 1; 
+				return RC_orig_blz + 1;
 		}
 		else
 			return - RC_orig_blz;
 	}
-	
+
 	//***** butext ***********************************************************
 	if(newBuch.butext[0] != '\0')
 	{
@@ -357,8 +357,8 @@ int compareRecord(const Buchung newBuch, const Buchung existBuch)
 	const char *ignoreText="SVWZ+";
 	const int   ignoreLen=strlen(ignoreText);
 
-	for(iPos = 0; 
-			iPos < sizeof(newBuch.vzweck)/sizeof(newBuch.vzweck[0]); 
+	for(iPos = 0;
+			iPos < sizeof(newBuch.vzweck)/sizeof(newBuch.vzweck[0]);
 			iPos++)
 	{
 		if( *newBuch.vzweck[iPos] != '\0')
@@ -429,19 +429,19 @@ int writeRecord(const Buchung inBuchung)
 		break;
 
 	case txtSingleLine:
-		printf("%8s/%10s %10s/%10s"  
+		printf("%8s/%10s %10s/%10s"
 				"%+11.2f %3s "
 				"(%c,"
 				"%3s,"
 				"%10s) %8s/%10s "
 				"%27s %27s %4s"
 				"%27s/%27s",
-				buchung.orig_blz, buchung.orig_ktonr, buchung.datum, buchung.valuta, 
-				buchung.betrag, buchung.waehrung, 
-				0x20 <= buchung.buchart && buchung.buchart <= 0x80 ? buchung.buchart : ' ', 
+				buchung.orig_blz, buchung.orig_ktonr, buchung.datum, buchung.valuta,
+				buchung.betrag, buchung.waehrung,
+				0x20 <= buchung.buchart && buchung.buchart <= 0x80 ? buchung.buchart : ' ',
 						buchung.buchungs_sl,
 						buchung.gv_code, buchung.part_blz, buchung.part_ktonr,
-						buchung.part_name1, buchung.part_name2, buchung.primanota, 
+						buchung.part_name1, buchung.part_name2, buchung.primanota,
 						buchung.referenz, buchung.butext);
 
 		for(i = 0; i < sizeof(buchung.vzweck) / sizeof(buchung.vzweck[0]); i++)
@@ -454,7 +454,7 @@ int writeRecord(const Buchung inBuchung)
 
 	case txtSql:
 		printf("%s;\n", getInsertSql(buchung));
-		/*			
+		/*
 			printf("INSERT INTO %s ("
 				"ORIG_BLZ, ORIG_KTONR, "
 				"DATUM, VALUTA, "
@@ -498,12 +498,12 @@ int writeRecord(const Buchung inBuchung)
 			return iRc;
 		break;
 
-	case checkMysql:    
+	case checkMysql:
 		iRc = checkMysqlRecord(buchung);
 		if(iRc != 0)
 			return iRc;
 		break;
-#endif			
+#endif
 
 	default:
 		fprintf(stderr, "Wrong Output format selected\n");
@@ -770,7 +770,7 @@ static const char * makeCVSDesc(const char *pchText)
 	while(*pchText == ' ')
 		pchText++;
 
-	if(*pchText != '\0') 
+	if(*pchText != '\0')
 		while (*pchText != '$' && *pchText != '\0')
 		{
 			achResult[iResult] = *pchText;

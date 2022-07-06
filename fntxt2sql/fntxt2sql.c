@@ -15,7 +15,7 @@
  * @TODO Indizes bei Create Table mit erzeugen
  * @TODO Kategorien in Tabelle einfuehren und Default-maessig belegen
  * @TODO Alte Formate einschliessen
- * @TODO Update in Datenbank wenn mehr Informationen als bisher in DB 
+ * @TODO Update in Datenbank wenn mehr Informationen als bisher in DB
  */
 
 
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
 	debugInfo.debug_level = 0;
 	//#endif
 
-	//***** Initialise config ****************************************************    
+	//***** Initialise config ****************************************************
 	config.printFormat = txtMultiLine;
 	config.inputFormat = inpInit;
 	config.achInpFileName[0] = '\0';
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 				!strcasecmp(argv[iActArg], "-SQL")       )
 			config.printFormat = txtSql;
 
-#ifdef CONF_MYSQL		
+#ifdef CONF_MYSQL
 		else if(!strcasecmp(argv[iActArg], "/MYSQL") ||
 				!strcasecmp(argv[iActArg], "-MYSQL")     )
 			config.printFormat = execMysql;
@@ -234,11 +234,11 @@ int main(int argc, char *argv[])
 #endif
 
 		//***** Actions *****
-#ifdef CONF_HBCIPX		
+#ifdef CONF_HBCIPX
 		else if(!strcasecmp(argv[iActArg], "/HBCI") ||
 				!strcasecmp(argv[iActArg], "-HBCI")     )
 			action = procHbci;
-#endif // CONF_HBCIPX		
+#endif // CONF_HBCIPX
 
 		else if(!strcasecmp(argv[iActArg], "/CRE") ||
 				!strcasecmp(argv[iActArg], "-CRE")     )
@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
 	debug_printf(dbg_in, "Input File Name=%s\n", config.achInpFileName);
 	debug_printf(dbg_in, "SQL Table Name=%s\n", config.achSqlTabName);
 
-#ifdef CONF_MYSQL	
+#ifdef CONF_MYSQL
 	if(config.printFormat == execMysql || config.printFormat == checkMysql)
 	{
 		iRc = initMysql(config.achMysqlHost, config.achMysqlDatabase,
@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
 		if(iRc != 0)
 			return iRc;
 	}
-#endif	
+#endif
 
 	switch(action)
 	{
@@ -328,21 +328,21 @@ int main(int argc, char *argv[])
 	case createTab:
 		iRc = createTable();
 		break;
-#ifdef CONF_HBCIPX			
+#ifdef CONF_HBCIPX
 	case procHbci:
 		iRc = processHbci(config.achInpFileName);
 		break;
-#endif			
+#endif
 	default:
 		debug_printf(dbg_in, "internal error action=%d\n",
 				action);
 		iRc = -1;
 	}
 
-#ifdef CONF_MYSQL	
+#ifdef CONF_MYSQL
 	if(config.printFormat == execMysql || config.printFormat == checkMysql)
 		termMysql();
-#endif	
+#endif
 
 	debug_printf(dbg_in, "Program ended. RC = %d\n", iRc);
 

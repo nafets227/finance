@@ -167,7 +167,7 @@ int processCsvText(const char * pchVZweck, Buchung *pBuchung)
 {
 	int i = 0;
 
-	static const struct _confFixText 
+	static const struct _confFixText
 	{ char * pchVZweck; char *pchPrimaNota; } confFixText[] = {
 			{"DAUERAUFTR ", "333"},
 			{"LASTSCHR. " , "222"},
@@ -178,7 +178,7 @@ int processCsvText(const char * pchVZweck, Buchung *pBuchung)
 	debug_printf(dbg_in, "processCsvText(\"%40s\")\n", pchVZweck);
 
 	for(i = 0; i < sizeof(confFixText) / sizeof(confFixText[0]); i++)
-		if (!strcmp(pBuchung->primanota, confFixText[i].pchPrimaNota) && 
+		if (!strcmp(pBuchung->primanota, confFixText[i].pchPrimaNota) &&
 				!memcmp(pchVZweck, confFixText[i].pchVZweck,
 						strlen(confFixText[i].pchVZweck)))
 			// Primanota and VZweck fit to vonfFixText[i]

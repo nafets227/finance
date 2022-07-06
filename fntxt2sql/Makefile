@@ -108,7 +108,7 @@ fnSql.o: fnSql.c fntxt2sql.h
 .c.o:
 	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c $^
 
-install: fntxt2sql finance 
+install: fntxt2sql finance
 	install -o finance -m 755 -d $(BINDIR)
 	install -o finance -m 755 cron.finance   $(BINDIR)
 	install -o finance -m 755 mailSilvi.sh   $(BINDIR)
@@ -116,5 +116,5 @@ install: fntxt2sql finance
 	install -o finance -m 755 fntxt2sql      $(BINDIR)
 
 clean:
-	-rm -f *.o fntxt2sql 
+	-rm -f *.o fntxt2sql
 

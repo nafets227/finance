@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # (C) 2012-2018 Stefan Schallenberg
-# 
+#
 # Execute automatic tasks for finance
 
 ##### trim ###################################################################
@@ -15,7 +15,7 @@ function trim {
 	local v="$1"
 	v="${v#"${v%%[![:space:]]*}"}"
 	v="${v%"${v##*[![:space:]]}"}"
-	
+
 	printf "%s\n" "$v"
 	}
 
@@ -69,7 +69,7 @@ function dbsetup_users () {
 			if [ $? != "0" ] ; then return  1 ; fi
 	done
 	if [ $? != "0" ] ; then return 1 ; fi
-		
+
 	printf "Creating DB Role fin_user.\n"
 	$MYSQL_ROOT_CMD <<-EOF
 		CREATE ROLE IF NOT EXISTS fin_user;
@@ -425,7 +425,7 @@ function import_handleDir
 	fi
 
 	for f in `ls -d $scandir/* 2>/dev/null`; do
-		case $ftype in 
+		case $ftype in
 			aqb6 | aqb-tran | aqb-bal | aqm | btx)
 				if [ -f $f ]; then
 					printf "Importing file %s\n" "$f"
@@ -470,14 +470,14 @@ function import_handleDir
 				rc=-1
 				return 1
 		esac
-		
+
 		if [ ! -z $moveTo ]; then
 			if [ "$rc" == 0 ]; then
 				mv -n $f $moveTo.$ftype/ || return 1
 				printf "Moved imported file %s to %s\n" "$f" "$moveTo.$ftype"
 			else
 				printf "Import of $f failed (RC=%s).\n" "$rc"
-			fi 
+			fi
 		fi
 	done
 
@@ -491,19 +491,19 @@ function alert () {
 	export MAILRC=/dev/null
 
 	for a in $MAIL_ACCOUNTS ; do
-		
+
 		Saldo=$(
 		$MYSQL_CMD -s <<-EOF
 		SELECT datum, betrag
-		  FROM fn_entry 
+		  FROM fn_entry
 		 WHERE buchart = 'E' AND
-		         orig_ktonr="$a" AND 
+		         orig_ktonr="$a" AND
 		         datum = ( SELECT MAX(DATUM) from fn_entry where orig_ktonr='$a');
 		EOF
 		)
 		if [ "$?" != "0" ] ; then return 1 ; fi
-		
-		
+
+
 		( $MYSQL_CMD <<-EOF
 		SELECT datum, betrag, part_name1, vzweck1, vzweck2
 		  FROM fn_entry
@@ -585,7 +585,7 @@ if ! ping  -c 1 $MYSQL_HOST ; then
 	cat /etc/resolv.conf
 	dig $MYSQL_HOST
 	ping -c 1 $MYSQL_HOST
-	set +x 
+	set +x
 fi
 
 MYSQL_CMD="mysql"
@@ -641,7 +641,7 @@ for f in $(ls $datadir/inbound.aqb/* 2>/dev/null) ; do
     fnam=$(basename $f)
     aqbanking_wrapper listtrans -c $f >$datadir/inbound.aqb-tran/$fnam && \
     aqbanking_wrapper listbal   -c $f >$datadir/inbound.aqb-bal/$fnam  && \
-    mv $f $datadir/store.aqb 
+    mv $f $datadir/store.aqb
     done
 
 printf "Importing transactions and balances into database\n"

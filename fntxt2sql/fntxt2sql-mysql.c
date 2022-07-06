@@ -12,7 +12,7 @@ static MYSQL * pMysqlConn = NULL;
 
 static void printMysqlError(MYSQL * conn)
 {
-	fprintf(stderr, "MySql Error %d (SqlState %s) %s\n", 
+	fprintf(stderr, "MySql Error %d (SqlState %s) %s\n",
 			mysql_errno(conn), mysql_sqlstate(conn), mysql_error(conn));
 }
 
@@ -44,16 +44,16 @@ int initMysql(const char * const pchHost, const char * const pchDbParm,
 		printMysqlError(conn); mysql_close(conn);
 		fprintf(stderr, "\tTried Host \"%s\", User \"%s\", Passwd \"%s\", "
 				"Db \"%s\", Port %d, Clientflag %d.\n",
-				pchHost, pchUser, pchPassword, pchDb, iPort, 
+				pchHost, pchUser, pchPassword, pchDb, iPort,
 				iCliFlags);
-		return -1; 
+		return -1;
 	}
 
-	if (mysql_set_character_set(pMysqlConn, "latin1") != 0) 
+	if (mysql_set_character_set(pMysqlConn, "latin1") != 0)
 	{
-	    fprintf(stderr, "mysql_set_character_set failed.\n"); 
+	    fprintf(stderr, "mysql_set_character_set failed.\n");
 	}
-	
+
 	return 0;
 }
 
@@ -81,13 +81,13 @@ static int execSql(const char *pchStmt, MYSQL_RES ** ppResult)
 
 	if(iRc != 0)	// error
 	{
-		fprintf(stderr, "mysql_query returned %d\n\tStatement: \"%s\"\n\t", 
+		fprintf(stderr, "mysql_query returned %d\n\tStatement: \"%s\"\n\t",
 				iRc, pchStmt);
 		printMysqlError(pMysqlConn);
 	}
 
 	pResult = mysql_store_result(pMysqlConn);
-	if( pResult == NULL && 
+	if( pResult == NULL &&
 			mysql_field_count(pMysqlConn) != 0)	// SQL Statement should produce results
 	{
 		fprintf(stderr, "Error in mysql_store_result. ");
@@ -95,7 +95,7 @@ static int execSql(const char *pchStmt, MYSQL_RES ** ppResult)
 		iRc = -1;
 	}
 
-	if(ppResult != 0) 
+	if(ppResult != 0)
 	{
 		if(iRc == 0)
 			*ppResult = pResult;
@@ -114,7 +114,7 @@ static int execSql(const char *pchStmt, MYSQL_RES ** ppResult)
 
 //****************************************************************************
 //***** Eine Zeile vom MySql Ergebnis lesen und zu Buchung konvertieren ******
-//***** Return-Codes: 
+//***** Return-Codes:
 //*****      -1 Fehler
 //*****       0 Keine Zeile mehr vorhanden
 //*****      +1 Eine Zeile erfolgreich gelesen und konvertiert
@@ -134,7 +134,7 @@ int fetchSqlBuchung(MYSQL_RES *pResult, Buchung *pBuchung)
 				iFieldCount, iExpFieldCount);
 		return -1;
 	}
-	
+
 	row = mysql_fetch_row(pResult);
 	if(row == NULL)
 	{
@@ -142,12 +142,12 @@ int fetchSqlBuchung(MYSQL_RES *pResult, Buchung *pBuchung)
 			return 0;
 		else
 		{
-			fprintf(stderr, "mysql_fetch_row error. "); 
-			printMysqlError(pMysqlConn); 
+			fprintf(stderr, "mysql_fetch_row error. ");
+			printMysqlError(pMysqlConn);
 			return -1;
 		}
 	}
-	
+
 	// Record successfully retrieved so now copy the values into buchung structure
 	strncpy(pBuchung->orig_blz   , row[ 0] ? row[ 0] : "", sizeof(pBuchung->orig_blz   ));
 	strncpy(pBuchung->orig_ktonr , row[ 1] ? row[ 1] : "", sizeof(pBuchung->orig_ktonr ));
@@ -163,17 +163,17 @@ int fetchSqlBuchung(MYSQL_RES *pResult, Buchung *pBuchung)
 	strncpy(pBuchung->part_name1 , row[11] ? row[11] : "", sizeof(pBuchung->part_name1 ));
 	strncpy(pBuchung->part_name2 , row[12] ? row[12] : "", sizeof(pBuchung->part_name2 ));
 	strncpy(pBuchung->primanota  , row[13] ? row[13] : "", sizeof(pBuchung->primanota  ));
-	strncpy(pBuchung->referenz   , row[14] ? row[14] : "", sizeof(pBuchung->referenz   ));	
-	strncpy(pBuchung->butext     , row[15] ? row[15] : "", sizeof(pBuchung->butext     ));	
-	strncpy(pBuchung->vzweck[0]  , row[16] ? row[16] : "", sizeof(pBuchung->vzweck[0]  ));	
-	strncpy(pBuchung->vzweck[1]  , row[17] ? row[17] : "", sizeof(pBuchung->vzweck[1]  ));	
-	strncpy(pBuchung->vzweck[2]  , row[18] ? row[18] : "", sizeof(pBuchung->vzweck[2]  ));	
-	strncpy(pBuchung->vzweck[3]  , row[19] ? row[19] : "", sizeof(pBuchung->vzweck[3]  ));	
-	strncpy(pBuchung->vzweck[4]  , row[20] ? row[20] : "", sizeof(pBuchung->vzweck[4]  ));	
+	strncpy(pBuchung->referenz   , row[14] ? row[14] : "", sizeof(pBuchung->referenz   ));
+	strncpy(pBuchung->butext     , row[15] ? row[15] : "", sizeof(pBuchung->butext     ));
+	strncpy(pBuchung->vzweck[0]  , row[16] ? row[16] : "", sizeof(pBuchung->vzweck[0]  ));
+	strncpy(pBuchung->vzweck[1]  , row[17] ? row[17] : "", sizeof(pBuchung->vzweck[1]  ));
+	strncpy(pBuchung->vzweck[2]  , row[18] ? row[18] : "", sizeof(pBuchung->vzweck[2]  ));
+	strncpy(pBuchung->vzweck[3]  , row[19] ? row[19] : "", sizeof(pBuchung->vzweck[3]  ));
+	strncpy(pBuchung->vzweck[4]  , row[20] ? row[20] : "", sizeof(pBuchung->vzweck[4]  ));
 	strncpy(pBuchung->vzweck[5]  , row[21] ? row[21] : "", sizeof(pBuchung->vzweck[5]  ));
-	strncpy(pBuchung->vzweck[6]  , row[22] ? row[22] : "", sizeof(pBuchung->vzweck[6]  ));	
-	strncpy(pBuchung->source     , row[23] ? row[23] : "", sizeof(pBuchung->source     ));	
-	
+	strncpy(pBuchung->vzweck[6]  , row[22] ? row[22] : "", sizeof(pBuchung->vzweck[6]  ));
+	strncpy(pBuchung->source     , row[23] ? row[23] : "", sizeof(pBuchung->source     ));
+
 	return 1;
 }
 
@@ -219,19 +219,19 @@ static int processMysqlRecord(const Buchung buchung, int fWrite)
 			{
 				fIsDuplicate = -1;
 				break;
-			}				
+			}
 			else // Records not identical means No Row found yet
 				;	// continue with next possibly equal Record.
 		}
 	}
 	mysql_free_result(pResult);
-		
+
 	if(!fIsDuplicate)	// Buchung noch nicht in der Datenbank
 	{
 		if(fWrite)
 		{
 			iRc = execSql(getInsertSql(buchung), NULL);
-	
+
 			if(iRc != 0)
 			{
 				fprintf(stderr, "Error %d inserting Booking\n", iRc);
@@ -241,7 +241,7 @@ static int processMysqlRecord(const Buchung buchung, int fWrite)
 		printf("%sOk(%03i): %s/%s %s %c %10.2f %25s\n",
 				fWrite ? "Buch" : "Check",
 				iCompResult,
-				buchung.orig_blz, buchung.orig_ktonr, buchung.datum, 
+				buchung.orig_blz, buchung.orig_ktonr, buchung.datum,
 				buchung.buchart ,buchung.betrag, buchung.vzweck[0]);
 	}
 	else	// Aehnliche Buchung bereits in der Datenbank

@@ -32,11 +32,11 @@ static int parseAqbBal(char *pchBuffer, Buchung *pBuchung)
 	memset(pBuchung, '\0', sizeof(*pBuchung));
 	pBuchung->buchart = 'E';
 	strncpy(pBuchung->source, makeSourceId(SRC_ID()), sizeof(pBuchung->source)-1);
-	
+
 	// Codepage Conversion
 	if(convertCP(pchBuffer, "utf8", "latin1") != 0)
 		return -1;
-	
+
 	// Now process fields
 	pchTemp = pchBuffer;
 	pchField = pchBuffer;

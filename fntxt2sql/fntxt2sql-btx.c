@@ -26,7 +26,7 @@ static const char *SRC_ID(void)
 //***** Puffer Zugriffs-Funktionen *******************************************
 //****************************************************************************
 static const char *pchBtxBuffer = NULL;
-static int        iBtxBufferLen = 0; 
+static int        iBtxBufferLen = 0;
 static int		  iBtxBufferPos = 0;
 
 static const char * const getLine()
@@ -47,7 +47,7 @@ static void rewindLine()
 {
 	if(iBtxBufferPos > 0)
 		iBtxBufferPos--;
-	
+
 	while(*(pchBtxBuffer + iBtxBufferPos - 1) != '\0' &&
 			iBtxBufferPos > 0)
 		iBtxBufferPos--;
@@ -192,7 +192,7 @@ oder
 	0000080843246 */
 
 	char achTemp[100];
-	char const *pchSource; 
+	char const *pchSource;
 	char *pchDest;
 	int rc;
 
@@ -552,7 +552,7 @@ int processComDirText(const char * const pchBuffer)
 			strcat(achCDirBuffer, pch);
 
 	} while(1);
-	
+
 	// Nun haben wir alle CDir Texte eingelesen.
 	// Jetzt folgt die Abarbeitung
 	for(pch = achCDirBuffer; *pch != '\0'; pch += iRc)
@@ -691,10 +691,10 @@ int processEndBuchung()
 	if(fTranPending)
 	{
 		strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-		rc = writeRecord(buchung); 
-		resetRecord(&buchung); 
-		fTranPending = 0; 
-		if(rc != 0) 
+		rc = writeRecord(buchung);
+		resetRecord(&buchung);
+		fTranPending = 0;
+		if(rc != 0)
 			return rc;
 	}
 
@@ -761,10 +761,10 @@ int processLastBtxRecord()
 	if(fTranPending)
 	{
 		strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-		rc = writeRecord(buchung); 
-		resetRecord(&buchung); 
-		fTranPending = 0; 
-		if(rc != 0) 
+		rc = writeRecord(buchung);
+		resetRecord(&buchung);
+		fTranPending = 0;
+		if(rc != 0)
 			return rc;
 	}
 
@@ -786,7 +786,7 @@ int processBtxFile(FILE * file)
 	int iRc = 0;
 	int iBufLen = 0;
 	int iActPos = 0;
-	int iActPosWrite = 0; 
+	int iActPosWrite = 0;
 	//	int iSepPos = 0;
 	//	int i = 0;
 
@@ -832,7 +832,7 @@ int processBtxFile(FILE * file)
 		 * So kann die Kombination \x40\n\x40 erkannt werden.
 		 */
 		case '\x40':	 // sometimes there are X`40` instead of X`15`
-		case '\xA7':     // xcept changes X`15` to X'A7` so we have 
+		case '\xA7':     // xcept changes X`15` to X'A7` so we have
 			// to correct this
 		case '\x15':
 			if(iActPosWrite > 0)		// Erstes Zeichen kopieren

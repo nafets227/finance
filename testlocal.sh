@@ -3,7 +3,7 @@
 # Test finance locally, assuming a working Mysql/MariaDB somewhere
 #
 # Environment Vairables to be set:
-# 
+#
 # MYSQL_HOST, MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD
 
 function test_dbconnect {
@@ -11,7 +11,7 @@ function test_dbconnect {
 	local pw="$2"
 	local rcexp="${3:-0}"
 
-	local CMD_PW	
+	local CMD_PW
 	if [ -z "$pw" ] ; then
 		CMD_PW=""
 		PRT_PW=""
@@ -32,12 +32,12 @@ function test_dbconnect {
 	rc=$?
 	if [ $rc != "$rcexp" ] ; then
 		printf "ERR: Connecting to DB at %s with user %s%s: RC=%s(Exp=%s)\n" \
-			"$MYSQL_HOST" "$user" "$PRT_PW" "$rc" "$rcexp"  
+			"$MYSQL_HOST" "$user" "$PRT_PW" "$rc" "$rcexp"
 		return 1
 	fi
-	
+
 	return 0
-}	
+}
 
 ##### Setup Database for Tests ###############################################
 function setup_testdb () {
@@ -50,7 +50,7 @@ function setup_testdb () {
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD	$MYSQL_DATABASE"
 
 	test_dbconnect "$MYSQL_USER" "$MYSQL_PASSWORD" 0 || return 1
-	
+
 	$MYSQL_ROOT_CMD <<-EOF
 		CREATE OR REPLACE USER testusershouldbedeleted;
 		GRANT select ON $MYSQL_DATABASE.* TO testusershouldbedeleted;
@@ -62,13 +62,13 @@ function setup_testdb () {
 		DROP USER IF EXISTS testuser2;
 		EOF
 	if [ $? != "0" ] ; then return 1 ; fi
-	
+
 	test_dbconnect "testusershouldbedeleted" "" 0 || return 1
 	test_dbconnect "testuser1" "" 1 || return 1
 	test_dbconnect "testuser2" "" 1 || return 1
 
 	printf "Setting up Test Database end.\n"
-	return 0	
+	return 0
 }
 
 ##### Setup Test data directory for Tests ####################################
@@ -88,7 +88,7 @@ test_dbsetup () {
 	test_dbconnect "testuser1" "" 1 || return 1
 	test_dbconnect "testuser1" "dummypw" 0 || return 1
 	test_dbconnect "testuser2" "" 0 || return 1
-	
+
 	printf "Testing DB Setup end.\n"
 	return 0
 }

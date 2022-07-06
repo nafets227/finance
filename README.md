@@ -10,7 +10,7 @@ editing the data.
 
 ## Limitations
 * Only PIN access is currently supported, no HBCI Keys
-* Only tested with german banks that have a "BLZ". 
+* Only tested with german banks that have a "BLZ".
 * Only MariaDB is tested, MySQL should also work. Main divergence from
   Standard SQL is that tinance uses the "IF EXISTS" claus in CREATE TABLE and
   similar commands.
@@ -24,7 +24,7 @@ at /finance. finance container will set access rights as needed.
 ### PinFile
 AqBanking PINFILE is expected at /finance/.hbci-pinfile
 ### Setup Parameters
-For banks or accounts that need special parameters, you can add a line 
+For banks or accounts that need special parameters, you can add a line
 ```
 SETUP_<blz>_<user> = "aqhbci-tool4 parms"
 ```
@@ -33,7 +33,7 @@ it is called. Please note that this is not available in AqBanking but just in
 this container.
 
 ## DB Setup
-Setup a MariaDB (or MySQL) database, no matter if in container of not. 
+Setup a MariaDB (or MySQL) database, no matter if in container of not.
 Then provide the credentrials in Environment variables to the finance container
 (see below for details).
 
@@ -45,7 +45,7 @@ Access rights in the database:
 * MYSQL_USER gets the full access on the database and can grant access to
   others. In Standard Mariadb Container the user is setup buth without being
   able to grant others.
-  
+
 If also DB_USERS is set, finance container will reset users:
 * delete all users not in DB_USERS (except 'root' and MYSQL_USER)
 * delete all roles

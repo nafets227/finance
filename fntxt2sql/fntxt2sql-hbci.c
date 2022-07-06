@@ -15,7 +15,7 @@ typedef struct _testblk {
 	long lBuchZaehler;	//  lBuchZaehler integer,
 	long lAutoInc; 		//  AUTOINC integer,
 	long nZeile;		//  nZeile integer,
-	char achText[29];	//  szText char(28),	
+	char achText[29];	//  szText char(28),
 } TextBlk;
 
 static const char *SRC_ID(void)
@@ -73,7 +73,7 @@ static int hbci_openIndexedDb(pxdoc_t ** pxDoc, pxdoc_t ** pxIndex, char *pchDir
 	strcat(achFileName, ".db");
 	iRc = hbci_open(pxDoc, pchDirName, achFileName);
 	if(iRc != 0) return iRc;
-	/*	
+	/*
 	strcpy(achFileName, pchFileName);
 	strcat(achFileName, ".px");
 	iRc = hbci_open(pxIndex, pchDirName, achFileName);
@@ -86,7 +86,7 @@ static int hbci_openIndexedDb(pxdoc_t ** pxDoc, pxdoc_t ** pxIndex, char *pchDir
 	iRc = PX_add_primary_index(*pxDoc, *pxIndex);
 	if(iRc != 0)
 		{ fprintf(stderr, "Eror %d in px_add_primary_index(\"%s\")\n", iRc, achFileName); return iRc; }
-	 */	
+	 */
 	return 0;
 }
 
@@ -95,7 +95,7 @@ static void hbci_closeIndexedDb(pxdoc_t ** pxDoc, pxdoc_t **pxIndex)
 	hbci_close(pxDoc);
 	//	hbci_close(pxIndex);
 
-	return;  
+	return;
 }
 
 static char * hbci_makeDatum(long lDatum)
@@ -166,10 +166,10 @@ static int hbci_comp_Textblk2(const void *pv1, const void*pv2)
 #define HBCI_ERR_WRONG_TYPE(value, expected)	 \
 	fprintf(stderr, #value " (%d) != " #expected " (%d)\n",(int)(value->type), (int)expected)
 
-static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung, 
+static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 		TextBlk *pTextBlk, long lCountTextBlk)
 {
-	static const int iVZweckCnt = 
+	static const int iVZweckCnt =
 		sizeof(pBuchung->vzweck) / sizeof(pBuchung->vzweck[0]);
 	long lBuchungZaehler;
 	int iVZweckNr = 0;
@@ -212,14 +212,14 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 	if(pxValues[5]->type != pxfLong || pxValues[5]->isnull != 0)
 	{ HBCI_ERR_WRONG_TYPE(pxValues[5], pxfLong);  return -1;}
 	debug_printf(dbg_fld, "BuchDatum: %d\n", (int)pxValues[5]->value.lval);
-	
+
 	/* Wenn der Datumswert 0 ist wird +1 zuruekgegeben und
-	 * dadurch die Buchung ignoriert! 
+	 * dadurch die Buchung ignoriert!
 	 */
 	if(pxValues[5]->value.lval == 0)
 		return 1;
-	
-	strncpy(pBuchung->datum, 
+
+	strncpy(pBuchung->datum,
 			hbci_makeDatum(pxValues[5]->value.lval),
 			sizeof(pBuchung->datum));
 
@@ -227,7 +227,7 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 	if(pxValues[6]->type != pxfLong || pxValues[6]->isnull != 0)
 	{ HBCI_ERR_WRONG_TYPE(pxValues[6], pxfLong);  return -1;}
 	debug_printf(dbg_fld, "WertDatum: %d\n", (int)pxValues[6]->value.lval);
-	strncpy(pBuchung->valuta, 
+	strncpy(pBuchung->valuta,
 			hbci_makeDatum(pxValues[6]->value.lval),
 			sizeof(pBuchung->valuta));
 
@@ -267,7 +267,7 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 	// Nun die Verwendungszwecke aus der im Speicher gehaltenen TextBlk
 
 	pTextBlkAct = bsearch(
-			&lBuchungZaehler, pTextBlk, lCountTextBlk, 
+			&lBuchungZaehler, pTextBlk, lCountTextBlk,
 			sizeof(*pTextBlk), hbci_comp_Textblk2);
 
 	// Find first matching record
@@ -277,23 +277,23 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 
 	while (pTextBlkAct != NULL &&
 			pTextBlkAct < pTextBlk + lCountTextBlk &&
-			pTextBlkAct ->lBuchZaehler == lBuchungZaehler && 
+			pTextBlkAct ->lBuchZaehler == lBuchungZaehler &&
 			iVZweckNr < sizeof(pBuchung->vzweck) / sizeof(pBuchung->vzweck[0]))
 	{
-		if(pTextBlkAct->nZeile == 10000) // This number marks a original 
+		if(pTextBlkAct->nZeile == 10000) // This number marks a original
 		{			     				 // currency text during Euro conversion period.
 			strncpy(pBuchung->waehrung, pTextBlkAct->achText, sizeof(pBuchung->waehrung));
 			pTextBlkAct++;
 			continue;
 		}
-		
+
 		// Sonderlocke: Wenn EUR und nur Nummern in VZweck1 dann ignorieren!
 		if(iVZweckNr == 0 && !memcmp(pTextBlkAct->achText, "EUR", 3))
 		{
 			int fIsSpecial = -1;
-			for(iPos = 3; 
+			for(iPos = 3;
 					iPos < sizeof(pTextBlkAct->achText) &&
-						pTextBlkAct->achText[iPos] != '\0'; 
+						pTextBlkAct->achText[iPos] != '\0';
 					iPos++)
 				if( (pTextBlkAct->achText[iPos] >= '0' && pTextBlkAct->achText[iPos] <= '9') ||
 						pTextBlkAct->achText[iPos] == '.' ||
@@ -313,17 +313,17 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 				continue;
 			}
 		}
-			
-		debug_printf(dbg_fld, "VZweck[%d]: \"%s\" (%d)\n", 
-				(int)iVZweckNr, pTextBlkAct->achText, (int)pTextBlkAct->nZeile); 
-		strncpy(pBuchung->vzweck[iVZweckNr], 
-				pTextBlkAct->achText, 
+
+		debug_printf(dbg_fld, "VZweck[%d]: \"%s\" (%d)\n",
+				(int)iVZweckNr, pTextBlkAct->achText, (int)pTextBlkAct->nZeile);
+		strncpy(pBuchung->vzweck[iVZweckNr],
+				pTextBlkAct->achText,
 				sizeof(pBuchung->vzweck[iVZweckNr]));
 		pTextBlkAct++;
 		iVZweckNr++;
 	}
-	
-	// Sonderbehandlung: Wenn der Text "Bankverbdg.: (Blz./KtoNr.)" erscheint, 
+
+	// Sonderbehandlung: Wenn der Text "Bankverbdg.: (Blz./KtoNr.)" erscheint,
 	// werden die naehsten 2 VZwecks besonders interpretiert.
 	// " Bankverbdg.: (Blz./KtoNr.)" "       70020270 / 780762394" "    HYPOVEREINSBANK HYPOTH."
 	for(iVZweckNr = 0; iVZweckNr < iVZweckCnt; iVZweckNr++)
@@ -331,23 +331,23 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 		{
 			if(iVZweckNr+1 < iVZweckCnt &&
 			   strlen(pBuchung->part_blz) == 0)
-				strncpy(pBuchung->part_blz, 
-						&pBuchung->vzweck[iVZweckNr+1][0], 
+				strncpy(pBuchung->part_blz,
+						&pBuchung->vzweck[iVZweckNr+1][0],
 						sizeof(pBuchung->part_blz)-1);
 			if(iVZweckNr+1 < iVZweckCnt &&
 			   strlen(pBuchung->part_ktonr) == 0 )
 				strncpy(pBuchung->part_ktonr,
-						&pBuchung->vzweck[iVZweckNr+1][11], 
+						&pBuchung->vzweck[iVZweckNr+1][11],
 						sizeof(pBuchung->part_ktonr)-1);
 			if(iVZweckNr+2 < iVZweckCnt &&
 			   strlen(pBuchung->part_name1) == 0 )
 				strncpy(pBuchung->part_name1,
-						pBuchung->vzweck[iVZweckNr+2], 
+						pBuchung->vzweck[iVZweckNr+2],
 						sizeof(pBuchung->part_name1)-1);
 			if(iVZweckNr+3 < iVZweckNr &&
 			   strlen(pBuchung->part_name2) == 0 )
 				strncpy(pBuchung->part_name2,
-						pBuchung->vzweck[iVZweckNr+3], 
+						pBuchung->vzweck[iVZweckNr+3],
 						sizeof(pBuchung->part_name2)-1);
 			debug_printf(dbg_fld, "Special VZweck detected: %8s/%10s \"%27s\" \"%27s\"\n",
 					pBuchung->part_blz, pBuchung->part_ktonr, pBuchung->part_name1, pBuchung->part_name2);
@@ -385,7 +385,7 @@ static int hbci_convertTextblk(pxval_t **pxValues, TextBlk *pTextBlk)
 	debug_printf(dbg_fld, "nZeile: %d\n", (int)pxValues[5]->value.lval);
 	pTextBlk->nZeile = pxValues[5]->value.lval;
 
-	//  szText char(28),	
+	//  szText char(28),
 	if(pxValues[6]->type != pxfAlpha || pxValues[6]->isnull != 0)
 	{ HBCI_ERR_WRONG_TYPE(pxValues[6], pxfAlpha);  return -1;}
 	debug_printf(dbg_fld, "szText: %s\n", pxValues[6]->value.str.val);
@@ -425,7 +425,7 @@ int processHbci(char * dirName)
 		debug_printf(dbg_file, "reading TextBlk.db record #%d\n", iRecNo);
 		pxValues = PX_retrieve_record(pxTextBlk, iRecNo);
 
-		hbci_convertTextblk(pxValues, textBlk+(iRecNo-1));	
+		hbci_convertTextblk(pxValues, textBlk+(iRecNo-1));
 	}
 	qsort(textBlk, PX_get_num_records(pxTextBlk), sizeof(*textBlk), hbci_comp_Textblk);
 

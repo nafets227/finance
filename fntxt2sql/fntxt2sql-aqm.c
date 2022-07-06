@@ -75,7 +75,7 @@ int parseAqm(char *pchBuffer, AqmBuchung *aqmBuchung)
 			// immer noch ein Hochkomma am Anfang des Namensfelds.
 			// Deshalb hier die spezielle Abfrage:
 			if(*pchField == '\"')
-				pchField++;	
+				pchField++;
 
 			debug_printf(dbg_fld, "Name: %s\n", pchField);
 			strcpy(&aqmBuchung->name[0], pchField);

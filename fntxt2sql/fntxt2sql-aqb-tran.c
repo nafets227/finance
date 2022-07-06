@@ -43,10 +43,10 @@ int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 	char *pchTemp, *pchField, *pchSep;
 
 	memset(aqbBuchung, '\0', sizeof(*aqbBuchung));
-	
+
 	if(convertCP(pchBuffer, "utf8", "latin1") != 0)
 		return -1;
-	
+
 	pchTemp = pchBuffer;
 	pchField = pchBuffer;
 	for(i = 0; i < 29; i++)
@@ -83,7 +83,7 @@ int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 		case 28: // category6
 		case 29: // category7
 			// Diese Felder werden ignoriert.
-			break; 
+			break;
 		case 1: // localBankCode
 			debug_printf(dbg_fld, "BLZ: %s\n", pchField);
 			strncpy(&aqbBuchung->blz[0], pchField, sizeof(aqbBuchung->blz)-1);
@@ -209,7 +209,7 @@ int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 //****************************************************************************
 int processAqbBuchung(const AqbBuchung aqbBuchung)
 {
-	const char *pc = (const char*)0; 
+	const char *pc = (const char*)0;
 	int i = 0;
 	int iRc;
 	Buchung buchung;
