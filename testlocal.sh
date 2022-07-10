@@ -98,15 +98,21 @@ exec_container () {
 	export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
 	export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
 	export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
-	[ -z "$DNS" ] || DNS_PARM="--dns $DNS"
+	if [ -z "${DNS-}" ] ; then
+		DNS_PARM=""
+	else
+		DNS_PARM="--dns $DNS"
+	fi
 
-	CUSTOM_PARM="$1"
+	CUSTOM_PARM="${1-}"
 	shift
 
-	if [ "$1" == "-ti" ] ; then
+	if [ "${1-}" == "-ti" ] ; then
 		ENTRY_PARM="-ti"
-	elif [ ! -z "$1" ] ; then
+	elif [ ! -z "${1-}" ] ; then
 		ENTRY_PARM="-ti --entrypoint $1"
+	else
+		ENTRY_PARM=""
 	fi
 	shift
 
@@ -131,26 +137,28 @@ exec_container () {
 	|| return 1
 }
 ##### Main ###################################################################
-if [ -z "$MYSQL_HOST" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+set -euo pipefail
+
+if [ -z "${MYSQL_HOST-}" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
 	MYSQL_HOST="www.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MYSQL_HOST to %s\n" "$MYSQL_HOST"
 fi
 
-if [ -z "$MAIL_URL" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+if [ -z "${MAIL_URL-}" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
 	MAIL_URL="smtp://www.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_URL to %s\n" "$MAIL_URL"
 fi
 
-if [ -z "$MAIL_HOSTNAME" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+if [ -z "${MAIL_HOSTNAME-}" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
 	MAIL_HOSTNAME="finance-testlocal.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_HOSTNAME to %s\n" "$MAIL_HOSTNAME"
 fi
 
-if [ -z "$MYSQL_HOST" ] ||
-   [ -z "$MYSQL_DATABASE" ] ||
-   [ -z "$MYSQL_USER" ] ||
-   [ -z "$MYSQL_PASSWORD" ] ||
-   [ -z "$MYSQL_ROOT_PASSWORD" ] ; then
+if [ -z "${MYSQL_HOST-}" ] ||
+   [ -z "${MYSQL_DATABASE-}" ] ||
+   [ -z "${MYSQL_USER-}" ] ||
+   [ -z "${MYSQL_PASSWORD-}" ] ||
+   [ -z "${MYSQL_ROOT_PASSWORD-}" ] ; then
 	printf "Error: Not all required Environment Variables are set.\n"
 	printf "\tMYSQL_HOST=%s\n" "$MYSQL_HOST"
 	printf "\tMYSQL_DATABASE=%s\n" "$MYSQL_DATABASE"
@@ -169,14 +177,14 @@ action=${1:-test}
 shift
 case $action in
 	test )
-		if [ "$1" == "--debug" ] ; then
+		if [ "${1-}" == "--debug" ] ; then
 			container_env="-e DEBUG=1"
 			shift
 		else
 			container_env=""
 		fi
 
-		if [ "$1" == "--taninteractive" ] ; then
+		if [ "${1-}" == "--taninteractive" ] ; then
 			container_parms=( "-ti" "$@")
 		else
 			container_parms=( "" "$@")

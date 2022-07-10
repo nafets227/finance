@@ -37,7 +37,7 @@ function dbsetup_privileges () {
 #### DB Setup Users ##########################################################
 function dbsetup_users () {
 	where_users=""
-	for u in $DB_USERS ; do
+	for u in ${DB_USERS-} ; do
 		where_users="${where_users}, '$u'"
 	done
 	$MYSQL_ROOT_CMD -N --batch <<-EOF |
@@ -76,8 +76,8 @@ function dbsetup_users () {
 		EOF
 	if [ $? != "0" ] ; then return  1 ; fi
 
-	for u in $DB_USERS ; do
-		eval p=\$DB_${u}_PASSWORD
+	for u in ${DB_USERS-} ; do
+		eval p=\${DB_${u}_PASSWORD-}
 		if [ -z "$p" ] ; then
 			printf "Creating DB User %s without password\n" "$u"
 			$MYSQL_ROOT_CMD <<-EOF
@@ -154,7 +154,7 @@ function aqsetup () {
 				blz=${line%_*}
 				#DEBUG printf "DEBUG: URL blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
 
-				eval "URL_$blz_$u=\"\$parm\""
+				eval "URL_${blz}_${u}=\"\$parm\""
 				;;
 			TANMODE_* )
 				parm=$(trim "${line#*=}")
@@ -215,10 +215,10 @@ function aqsetup () {
 	for i in $(seq 0 $account_nr) ; do
 		blz=${accounts_blz[$i]}
 		u=${accounts_user[$i]}
-		eval url=\"\$URL_$blz_$u\"
-		eval tanmode=\"\$TANMODE_$blz_$u\"
-		eval setup=\"\$SETUP_$blz_$u\"
-		eval aqconf=\"\$AQCONF_$blz_$u\"
+		eval url=\"\$URL_${blz}_${u}\"
+		eval tanmode=\"\$\{TANMODE_${blz}_${u}-\}\"
+		eval setup=\"\$\{SETUP_${blz}_${u}-\}\"
+		eval aqconf=\"\$\{AQCONF_${blz}_${u}-\}\"
 		if [ -z "$aqconf" ] ; then
 			aqsetup_acc "$blz" "$u" "$url" "$tanmode" "$setup" || return 1
 		else
@@ -414,7 +414,7 @@ function import_rescan () {
 function import_handleDir
 {
 	scandir="$1"
-	moveTo="$2"
+	moveTo="${2-}"
 
 	# get type from Extension
 	ftype=${scandir##*.}
@@ -490,7 +490,7 @@ function alert () {
 	export LC_ALL=C
 	export MAILRC=/dev/null
 
-	for a in $MAIL_ACCOUNTS ; do
+	for a in ${MAIL_ACCOUNTS-} ; do
 
 		Saldo=$(
 		$MYSQL_CMD -s <<-EOF
@@ -529,20 +529,21 @@ function alert () {
 }
 
 ##### Main ###################################################################
-[ "$DEBUG" == "1" ] && set -x 
+set -euo pipefail
+[ "${DEBUG-}" == "1" ] && set -x 
 
 datadir=/finance
 
-if [ -z "$MYSQL_HOST" ] ; then
+if [ -z "${MYSQL_HOST-}" ] ; then
 	printf "Variable MYSQL_HOST needs to be set.\n"
 	exit 1
-elif [ -z "$MYSQL_DATABASE" ] ; then
+elif [ -z "${MYSQL_DATABASE-}" ] ; then
 	printf "Variable MYSQL_DATABASE needs to be set.\n"
 	exit 1
-elif [ -z "$MYSQL_USER" ] ; then
+elif [ -z "${MYSQL_USER-}" ] ; then
 	printf "Variable MYSQL_USER needs to be set.\n"
 	exit 1
-elif [ -z "$MYSQL_PASSWORD" ] ; then
+elif [ -z "${MYSQL_PASSWORD-}" ] ; then
 	printf "Variable MYSQL_PASSWORD needs to be set.\n"
 	exit 1
 elif [ ! -r $datadir/.hbci-pinfile ] ; then
@@ -551,18 +552,18 @@ elif [ ! -r $datadir/.hbci-pinfile ] ; then
 	exit 1
 fi
 
-if [ ! -z "$MAIL_TO" ] ; then
-	if [ -z "$MAIL_FROM" ] ; then
+if [ ! -z "${MAIL_TO-}" ] ; then
+	if [ -z "${MAIL_FROM-}" ] ; then
 		printf "Variable MAIL_FROM needs to be set if using Alerting indicated by MAIL_TO\n"
 		exit 1
-	elif [ -z "$MAIL_URL" ] ; then
+	elif [ -z "${MAIL_URL-}" ] ; then
 		printf "Variable MAIL_URL needs to be set if using Alerting indicated by MAIL_TO\n"
 		exit 1
-	elif [ -z "$MAIL_ACCOUNTS" ] ; then
+	elif [ -z "${MAIL_ACCOUNTS-}" ] ; then
 		printf "Variable MAIL_ACCOUNTS needs to be set if using Alerting indicated by MAIL_TO\n"
 		exit 1
 	fi
-	if [ -z "$MAIL_HOSTNAME" ] ; then
+	if [ -z "${MAIL_HOSTNAME-}" ] ; then
 		MAIL_HOSTNAME="$(hostname)"
 	fi
 fi
