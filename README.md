@@ -84,6 +84,7 @@ to MAIL_URL. Authentication to the mail server is not yet supported.
 * MAIL_HOSTNAME optionally give the hostname that we report to SMTP server in
   HELO command. Usefule if the SMTP server requires a FQDN. Defaults to
   hostname.
+* DEBUG if set to 1, container will log all bash scripts (set -x)
 
 ## Advanced features
 fntxt2sql program supports more than mySql targets, have a look into its C

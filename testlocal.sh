@@ -99,15 +99,21 @@ exec_container () {
 	export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
 	export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
 	[ -z "$DNS" ] || DNS_PARM="--dns $DNS"
+
+	CUSTOM_PARM="$1"
+	shift
+
 	if [ "$1" == "-ti" ] ; then
 		ENTRY_PARM="-ti"
 	elif [ ! -z "$1" ] ; then
 		ENTRY_PARM="-ti --entrypoint $1"
 	fi
 	shift
+
 	docker run \
 		$DNS_PARM \
 		$ENTRY_PARM \
+		$CUSTOM_PARM \
 		-e MYSQL_HOST \
 		-e MYSQL_DATABASE \
 		-e MYSQL_USER \
@@ -163,6 +169,13 @@ action=${1:-test}
 shift
 case $action in
 	test )
+		if [ "$1" == "--debug" ] ; then
+			container_env="-e DEBUG=1"
+			shift
+		else
+			container_env=""
+		fi
+
 		if [ "$1" == "--taninteractive" ] ; then
 			container_parms=( "-ti" "$@")
 		else
@@ -177,7 +190,7 @@ case $action in
 		printf "Executing container 1st time - start.\n"
 		DB_USERS="testuser1 testuser2"
 		DB_testuser1_PASSWORD="dummypw"
-		exec_container "${container_parms[@]}"
+		exec_container "$container_env" "${container_parms[@]}"
 		printf "Executing container 1st time - end.\n"
 
 		# Now check is results are what we expected.
@@ -185,17 +198,17 @@ case $action in
 
 		# Start our just built container another time
 		printf "Executing container 2nd time - start.\n"
-		exec_container "${container_parms[@]}"
+		exec_container "$container_env" "${container_parms[@]}"
 		printf "Executing container 2nd time - end.\n"
 
 		# database should be still the same
 		test_dbsetup || exit 1
 		;;
 	exec )
-		exec_container "-ti" "$@"
+		exec_container "" "-ti" "$@"
 		;;
 	bash )
-		exec_container "/bin/bash" "$@"
+		exec_container "" "/bin/bash" "$@"
 		;;
 	initdata )
 		setup_testdata || exit 1

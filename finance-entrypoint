@@ -529,6 +529,8 @@ function alert () {
 }
 
 ##### Main ###################################################################
+[ "$DEBUG" == "1" ] && set -x 
+
 datadir=/finance
 
 if [ -z "$MYSQL_HOST" ] ; then
