@@ -36,6 +36,18 @@ function dbsetup_privileges () {
 
 #### DB Setup Users ##########################################################
 function dbsetup_users () {
+	printf "(Re-)Creating DB User mariadb.sys\n"
+	mysql \
+		--host=$MYSQL_HOST \
+		--user=root \
+		--password=$MYSQL_ROOT_PASSWORD \
+		mysql \
+		<<-EOF
+			CREATE USER IF NOT EXISTS 'mariadb.sys'@'localhost' ACCOUNT LOCK;
+			GRANT SELECT,UPDATE,DELETE on mysql.global_priv to 'mariadb.sys'@'localhost';
+			EOF
+	if [ $? != "0" ] ; then return  1 ; fi
+
 	where_users=""
 	for u in ${DB_USERS-} ; do
 		where_users="${where_users}, '$u'"
@@ -43,7 +55,7 @@ function dbsetup_users () {
 	$MYSQL_ROOT_CMD -N --batch <<-EOF |
 		SELECT user, host
 			FROM mysql.user
-			WHERE user NOT IN ('root', '$MYSQL_USER' $where_users ) AND
+			WHERE user NOT IN ('root', 'mariadb.sys', '$MYSQL_USER' $where_users ) AND
 				is_role="N";
 		EOF
 	while IFS=$'\t' read db_user db_host ; do
