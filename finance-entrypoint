@@ -220,7 +220,7 @@ function aqsetup () {
 		u=${line##*User Id: }
 		u=${u%% Customer Id: *}
 		#DEBUG printf "DEBUG: SETUP blz=%s u=%s\n" "$blz" "$u"
-		eval "AQCONF_$blz_$u=1"
+		eval "AQCONF_${blz}_${u}=1"
 	done <<<$users
 
 	# Now configure each account in pinfile but not yet in aqhbci
