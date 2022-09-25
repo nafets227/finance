@@ -598,7 +598,7 @@ if ! ping  -c 1 $MYSQL_HOST ; then
 	printf "Warning: MYSQL_HOST %s is not pingable.\n" "$MYSQL_HOST"
 	set -x
 	cat /etc/resolv.conf
-	dig $MYSQL_HOST || true # dont stop on error
+	dig +search $MYSQL_HOST || true # dont stop on error
 	ping -c 1 $MYSQL_HOST || true # dont stop on error
 	set +x
 fi
