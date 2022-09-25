@@ -174,7 +174,8 @@ fi
 docker build . -t nafets227/finance:local || exit 1
 
 action=${1:-test}
-shift
+shift || true # ignore error in shift if no parm was given
+
 case $action in
 	test )
 		if [ "${1-}" == "--debug" ] ; then
