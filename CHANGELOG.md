@@ -1,5 +1,11 @@
 # finance CHANGELOG
 
+## 0.7.2
+* Fix Stop when MYSQL_HOST cannot be pinged
+* Fix stop when .hbci-pinfile container TANMODE_ and SETUP_ lines. Error message:
+  /usr/local/bin/finance-entrypoint: line 181: blz_: unbound variable
+* Allow setting debug mode with either DEBUG=1 Environment or --debug parameter
+
 ## 0.7.1
 * Bump tp AqBanking 6.5.3 and gwenhywfar 5.9.0. This fixes the known bug of 0.7.0
 * fix DB view _cat where valuta is NULL
