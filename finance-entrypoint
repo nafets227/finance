@@ -587,6 +587,9 @@ while [ "$#" -gt 0 ] ; do
 		fromdate="${1:11}"
 	elif [ "$1" == "--taninteractive" ] ; then
 		taninteractive=""
+	elif [ "$1" == "--debug" ] ; then
+		DEBUG=1
+		set -x
 	else
 		printf "Error: Unknown parameter %s\n" "$1"
 		exit 1
