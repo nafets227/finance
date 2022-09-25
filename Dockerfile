@@ -108,6 +108,7 @@ RUN \
 		xmlsec \
 		gmp \
 		gnutls \
+		bind-tools \
 		&& \
 	if [ "$DEBUG" == "1" ] ; then \
 		echo deleting files not needed: && \
