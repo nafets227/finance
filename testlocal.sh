@@ -199,31 +199,45 @@ case $action in
 		printf "Executing container 1st time - start.\n"
 		DB_USERS="testuser1 testuser2"
 		DB_testuser1_PASSWORD="dummypw"
-		exec_container "$container_env" "${container_parms[@]}"
-		printf "Executing container 1st time - end.\n"
+		if exec_container "$container_env" "${container_parms[@]}"
+		then printf "Executing container 1st time - ended OK.\n"
+		else 
+			printf "Executing container 1st time - ended in ERROR.\n"
+			exit 1
+		fi
 
 		# Now check is results are what we expected.
 		test_dbsetup || exit 1
 
 		# Start our just built container another time
 		printf "Executing container 2nd time - start.\n"
-		exec_container "$container_env" "${container_parms[@]}"
-		printf "Executing container 2nd time - end.\n"
+		if exec_container "$container_env" "${container_parms[@]}"
+		then printf "Executing container 2nd time - ended OK.\n"
+		else
+			printf "Executing container 2nd time - ended in ERROR.\n"
+			exit 1
+		fi
 
 		# database should be still the same
 		test_dbsetup || exit 1
+
+		printf "***** All tests on finance have been successfully completed. *****\n"
 		;;
 	exec )
 		exec_container "" "-ti" "$@"
+		exit $?
 		;;
 	bash )
 		exec_container "" "/bin/bash" "$@"
+		exit $?
 		;;
 	initdata )
-		setup_testdata || exit 1
+		setup_testdata
+		exit $?
 		;;
 	initdb )
-		setup_testdb || exit 1
+		setup_testdb
+		exit $?
 		;;
 
 	*)
