@@ -1,5 +1,10 @@
 # finance CHANGELOG
 
+## 0.7.1
+* Bump tp AqBanking 6.5.3 and gwenhywfar 5.9.0. This fixes the known bug of 0.7.0
+* fix DB view _cat where valuta is NULL
+* Fix for MariaDB 10.4.13+: dont delete db user mariadb.sys
+
 ## 0.7
 * allow interactive input of tan received from 2-factor (see README)
 * Bump to aqbanking 6.3.2
