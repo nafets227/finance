@@ -47,7 +47,7 @@ RUN \
 	set -x && \
 	git clone https://git.aquamaniac.de/git/aqbanking.git && \
 	cd aqbanking && \
-	git checkout tags/6.5.0 && \
+	git checkout tags/6.5.3 && \
 	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
 	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
 	./configure && \
