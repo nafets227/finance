@@ -1,5 +1,8 @@
 # finance CHANGELOG
 
+## 0.7.3
+* really fix DB view _cat where valuta is NULL
+
 ## 0.7.2
 * Fix Stop when MYSQL_HOST cannot be pinged
 * Fix stop when .hbci-pinfile container TANMODE_ and SETUP_ lines. Error message:
