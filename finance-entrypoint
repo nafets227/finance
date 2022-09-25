@@ -178,7 +178,7 @@ function aqsetup () {
 				blz=${line%_*}
 				#DEBUG printf "DEBUG: TANMODE blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
 
-				eval "TANMODE_$blz_$u=\"\$parm\""
+				eval "TANMODE_${blz}_${u}=\"\$parm\""
 				;;
 
 			SETUP_* )
@@ -191,7 +191,7 @@ function aqsetup () {
 				blz=${line%_*}
 				#DEBUG printf "DEBUG: SETUP blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
 
-				eval "SETUP_$blz_$u=\"\$parm\""
+				eval "SETUP_${blz}_${u}=\"\$parm\""
 				;;
 			* )
 				printf "Warning: Ignoring unknown HBCI config Line %s in %s\n" \
