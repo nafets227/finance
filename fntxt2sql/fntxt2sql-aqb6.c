@@ -110,11 +110,9 @@ static int processAqb6Bal(const AB_IMEXPORTER_ACCOUNTINFO *iea, const AB_BALANCE
 	switch (AB_Balance_GetType(b))
 	{
 	case AB_Balance_TypeNoted: // @TODO: check which balance to take
+	case AB_Balance_TypeBooked:
 		buchung.buchart = 'E';
 		break;
-//	case AB_Balance_TypeBooked:
-//		buchung.buchart = 'F';
-//		break;
 	default:
 		debug_printf(dbg_in, "Ignoring Aqb6 Balance type %d\n", AB_Balance_GetType(b))
 		return 0; // Ignore this Balance
@@ -232,14 +230,44 @@ int processAqb6File(char *pchFileName)
 				return -1;
 		} // for all transactionds of account
 
+		/* special logic to solve https://github.com/nafets227/finance/issues/16
+			if we receive two balance entries for the same day, ww ignore both.
+			This is relevant for the day of data retrieval, as the balance may change
+			during the remaining hours of the day.
+			Next (booking-) day we will receive only one balance that is save to use
+			as it cannot change in future.
+		*/
+		const AB_BALANCE *bLast=NULL;
+		const GWEN_DATE *bDate=NULL, *bLastDate=NULL;
 		for(const AB_BALANCE *b =
 				AB_ImExporterAccountInfo_GetFirstBalance(iea);
 			b;
 			b=AB_Balance_List_Next(b) )
 		{ // for all balances of account
-			if (processAqb6Bal(iea, b))
-				return -1;
+			bDate=AB_Balance_GetDate(b);
+			if (bLastDate && bDate && (GWEN_Date_Compare(bDate, bLastDate) == 0) )
+			{
+				// double balance -> last and this balance to be ignored
+				AB_Balance_free(bLast); bLast = NULL;
+				GWEN_Date_free(bLastDate); bLastDate=NULL;
+			}
+			else
+			{
+				// no double balance -> save last one if stored
+				if (bLast && processAqb6Bal(iea, bLast))
+					return -1;
+
+				if(bLast) AB_Balance_free(bLast);
+				bLast = AB_Balance_dup(b);
+
+				if(bLastDate) GWEN_Date_free(bLastDate);
+				bLastDate=GWEN_Date_dup(bDate);
+			}
 		} // for all balances of account
+
+		// handle last balance
+		if (bLast && processAqb6Bal(iea, bLast))
+			return -1;
 	} // for all accounts
 
 	AB_ImExporterContext_free(ctx);
