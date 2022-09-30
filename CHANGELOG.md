@@ -1,5 +1,11 @@
 # finance CHANGELOG
 
+## 0.8
+* fix handling balances: (#16)
+  balances of days where both noted and booked balances exist are ignored. This applies to
+  "today" balances, that are not final and might change in the remaining time of the day.
+* fixes bash error when running with unset MAIL_TO
+
 ## 0.7.3
 * really fix DB view _cat where valuta is NULL
 
