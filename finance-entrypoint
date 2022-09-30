@@ -665,7 +665,7 @@ for f in $(ls $datadir/inbound.aqb/* 2>/dev/null) ; do
 printf "Importing transactions and balances into database\n"
 import || exit 1
 
-if [ ! -z "$MAIL_TO" ] ; then
+if [ ! -z "${MAIL_TO:-}" ] ; then
 	printf "Sending alert EMail\n"
 	alert || exit 1
 fi

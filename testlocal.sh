@@ -221,6 +221,17 @@ case $action in
 		# database should be still the same
 		test_dbsetup || exit 1
 
+		# Start our just built container another time
+		printf "Executing container 3rd time (no MAIL_TO) - start.\n"
+		unset MAIL_TO
+		export -n MAIL_TO
+		if exec_container "$container_env" "${container_parms[@]}"
+		then printf "Executing container 3rd time (no MAIL_TO) - ended OK.\n"
+		else
+			printf "Executing container 3rd time (no MAIL_TO) - ended in ERROR.\n"
+			exit 1
+		fi
+
 		printf "***** All tests on finance have been successfully completed. *****\n"
 		;;
 	exec )
