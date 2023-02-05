@@ -236,7 +236,16 @@ const char * const * getCreateSql(void)
 			"ORDER BY orig_ktonr, orig_blz, datum, buchart desc "
 			") as l0 "
 		"ORDER BY orig_ktonr, orig_blz, jahr, monat";
-
+	static const char achCreViewTodo[] = "CREATE OR REPLACE VIEW %s_todo AS "
+		"SELECT KATG5, KATG5_BETRAG, "
+			"KATG4, KATG4_BETRAG, "
+			"KATG3, KATG3_BETRAG, "
+			"KATG2, KATG2_BETRAG, "
+			"DATUM_KOR, KATG, "
+			"ORIG_KTONR, VALUTA, BETRAG, PART_NAME1, BUTEXT, "
+			"VZWECK1, VZWECK2, VZWECK3, VZWECK4, VZWECK5, VZWECK6, VZWECK7 "
+		"FROM fn_entry "
+		"WHERE KATG IS NULL AND BUCHART='B'";
 	static const char achGrantTab[] =
 			"GRANT SELECT, UPDATE ( "
 				"DATUM_KOR, KATG, "
@@ -256,13 +265,14 @@ const char * const * getCreateSql(void)
 	static char achTempCreViewCat[sizeof(achCreViewCat)+6*sizeof(config.achSqlTabName)] = "";
 	static char achTempCreViewManual[sizeof(achCreViewManual)+2*sizeof(config.achSqlTabName)] = "";
 	static char achTempCreViewBalance[sizeof(achCreViewBalance)+2*sizeof(config.achSqlTabName)] = "";
+	static char achTempCreViewTodo[sizeof(achCreViewTodo)+2*sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantTab[sizeof(achGrantTab)+sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantViewCat[sizeof(achGrantViewCat)+sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantViewManual[sizeof(achGrantViewManual)+sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantViewBalance[sizeof(achGrantViewBalance)+sizeof(config.achSqlTabName)] = "";
 
 	static char const * apchTempResult[] = {
-		achTempCreTab, achTempCreViewCat, achTempCreViewManual, achTempCreViewBalance,
+		achTempCreTab, achTempCreViewCat, achTempCreViewManual, achTempCreViewBalance, achTempCreViewTodo,
 		achTempGrantTab, achTempGrantViewCat, achTempGrantViewManual, achTempGrantViewBalance,
 		NULL};
 
@@ -275,6 +285,8 @@ const char * const * getCreateSql(void)
 	snprintf(achTempCreViewManual , sizeof(achTempCreViewManual ), achCreViewManual,
 	    config.achSqlTabName, config.achSqlTabName);
 	snprintf(achTempCreViewBalance , sizeof(achTempCreViewBalance ), achCreViewBalance,
+	    config.achSqlTabName, config.achSqlTabName);
+	snprintf(achTempCreViewTodo , sizeof(achTempCreViewTodo ), achCreViewTodo,
 	    config.achSqlTabName, config.achSqlTabName);
 	snprintf(achTempGrantTab , sizeof(achTempGrantTab ), achGrantTab,
 		config.achSqlTabName);
