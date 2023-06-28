@@ -35,6 +35,7 @@ RUN \
 	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
 	make -f Makefile.cvs && \
 	./configure \
+		CFLAGS=-Wno-error=deprecated-declarations \
 		--with-guis="cpp" \
 		--enable-error-on-warning \
 		--disable-network-checks && \
