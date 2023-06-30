@@ -139,17 +139,17 @@ exec_container () {
 ##### Main ###################################################################
 set -euo pipefail
 
-if [ -z "${MYSQL_HOST-}" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+if [ -z "${MYSQL_HOST-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
 	MYSQL_HOST="www.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MYSQL_HOST to %s\n" "$MYSQL_HOST"
 fi
 
-if [ -z "${MAIL_URL-}" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+if [ -z "${MAIL_URL-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
 	MAIL_URL="smtp://www.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_URL to %s\n" "$MAIL_URL"
 fi
 
-if [ -z "${MAIL_HOSTNAME-}" ] && [ ! -z "$KUBE_BASEDOM" ] ; then
+if [ -z "${MAIL_HOSTNAME-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
 	MAIL_HOSTNAME="finance-testlocal.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_HOSTNAME to %s\n" "$MAIL_HOSTNAME"
 fi
