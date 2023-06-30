@@ -19,16 +19,18 @@ function test_dbconnect {
 		CMD_PW="--password=$pw"
 		PRT_PW=", password \"$pw\""
 	fi
-	mysql \
+	if [ $DEBUG != "1" ] ; then
+		REDIR=">/dev/null 2>/dev/null"
+	else
+		REDIR=""
+	fi
+	eval mysql \
 		--host=$MYSQL_HOST \
 		--user=$user \
 		$CMD_PW \
+		'"--execute=SELECT 1;"' \
 		$MYSQL_DATABASE \
-		>/dev/null \
-		2>/dev/null \
-		<<-EOF
-			SELECT 1;
-		EOF
+		$REDIR
 	rc=$?
 	if [ $rc != "$rcexp" ] ; then
 		printf "ERR: Connecting to DB at %s with user %s%s: RC=%s(Exp=%s)\n" \
@@ -181,9 +183,11 @@ case $action in
 	test )
 		if [ "${1-}" == "--debug" ] ; then
 			container_env="-e DEBUG=1"
+			DEBUG=1
 			shift
 		else
 			container_env=""
+			DEBUG=0
 		fi
 
 		if [ "${1-}" == "--taninteractive" ] ; then
