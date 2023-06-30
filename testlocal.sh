@@ -170,13 +170,14 @@ if [ -z "${MYSQL_HOST-}" ] ||
 	exit 1
 fi
 
-# Build
-docker build . -t nafets227/finance:local || exit 1
-
 action=${1:-test}
 shift || true # ignore error in shift if no parm was given
 
 case $action in
+	build)
+		# Build
+		docker build . -t nafets227/finance:local || exit 1
+		;;
 	test )
 		if [ "${1-}" == "--debug" ] ; then
 			container_env="-e DEBUG=1"
