@@ -135,7 +135,7 @@ exec_container () {
 		-e MAIL_HOSTNAME \
 		-e MAIL_ACCOUNTS \
 		-v $(pwd)/testdata:/finance \
-		"nafets227/finance:local" "$@" \
+		"$FINIMG" "$@" \
 	|| return 1
 }
 ##### Main ###################################################################
@@ -155,6 +155,11 @@ if [ -z "${MAIL_HOSTNAME-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
 	MAIL_HOSTNAME="finance-testlocal.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_HOSTNAME to %s\n" "$MAIL_HOSTNAME"
 fi
+
+if [ -z "$FINIMG" ] ; then
+	FINIMG="nafets227/finance:local"
+fi
+printf "Using docker image %s for testing\n" "$FINIMG"
 
 if [ -z "${MYSQL_HOST-}" ] ||
    [ -z "${MYSQL_DATABASE-}" ] ||

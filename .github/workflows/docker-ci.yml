@@ -81,6 +81,8 @@ jobs:
           MYSQL_PASSWORD=mysqlpassword
           MYSQL_ROOT_PASSWORD=geheim
 
+          FINIMG="${{ steps.meta.outputs.tags}}"
+
           . ./testlocal.sh test $TESTPARM
 
       - name: Cleanup Test
