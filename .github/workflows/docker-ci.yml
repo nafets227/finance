@@ -75,13 +75,15 @@ jobs:
             set -x
           cat >.hbci-pinfile <<<"$HBCI_PINFILE"
           
-          MYSQL_HOST=127.0.0.1
+          MYSQL_HOST=db
+          MYSQL_LOCAL_HOST=127.0.0.1
           MYSQL_DATABASE=dbTest
           MYSQL_USER=mysqluser
           MYSQL_PASSWORD=mysqlpassword
           MYSQL_ROOT_PASSWORD=geheim
 
           FINIMG="${{ steps.meta.outputs.tags}}"
+          FINNET="${{ job.services.db.network}}"
 
           . ./testlocal.sh test $TESTPARM
 

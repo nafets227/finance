@@ -4,7 +4,7 @@
 #
 # Environment Vairables to be set:
 #
-# MYSQL_HOST, MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD
+# MYSQL_LOCAL_HOST, MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD
 
 function test_dbconnect {
 	local user="$1"
@@ -25,7 +25,7 @@ function test_dbconnect {
 		REDIR=""
 	fi
 	eval mysql \
-		--host=$MYSQL_HOST \
+		--host=$MYSQL_LOCAL_HOST \
 		--user=$user \
 		$CMD_PW \
 		'"--execute=SELECT 1;"' \
@@ -34,7 +34,7 @@ function test_dbconnect {
 	rc=$?
 	if [ $rc != "$rcexp" ] ; then
 		printf "ERR: Connecting to DB at %s with user %s%s: RC=%s(Exp=%s)\n" \
-			"$MYSQL_HOST" "$user" "$PRT_PW" "$rc" "$rcexp"
+			"$MYSQL_LOCAL_HOST" "$user" "$PRT_PW" "$rc" "$rcexp"
 		return 1
 	fi
 
@@ -46,7 +46,7 @@ function setup_testdb () {
 	printf "Setting up Test Database start.\n"
 	# Setup Helper Vars
 	MYSQL_ROOT_CMD="mysql"
-	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --host=$MYSQL_HOST"
+	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --host=$MYSQL_LOCAL_HOST"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --user=root"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --password=$MYSQL_ROOT_PASSWORD"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD	$MYSQL_DATABASE"
@@ -118,9 +118,16 @@ exec_container () {
 	fi
 	shift
 
+	if [ -n "$FINNET" ] ; then
+		NET_PARM="--net $FINNET"
+	else
+		NET_PARM=""
+	fi
+
 	docker run \
 		$DNS_PARM \
 		$ENTRY_PARM \
+		$NET_PARM \
 		$CUSTOM_PARM \
 		-e MYSQL_HOST \
 		-e MYSQL_DATABASE \
@@ -154,6 +161,11 @@ fi
 if [ -z "${MAIL_HOSTNAME-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
 	MAIL_HOSTNAME="finance-testlocal.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_HOSTNAME to %s\n" "$MAIL_HOSTNAME"
+fi
+
+if [ -z "$MYSQL_LOCAL_HOST" ] ; then
+	MYSQL_LOCAL_HOST=$MYSQL_HOST
+	printf "Using MYSQL_HOST to set MYSQL_LOCAL_HOST to %s\N" "$MYSQL_HOST"
 fi
 
 if [ -z "$FINIMG" ] ; then
