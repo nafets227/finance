@@ -17,6 +17,18 @@ jobs:
       contents: read
       packages: write
 
+    # mariadb service for testing 
+    services:
+      db:
+        image: mariadb
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: geheim
+          MYSQL_DATABASE: dbTest
+          MYSQL_USER: mysqluser
+          MYSQL_PASSWORD: mysqlpassword
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -34,10 +46,58 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
 
-      - name: Build and push Docker image
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Install Mariadb-Client on Runner for tests
+        run: |
+          # install MariaDB client
+          sudo apt-get update
+          sudo apt-get install mariadb-client
+
+      - name: Test
+        env:
+          HBCI_PINFILE: ${{ secrets.HBCI_PINFILE }}
+        run: |
+          [ "$RUNNER_DEBUG" == 1 ] &&
+            DEBUGSH="set -x" &&
+            TESTPARM="--debug" &&
+            set -x
+          cat >.hbci-pinfile <<<"$HBCI_PINFILE"
+          
+          MYSQL_HOST=db
+          MYSQL_LOCAL_HOST=127.0.0.1
+          MYSQL_DATABASE=dbTest
+          MYSQL_USER=mysqluser
+          MYSQL_PASSWORD=mysqlpassword
+          MYSQL_ROOT_PASSWORD=geheim
+
+          FINIMG="${{ steps.meta.outputs.tags}}"
+          FINNET="${{ job.services.db.network}}"
+
+          . ./testlocal.sh test $TESTPARM
+
+      - name: Cleanup Test
+        if: always()
+        run: |
+          rm .hbci-pinfile
+
+      - name: Push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

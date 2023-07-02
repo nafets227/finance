@@ -283,7 +283,7 @@ function aqsetup_acc () {
 	local tanmode="$4"
 	local parm="$5"
 
-	local disable_getbankinfo disable_getsysid disable_setitanmode
+	local disable_getbankinfo="" disable_getsysid="" disable_setitanmode=""
 	printf "Configuring HBCI for BLZ %s User %s tanmode=%s url=%s setup=%s\n" \
 		"$blz" "$u" "$tanmode" "$url" "$parm"
 
