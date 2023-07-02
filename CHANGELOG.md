@@ -1,5 +1,11 @@
 # finance CHANGELOG
 
+## 0.9 (2.7.2023)
+* Bump to AqBanking 6.5.4, gwenhywfar 5.10.1
+* bump to Alping 3.18.2 and pin to that version
+* Fix a compile error with deprecated OpenSSL functions used in gwenhywfar
+* improve CI, also activating dependabot
+
 ## 0.8
 * fix handling balances: (#16)
   balances of days where both noted and booked balances exist are ignored. This applies to
