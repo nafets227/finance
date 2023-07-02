@@ -63,7 +63,7 @@ In order to prevent users from accidently modifying any bookings their access
 rights are restricted. You need to list all userIDs in the Environment variable
 DB_USERS, then start the container and it will grant the restricted rights.
 
-##Alerting
+## Alerting
 If MAIL_TO is set, every run will send the bookings of the last 7 days plus the
 current balance ot MAIL_ACCOUNTS to MAIL_TO. The delivery will be based on SMTP
 to MAIL_URL. Authentication to the mail server is not yet supported.
@@ -87,6 +87,7 @@ to MAIL_URL. Authentication to the mail server is not yet supported.
 * DEBUG if set to 1, container will log all bash scripts (set -x)
 
 ## Advanced features
+### enhanced features of fntxt2sql
 fntxt2sql program supports more than mySql targets, have a look into its C
 sourcecode. However, the scripts of this container only support importing into
 a Mysql/Mariadb database.
@@ -95,3 +96,10 @@ If you need to get information where the bank requests to enter a mobile pin, pl
 
 If your bank, as e.g. HypoVereinsbank, does no longer support logging on
 without 2 factor authorisation, you can try with ./testlocal exec --taninteractive. This allows you to enter the tan received via 2nd factor.
+
+### testing with testlocal.sh
+testlocal.sh adds additional Environment Variables for testing:
+* MYSQL_LOCAL_HOST (defaults to MYSQL_HOST)
+* FINIMG docker image to test (default: nafets227/finance:local)
+Both are useful if you are testing on a local machine or in a github action like
+.github/workflows/docker-ci.yml
