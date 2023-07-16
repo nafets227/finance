@@ -1,5 +1,11 @@
 # finance CHANGELOG
 
+## Next
+* INCOMPATIBLE: Email configuration using mta instead of smtp in mailx
+  you need to include the protocol in MAIL_URL (smtp://mail.server.tld:port).
+  Up to now it was enough to specify the servername without protocol
+  (mail.server.tld:port)
+
 ## 0.9.3 (23.7.2023)
 * fix access right on *todo view
 
