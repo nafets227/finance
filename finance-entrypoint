@@ -528,6 +528,8 @@ function alert () {
 			-n -Sv15-compat -Ssendwait -Snosave -Sexpandaddr=fail,-all,+addr \
 			-S 'smtp-auth=none' \
         	-S "smtp=$MAIL_URL" \
+			-S 'sendcharsets=C' \
+			-S 'ttycharset=C' \
         	-S "hostname=$MAIL_HOSTNAME" \
 			-s "Account-info $a: $Saldo" \
 			-r "$MAIL_FROM" $MAIL_TO \
