@@ -173,11 +173,12 @@ if [ -z "$FINIMG" ] ; then
 fi
 printf "Using docker image %s for testing\n" "$FINIMG"
 
-if [ -z "${MYSQL_HOST-}" ] ||
-   [ -z "${MYSQL_DATABASE-}" ] ||
-   [ -z "${MYSQL_USER-}" ] ||
-   [ -z "${MYSQL_PASSWORD-}" ] ||
-   [ -z "${MYSQL_ROOT_PASSWORD-}" ] ; then
+if	[ -z "${MYSQL_HOST-}" ] ||
+	[ -z "${MYSQL_DATABASE-}" ] ||
+	[ -z "${MYSQL_USER-}" ] ||
+	[ -z "${MYSQL_PASSWORD-}" ] ||
+	[ -z "${MYSQL_ROOT_PASSWORD-}" ]
+then
 	printf "Error: Not all required Environment Variables are set.\n"
 	printf "\tMYSQL_HOST=%s\n" "$MYSQL_HOST"
 	printf "\tMYSQL_DATABASE=%s\n" "$MYSQL_DATABASE"

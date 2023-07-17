@@ -476,7 +476,7 @@ function import_handleDir
 			manual )
 				printf "Not importing %s %s. Run manually!\n" "$ftype" "$f"
 				rc=-1
-			    ;;
+				;;
 			*)
 				printf "Not importing unknown type %s in %s\n" "$ftype" "$f"
 				rc=-1
@@ -506,36 +506,36 @@ function alert () {
 
 		Saldo=$(
 		$MYSQL_CMD -s <<-EOF
-		SELECT datum, betrag
-		  FROM fn_entry
-		 WHERE buchart = 'E' AND
-		         orig_ktonr="$a" AND
-		         datum = ( SELECT MAX(DATUM) from fn_entry where orig_ktonr='$a');
-		EOF
+			SELECT datum, betrag
+			FROM fn_entry
+			WHERE buchart = 'E' AND
+				orig_ktonr="$a" AND
+				datum = ( SELECT MAX(DATUM) from fn_entry where orig_ktonr='$a');
+			EOF
 		)
 		if [ "$?" != "0" ] ; then return 1 ; fi
 
 
 		( $MYSQL_CMD <<-EOF
-		SELECT datum, betrag, part_name1, vzweck1, vzweck2
-		  FROM fn_entry
-		 WHERE buchart='B' AND
-		       orig_ktonr='$a' AND
-		       datum >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-		  ORDER BY datum DESC, betrag;
+			SELECT datum, betrag, part_name1, vzweck1, vzweck2
+			FROM fn_entry
+			WHERE buchart='B' AND
+				orig_ktonr='$a' AND
+				datum >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+			ORDER BY datum DESC, betrag;
 		EOF
 		) | mail \
 			-n -Sv15-compat -Ssendwait -Snosave -Sexpandaddr=fail,-all,+addr \
 			-S 'smtp-auth=none' \
-        	-S "smtp=$MAIL_URL" \
+			-S "smtp=$MAIL_URL" \
 			-S 'sendcharsets=C' \
 			-S 'ttycharset=C' \
-        	-S "hostname=$MAIL_HOSTNAME" \
+			-S "hostname=$MAIL_HOSTNAME" \
 			-s "Account-info $a: $Saldo" \
 			-r "$MAIL_FROM" $MAIL_TO \
 			|| return 1
-        	# -SNosave is included in -d and generates error messages - so dont include it
-        	# -n -d -vv -Sv15-compat -Ssendwait -Sexpandaddr=fail,-all,+addr
+			# -SNosave is included in -d and generates error messages - so dont include it
+			# -n -d -vv -Sv15-compat -Ssendwait -Sexpandaddr=fail,-all,+addr
 
 	done
 
@@ -544,7 +544,7 @@ function alert () {
 
 ##### Main ###################################################################
 set -euo pipefail
-[ "${DEBUG-}" == "1" ] && set -x 
+[ "${DEBUG-}" == "1" ] && set -x
 
 datadir=/finance
 
@@ -658,11 +658,11 @@ aqbanking_wrapper \
 # also modify fntxt2sql to the new format
 printf "Processing transactions and balances \n"
 for f in $(ls $datadir/inbound.aqb/* 2>/dev/null) ; do
-    fnam=$(basename $f)
-    aqbanking_wrapper listtrans -c $f >$datadir/inbound.aqb-tran/$fnam && \
-    aqbanking_wrapper listbal   -c $f >$datadir/inbound.aqb-bal/$fnam  && \
-    mv $f $datadir/store.aqb
-    done
+	fnam=$(basename $f)
+	aqbanking_wrapper listtrans -c $f >$datadir/inbound.aqb-tran/$fnam && \
+	aqbanking_wrapper listbal   -c $f >$datadir/inbound.aqb-bal/$fnam  && \
+	mv $f $datadir/store.aqb
+done
 
 printf "Importing transactions and balances into database\n"
 import || exit 1

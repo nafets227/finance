@@ -7,7 +7,7 @@
 # finance-entrypoint as restricted user.
 
 set -euo pipefail
-[ "${DEBUG-}" == "1" ] && set -x 
+[ "${DEBUG-}" == "1" ] && set -x
 
 printf "Setting permissions of /finance\n"
 # change all files ownership to finance:finance

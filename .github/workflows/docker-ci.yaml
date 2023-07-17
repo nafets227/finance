@@ -17,7 +17,7 @@ jobs:
       contents: read
       packages: write
 
-    # mariadb service for testing 
+    # mariadb service for testing
     services:
       db:
         image: mariadb
@@ -74,7 +74,7 @@ jobs:
             TESTPARM="--debug" &&
             set -x
           cat >.hbci-pinfile <<<"$HBCI_PINFILE"
-          
+
           MYSQL_HOST=db
           MYSQL_LOCAL_HOST=127.0.0.1
           MYSQL_DATABASE=dbTest

@@ -5,7 +5,7 @@
 * bump to Alping 3.18.2 and pin to that version
 * Fix a compile error with deprecated OpenSSL functions used in gwenhywfar
 * improve CI, also activating dependabot
-* Add *todo view 
+* Add *todo view
 
 ## 0.8
 * fix handling balances: (#16)
