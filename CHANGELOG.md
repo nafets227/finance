@@ -1,5 +1,8 @@
 # finance CHANGELOG
 
+## 0.9.1 (17.7.2023)
+* Fix sending Alert-Email by disabling charset conversion
+
 ## 0.9 (2.7.2023)
 * Bump to AqBanking 6.5.4, gwenhywfar 5.10.1
 * bump to Alping 3.18.2 and pin to that version
