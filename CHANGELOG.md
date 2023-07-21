@@ -1,5 +1,9 @@
 # finance CHANGELOG
 
+## Next
+* Dont delete Database user "healthcheck" that is a standard-user of
+  MariaDB container
+
 ## 0.9.1 (17.7.2023)
 * Fix sending Alert-Email by disabling charset conversion
 

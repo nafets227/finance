@@ -55,7 +55,9 @@ function dbsetup_users () {
 	$MYSQL_ROOT_CMD -N --batch <<-EOF |
 		SELECT user, host
 			FROM mysql.user
-			WHERE user NOT IN ('root', 'mariadb.sys', '$MYSQL_USER' $where_users ) AND
+			WHERE user NOT IN ('root', 'mariadb.sys', 'healthcheck',
+				'$MYSQL_USER' $where_users )
+			AND
 				is_role="N";
 		EOF
 	while IFS=$'\t' read db_user db_host ; do
