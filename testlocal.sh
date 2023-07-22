@@ -118,7 +118,7 @@ exec_container () {
 	fi
 	shift
 
-	if [ -n "$FINNET" ] ; then
+	if [ -n "${FINNET-}" ] ; then
 		NET_PARM="--net $FINNET"
 	else
 		NET_PARM=""
@@ -163,12 +163,12 @@ if [ -z "${MAIL_HOSTNAME-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
 	printf "Using KUBE_BASEDOM to set MAIL_HOSTNAME to %s\n" "$MAIL_HOSTNAME"
 fi
 
-if [ -z "$MYSQL_LOCAL_HOST" ] ; then
-	MYSQL_LOCAL_HOST=$MYSQL_HOST
-	printf "Using MYSQL_HOST to set MYSQL_LOCAL_HOST to %s\N" "$MYSQL_HOST"
+if [ -z "${MYSQL_LOCAL_HOST-}" ] ; then
+	MYSQL_LOCAL_HOST=${MYSQL_HOST-}
+	printf "Using MYSQL_HOST to set MYSQL_LOCAL_HOST to %s\n" "${MYSQL_HOST-}"
 fi
 
-if [ -z "$FINIMG" ] ; then
+if [ -z "${FINIMG-}" ] ; then
 	FINIMG="nafets227/finance:local"
 fi
 printf "Using docker image %s for testing\n" "$FINIMG"
@@ -180,12 +180,12 @@ if	[ -z "${MYSQL_HOST-}" ] ||
 	[ -z "${MYSQL_ROOT_PASSWORD-}" ]
 then
 	printf "Error: Not all required Environment Variables are set.\n"
-	printf "\tMYSQL_HOST=%s\n" "$MYSQL_HOST"
-	printf "\tMYSQL_DATABASE=%s\n" "$MYSQL_DATABASE"
-	printf "\tMYSQL_USER=%s\n" "$MYSQL_USER"
-	printf "\tMYSQL_PASSWORD=%s\n" "$MYSQL_PASSWORD"
-	printf "\tMYSQL_ROOT_PASSWORD=%s\n" "$MYSQL_ROOT_PASSWORD"
-	printf "\tKUBE_BASEDOM=%s\n" "$KUBE_BASEDOM"
+	printf "\tMYSQL_HOST=%s\n" "${MYSQL_HOST-}"
+	printf "\tMYSQL_DATABASE=%s\n" "${MYSQL_DATABASE-}"
+	printf "\tMYSQL_USER=%s\n" "${MYSQL_USER-}"
+	printf "\tMYSQL_PASSWORD=%s\n" "${MYSQL_PASSWORD-}"
+	printf "\tMYSQL_ROOT_PASSWORD=%s\n" "${MYSQL_ROOT_PASSWORD-}"
+	printf "\tKUBE_BASEDOM=%s\n" "${KUBE_BASEDOM-}"
 	printf "\tKUBE_BASEDOM would set default for MYSQL_HOST, MAIL_URL and MAIL_HOSTNAME\n"
 	exit 1
 fi
