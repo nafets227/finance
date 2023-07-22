@@ -1,5 +1,8 @@
 # finance CHANGELOG
 
+## Next
+* fix access right on *todo view
+
 ## 0.9.2 (22.7.2023)
 * Dont delete Database user "healthcheck" that is a standard-user of
   MariaDB container

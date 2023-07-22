@@ -260,6 +260,14 @@ const char * const * getCreateSql(void)
 			"GRANT SELECT,INSERT,UPDATE on %s_manual TO fin_user";
 	static const char achGrantViewBalance[] =
 			"GRANT SELECT on %s_balance TO fin_user";
+	static const char achGrantViewTodo[] =
+			"GRANT SELECT, UPDATE( "
+				"DATUM_KOR, KATG, "
+				"KATG2, KATG2_BETRAG, "
+				"KATG3, KATG3_BETRAG, "
+				"KATG4, KATG4_BETRAG, "
+				"KATG5, KATG5_BETRAG "
+			") on %s_todo TO fin_user";
 
 	static char achTempCreTab[sizeof(achCreTab)+sizeof(config.achSqlTabName)] = "";
 	static char achTempCreViewCat[sizeof(achCreViewCat)+6*sizeof(config.achSqlTabName)] = "";
@@ -270,10 +278,11 @@ const char * const * getCreateSql(void)
 	static char achTempGrantViewCat[sizeof(achGrantViewCat)+sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantViewManual[sizeof(achGrantViewManual)+sizeof(config.achSqlTabName)] = "";
 	static char achTempGrantViewBalance[sizeof(achGrantViewBalance)+sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantViewTodo[sizeof(achGrantViewTodo)+sizeof(config.achSqlTabName)] = "";
 
 	static char const * apchTempResult[] = {
 		achTempCreTab, achTempCreViewCat, achTempCreViewManual, achTempCreViewBalance, achTempCreViewTodo,
-		achTempGrantTab, achTempGrantViewCat, achTempGrantViewManual, achTempGrantViewBalance,
+		achTempGrantTab, achTempGrantViewCat, achTempGrantViewManual, achTempGrantViewBalance, achTempGrantViewTodo,
 		NULL};
 
 	snprintf(achTempCreTab , sizeof(achTempCreTab ), achCreTab,
@@ -295,6 +304,8 @@ const char * const * getCreateSql(void)
 	snprintf(achTempGrantViewManual, sizeof(achTempGrantViewManual), achGrantViewManual,
 		config.achSqlTabName);
 	snprintf(achTempGrantViewBalance, sizeof(achTempGrantViewBalance), achGrantViewBalance,
+		config.achSqlTabName);
+	snprintf(achTempGrantViewTodo, sizeof(achTempGrantViewTodo), achGrantViewTodo,
 		config.achSqlTabName);
 
 	return apchTempResult;
