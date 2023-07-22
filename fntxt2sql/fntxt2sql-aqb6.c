@@ -152,7 +152,6 @@ static int processAqb6Tran(const AB_TRANSACTION *t)
 	debug_printf(dbg_in, "processAqb6Tran.\n");
 
 	memset(&buchung, '\0', sizeof(buchung));
-
 	buchung.buchart = 'B';
 
 	save_strcpy(buchung.orig_blz, AB_Transaction_GetLocalBankCode(t));
@@ -226,8 +225,14 @@ int processAqb6File(char *pchFileName)
 			t;
 			t=AB_Transaction_List_Next(t))
 		{ // for all transactions of account
-			if (processAqb6Tran(t))
-				return -1;
+			/* we ignore all noted statements since they will be replaced
+				by Statements the following day. This fixes an error where we have
+				statements twice, once as noted and once as booked, since they differ
+				in their detailed data (e.g. comment) and cannot be matched to each other.
+			*/
+			if (AB_Transaction_GetType(t) != AB_Transaction_TypeNotedStatement)
+				if (processAqb6Tran(t))
+					return -1;
 		} // for all transactionds of account
 
 		/* special logic to solve https://github.com/nafets227/finance/issues/16

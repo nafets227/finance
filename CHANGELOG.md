@@ -3,6 +3,11 @@
 ## Next
 * Dont delete Database user "healthcheck" that is a standard-user of
   MariaDB container
+* Ignore all noted statements
+  they will be replaced by Statements the following day.
+  This fixes an error where we have	statements twice, once as noted and once
+  as booked, since they differ in their detailed data (e.g. comment) and
+  cannot be matched to each other.
 
 ## 0.9.1 (17.7.2023)
 * Fix sending Alert-Email by disabling charset conversion
