@@ -1,6 +1,6 @@
 # finance CHANGELOG
 
-## Next
+## 0.9.3 (23.7.2023)
 * fix access right on *todo view
 
 ## 0.9.2 (22.7.2023)
