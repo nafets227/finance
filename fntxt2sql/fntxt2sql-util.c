@@ -264,7 +264,7 @@ int compareRecord(const Buchung newBuch, const Buchung existBuch)
 //		RC_referenz    =  90,
 //		RC_gv_code     = 100,
 		RC_part_name1  = 110,
-		RC_part_name2  = 120,
+//		RC_part_name2  = 120,
 		RC_part_ktonr  = 130,
 		RC_part_blz    = 140,
 		RC_butext      = 150,
@@ -320,6 +320,9 @@ int compareRecord(const Buchung newBuch, const Buchung existBuch)
 	}
 
 	//***** part_name2 *******************************************************
+	// disabled since aqb6 importer sets part_name2 to ultimateDebtor
+	// this prohibits double-imports with old and new SW version.
+	/*
 	if(newBuch.part_name2[0] != '\0')
 	{
 		if(existBuch.part_name2[0] == '\0')
@@ -328,6 +331,7 @@ int compareRecord(const Buchung newBuch, const Buchung existBuch)
 			if(strcmp(newBuch.part_name2, existBuch.part_name2))
 				return - RC_part_name2 - 2;
 	}
+	*/
 
 	//***** part_ktonr *******************************************************
 	if(newBuch.part_ktonr[0] != '\0')

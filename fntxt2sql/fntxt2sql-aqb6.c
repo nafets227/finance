@@ -158,6 +158,7 @@ static int processAqb6Tran(const AB_TRANSACTION *t)
 	save_strcpy(buchung.orig_ktonr, AB_Transaction_GetLocalAccountNumber(t));
 
 	save_strcpy(buchung.part_name1, AB_Transaction_GetRemoteName(t));
+	save_strcpy(buchung.part_name2, AB_Transaction_GetUltimateDebtor(t));
 	save_strcpy(buchung.part_blz,   AB_Transaction_GetRemoteBankCode(t));
 	save_strcpy(buchung.part_ktonr, AB_Transaction_GetRemoteAccountNumber(t));
 
