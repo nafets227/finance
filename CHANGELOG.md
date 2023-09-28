@@ -1,10 +1,11 @@
 # finance CHANGELOG
 
-## Next
+## 1.0.0 (28.9.2023)
 * INCOMPATIBLE: Email configuration using mta instead of smtp in mailx
   you need to include the protocol in MAIL_URL (smtp://mail.server.tld:port).
   Up to now it was enough to specify the servername without protocol
   (mail.server.tld:port)
+* Show uptimateDebtor in PART_NAME2 [#30|https://github.com/nafets227/finance/issues/30]
 
 ## 0.9.3 (23.7.2023)
 * fix access right on *todo view
