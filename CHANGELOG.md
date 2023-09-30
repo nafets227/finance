@@ -1,5 +1,8 @@
 # finance CHANGELOG
 
+## 1.0.1 (30.9.2023)
+* Include PART_NAME2 and ID in view ToDo
+
 ## 1.0.0 (28.9.2023)
 * INCOMPATIBLE: Email configuration using mta instead of smtp in mailx
   you need to include the protocol in MAIL_URL (smtp://mail.server.tld:port).
