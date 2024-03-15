@@ -255,6 +255,17 @@ case $action in
 			exit 1
 		fi
 
+		# Start our just built container another time
+		printf "Executing container 4th time (no MYSQL_ROOT_PASSWORD) - start.\n"
+		unset MYSQL_ROOT_PASSWORD
+		export -n MYSQL_ROOT_PASSWORD
+		if exec_container "$container_env" "${container_parms[@]}"
+		then printf "Executing container 4th time (no MYSQL_ROOT_PASSWORD) - ended OK.\n"
+		else
+			printf "Executing container 4th time (no MYSQL_ROOT_PASSWORD) - ended in ERROR.\n"
+			exit 1
+		fi
+
 		printf "***** All tests on finance have been successfully completed. *****\n"
 		;;
 	exec )
