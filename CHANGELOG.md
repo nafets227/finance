@@ -1,5 +1,9 @@
 # finance CHANGELOG
 
+## 1.0.2 (16.3.2024)
+* Fix Error when starting with unset MYSQL_ROOT_PASSWORD (thx to agross for
+  reporting)
+
 ## 1.0.1 (30.9.2023)
 * Include PART_NAME2 and ID in view ToDo
 
