@@ -1,5 +1,10 @@
 # finance CHANGELOG
 
+## 1.1.0 (23.3.2024)
+* Support Sparkasse S-Pushtan 2.0 by using Beta-Versions of Aqbanking
+
+WARNING: this version uses Beta of AqBanking. Use at own risk, you have been warned.
+
 ## 1.0.2 (16.3.2024)
 * Fix Error when starting with unset MYSQL_ROOT_PASSWORD (thx to agross for
   reporting)
