@@ -73,6 +73,24 @@ jobs:
             DEBUGSH="set -x" &&
             TESTPARM="--debug" &&
             set -x
+
+          if [ -z "$HBCI_PINFILE" ] ; then
+            printf "Missing testdata. HBCI_PINFILE not set.\n"
+            exit 1
+          else
+            # dump testdata
+            while read line ; do
+              case $line in
+                PIN_* )
+                  line=${line##PIN_}
+                  line=${line%%=*}
+                  u=${line#*_}
+                  blz=${line%_*}
+                  printf "Found Testdata for blz=%s u=%s\n" "$blz" "$u"
+                  ;;
+              esac
+            done <<<"$HBCI_PINFILE"
+          fi
           cat >.hbci-pinfile <<<"$HBCI_PINFILE"
 
           MYSQL_HOST=db
