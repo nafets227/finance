@@ -1,5 +1,10 @@
 # finance CHANGELOG
 
+## 1.1.1 (30.8.2024)
+* Update to Dev Version of AqBanking to overcome the pin error message
+
+WARNING: this version uses Developer Version of AqBanking. Use at own risk, you have been warned.
+
 ## 1.1.0 (23.3.2024)
 * Support Sparkasse S-Pushtan 2.0 by using Beta-Versions of Aqbanking
 
