@@ -31,7 +31,7 @@ RUN \
 	set -x && \
 	git clone https://git.aquamaniac.de/git/gwenhywfar.git && \
 	cd gwenhywfar && \
-	git checkout tags/5.11.2beta && \
+	git checkout tags/5.12.0 && \
 	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
 	make -f Makefile.cvs && \
 	./configure \
@@ -48,7 +48,7 @@ RUN \
 	set -x && \
 	git clone https://git.aquamaniac.de/git/aqbanking.git && \
 	cd aqbanking && \
-	git checkout a38baa2401316cb53cc67416e088ffda6704216f && \
+	git checkout tags/6.6.0 && \
 	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
 	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
 	./configure && \
