@@ -1,4 +1,4 @@
-FROM alpine:3.20.2 AS builder
+FROM alpine:3.21.3 AS builder
 LABEL Description="Finance Build Container for aqbanking"
 
 # install prerequisited
@@ -66,6 +66,7 @@ RUN \
 	touch config.rpath && \
 	git checkout 781a234 && \
 	rm -rf debian && \
+	sed -i 's:automake-1.16:automake-1.17:' autogen.sh && \
 	./autogen.sh && \
 	#autoupdate && \
 	#autoconf && \
@@ -91,7 +92,7 @@ RUN \
 	cp -a fntxt2sql  dist/usr/local/bin/
 
 ##############################################################################
-FROM alpine:3.20.2
+FROM alpine:3.21.3
 
 LABEL org.opencontainers.image.authors="Stefan Schallenberg aka nafets227 <infos@nafets.de>"
 LABEL Description="Finance Container"
