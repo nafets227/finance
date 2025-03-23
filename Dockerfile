@@ -61,10 +61,15 @@ RUN \
 # pxlib, a paradox DB library
 RUN \
 	set -x && \
-	curl -L http://downloads.sourceforge.net/sourceforge/pxlib/pxlib-0.6.8.tar.gz | tar xvz && \
-	cd pxlib-0.6.8 && \
+	git clone https://github.com/steinm/pxlib.git && \
+	cd pxlib && \
 	touch config.rpath && \
-	autoreconf && \
+	git checkout 781a234 && \
+	rm -rf debian && \
+	./autogen.sh && \
+	#autoupdate && \
+	#autoconf && \
+	# autoreconf && \
 	./configure \
 		--prefix=/usr/local \
 		--with-gsf \
@@ -129,7 +134,7 @@ RUN \
 
 COPY --from=builder /gwenhywfar/dist/usr/local /usr/local
 COPY --from=builder /aqbanking/dist /
-COPY --from=builder /pxlib-0.6.8/dist /
+COPY --from=builder /pxlib/dist /
 COPY --from=builder /fntxt2sql/dist /
 
 # copy and install additional scripts
