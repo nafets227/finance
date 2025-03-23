@@ -66,6 +66,7 @@ RUN \
 	touch config.rpath && \
 	git checkout 781a234 && \
 	rm -rf debian && \
+	sed -i 's:automake-1.16:automake-1.17:' autogen.sh && \
 	./autogen.sh && \
 	#autoupdate && \
 	#autoconf && \
