@@ -25,7 +25,7 @@ at /finance. finance container will set access rights as needed.
 AqBanking PINFILE is expected at /finance/.hbci-pinfile
 ### Setup Parameters
 For banks or accounts that need special parameters, you can add a line
-```
+```text
 SETUP_<blz>_<user> = "aqhbci-tool4 parms"
 ```
 into the Pinfile. The parameters wil be forwarded to aqhbci-tool4 adduser when
@@ -69,17 +69,18 @@ current balance ot MAIL_ACCOUNTS to MAIL_TO. The delivery will be based on SMTP
 to MAIL_URL. Authentication to the mail server is not yet supported.
 
 ## Environment Variables
-* MYSQL_HOST gives the DNS name or IP adress of the host that holds the database.
+* MYSQL_HOST gives the DNS name or IP adress of the host that holds the
+  database.
 * MYSQL_DATABASE name of the database
 * MYSQL_USER UserID to connect to the database
 * MYSQL_PASSWORD Password to connect to the database
 * DB_USERS List of users that should have "normal" access to the database
 * DB_xxx_PASSWORD password to set for user xxx. xxx must be in the DB_USERS
-* MAIL_TO Recipient(s) of Alerting E-Mails. If set, it also activates the
+* MAIL_TO Recipient(s) of Alerting emails. If set, it also activates the
   alerting feature.
-* MAIL_FROM sender of the Alerting E-Mails
+* MAIL_FROM sender of the Alerting emails
 * MAIL_ACCOUNTS account numbers, separated by blanks, to be alerted.
-* MAIL_URL Server where to deliver the Alerting E-Mails like
+* MAIL_URL Server where to deliver the Alerting emails like
   'smtp[s]://user:password@some.host:port'
 * MAIL_HOSTNAME optionally give the hostname that we report to SMTP server in
   HELO command. Usefule if the SMTP server requires a FQDN. Defaults to
@@ -88,18 +89,21 @@ to MAIL_URL. Authentication to the mail server is not yet supported.
 
 ## Advanced features
 ### enhanced features of fntxt2sql
-fntxt2sql program supports more than mySql targets, have a look into its C
+fntxt2sql program supports more than MySQL targets, have a look into its C
 sourcecode. However, the scripts of this container only support importing into
-a Mysql/Mariadb database.
+a MySQL/Mariadb database.
 
-If you need to get information where the bank requests to enter a mobile pin, please try to use ./testlocal exec. Common case is to load bookings older than 90 day with ./testlocal exec --fromdate=yyyymmdd.
+If you need to get information where the bank requests to enter a mobile pin,
+please try to use ./testlocal exec. Common case is to load bookings older than
+90 day with ./testlocal exec --fromdate=yyyymmdd.
 
 If your bank, as e.g. HypoVereinsbank, does no longer support logging on
-without 2 factor authorisation, you can try with ./testlocal exec --taninteractive. This allows you to enter the tan received via 2nd factor.
+without 2 factor authorisation, you can try with ./testlocal exec
+--taninteractive. This allows you to enter the tan received via 2nd factor.
 
 ### testing with testlocal.sh
 testlocal.sh adds additional Environment Variables for testing:
 * MYSQL_LOCAL_HOST (defaults to MYSQL_HOST)
 * FINIMG docker image to test (default: nafets227/finance:local)
-Both are useful if you are testing on a local machine or in a github action like
-.github/workflows/docker-ci.yml
+Both are useful if you are testing on a local machine or in a GitHub Action
+like .github/workflows/docker-ci.yml

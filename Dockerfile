@@ -1,10 +1,11 @@
 FROM alpine:3.21.3 AS builder
-LABEL Description="Finance Build Container for aqbanking"
+LABEL description="Finance Build Container for aqbanking"
 
 # install prerequisited
+# hadolint ignore=DL3018
 RUN \
 	set -x && \
-	apk add \
+	apk add --no-cache \
 		autoconf \
 		automake \
 		bash \
@@ -26,13 +27,15 @@ RUN \
 		xmlsec-dev
 	#----- end for alpine
 
+SHELL [ "/bin/bash", "-c" ]
+
 # gwenhywfar
+WORKDIR /gwenhywfar
 RUN \
 	set -x && \
-	git clone https://git.aquamaniac.de/git/gwenhywfar.git && \
-	cd gwenhywfar && \
+	git clone https://git.aquamaniac.de/git/gwenhywfar.git . && \
 	git checkout tags/5.12.0 && \
-	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
+	sed -i "s:i18n_libs=\"\$LIBS\":i18n_libs=\"\$LIBS -lintl\":" configure.ac && \
 	make -f Makefile.cvs && \
 	./configure \
 		CFLAGS=-Wno-error=deprecated-declarations \
@@ -41,28 +44,28 @@ RUN \
 		--disable-network-checks && \
 	make && \
 	make install && \
-	make DESTDIR=$PWD/dist install
+	make DESTDIR="$PWD"/dist install
 
 # aqbanking
+WORKDIR /aqbanking
 RUN \
 	set -x && \
-	git clone https://git.aquamaniac.de/git/aqbanking.git && \
-	cd aqbanking && \
+	git clone https://git.aquamaniac.de/git/aqbanking.git . && \
 	git checkout tags/6.6.0 && \
-	sed -i 's:i18n_libs="$LIBS":i18n_libs="$LIBS -lintl":' configure.ac && \
+	sed -i "s:i18n_libs=\"\$LIBS\":i18n_libs=\"\$LIBS -lintl\":" configure.ac && \
 	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
 	./configure && \
 	make typedefs && \
 	make typefiles && \
 	make && \
 	make install && \
-	make DESTDIR=$PWD/dist install
+	make DESTDIR="$PWD"/dist install
 
 # pxlib, a paradox DB library
+WORKDIR /pxlib
 RUN \
 	set -x && \
-	git clone https://github.com/steinm/pxlib.git && \
-	cd pxlib && \
+	git clone https://github.com/steinm/pxlib.git . && \
 	touch config.rpath && \
 	git checkout 781a234 && \
 	rm -rf debian && \
@@ -77,15 +80,13 @@ RUN \
 		--disable-static && \
 	make && \
 	make install && \
-	make DESTDIR=$PWD/dist install
+	make DESTDIR="$PWD"/dist install
 
 # fntxt2sql
-RUN \
-	mkdir /fntxt2sql
+WORKDIR /fntxt2sql
 COPY fntxt2sql/* /fntxt2sql/
 RUN \
 	set -x && \
-	cd fntxt2sql && \
 	make clean && \
 	make && \
 	mkdir -p dist/usr/local/bin && \
@@ -94,12 +95,14 @@ RUN \
 ##############################################################################
 FROM alpine:3.21.3
 
-LABEL org.opencontainers.image.authors="Stefan Schallenberg aka nafets227 <infos@nafets.de>"
-LABEL Description="Finance Container"
+LABEL org.opencontainers.image.authors="Stefan Schallenberg aka \
+	nafets227 <infos@nafets.de>"
+LABEL description="Finance Container"
 
 VOLUME /finance
 
 ARG DEBUG=0
+# hadolint ignore=DL3018
 RUN \
 	set -x && \
 	apk add --no-cache --update \
@@ -117,7 +120,7 @@ RUN \
 		gnutls \
 		bind-tools \
 		&& \
-	if [ "$DEBUG" == "1" ] ; then \
+	if [ "$DEBUG" = "1" ] ; then \
 		echo deleting files not needed: && \
 		find \
 			/var/cache/apk \
@@ -132,6 +135,8 @@ RUN \
 		/usr/share/man/* \
 		/tmp/* \
 		/var/tmp/*
+
+SHELL [ "/bin/bash", "-c" ]
 
 COPY --from=builder /gwenhywfar/dist/usr/local /usr/local
 COPY --from=builder /aqbanking/dist /
@@ -148,3 +153,5 @@ RUN \
 	chmod 755 /usr/local/bin/*
 
 ENTRYPOINT [ "/usr/local/bin/finance-root-wrapper" ]
+
+#checkov:skip=CKV_DOCKER_3:root user needed here.

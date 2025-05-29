@@ -19,18 +19,18 @@ function test_dbconnect {
 		CMD_PW="--password=$pw"
 		PRT_PW=", password \"$pw\""
 	fi
-	if [ $DEBUG != "1" ] ; then
+	if [ "$DEBUG" != "1" ] ; then
 		REDIR=">/dev/null 2>/dev/null"
 	else
 		REDIR=""
 	fi
 	eval mysql \
-		--host=$MYSQL_LOCAL_HOST \
-		--user=$user \
-		$CMD_PW \
+		--host="$MYSQL_LOCAL_HOST" \
+		--user="$user" \
+		"$CMD_PW" \
 		'"--execute=SELECT 1;"' \
-		$MYSQL_DATABASE \
-		$REDIR
+		"$MYSQL_DATABASE" \
+		"$REDIR"
 	rc=$?
 	if [ $rc != "$rcexp" ] ; then
 		printf "ERR: Connecting to DB at %s with user %s%s: RC=%s(Exp=%s)\n" \
@@ -53,7 +53,7 @@ function setup_testdb () {
 
 	test_dbconnect "$MYSQL_USER" "$MYSQL_PASSWORD" 0 || return 1
 
-	$MYSQL_ROOT_CMD <<-EOF
+	if ! $MYSQL_ROOT_CMD <<-EOF
 		CREATE OR REPLACE USER testusershouldbedeleted;
 		GRANT select ON $MYSQL_DATABASE.* TO testusershouldbedeleted;
 		DROP TABLE IF EXISTS fn_entry;
@@ -63,7 +63,9 @@ function setup_testdb () {
 		DROP USER IF EXISTS testuser1;
 		DROP USER IF EXISTS testuser2;
 		EOF
-	if [ $? != "0" ] ; then return 1 ; fi
+	then
+		return 1
+	fi
 
 	test_dbconnect "testusershouldbedeleted" "" 0 || return 1
 	test_dbconnect "testuser1" "" 1 || return 1
@@ -111,7 +113,7 @@ exec_container () {
 
 	if [ "${1-}" == "-ti" ] ; then
 		ENTRY_PARM="-ti"
-	elif [ ! -z "${1-}" ] ; then
+	elif [ -n "${1-}" ] ; then
 		ENTRY_PARM="-ti --entrypoint $1"
 	else
 		ENTRY_PARM=""
@@ -124,6 +126,7 @@ exec_container () {
 		NET_PARM=""
 	fi
 
+	#shellcheck disable=SC2086 # intentionally more words per var
 	docker run \
 		$DNS_PARM \
 		$ENTRY_PARM \
@@ -141,24 +144,24 @@ exec_container () {
 		-e MAIL_URL \
 		-e MAIL_HOSTNAME \
 		-e MAIL_ACCOUNTS \
-		-v $(pwd)/testdata:/finance \
+		-v "$(pwd)"/testdata:/finance \
 		"$FINIMG" "$@" \
 	|| return 1
 }
 ##### Main ###################################################################
 set -euo pipefail
 
-if [ -z "${MYSQL_HOST-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
+if [ -z "${MYSQL_HOST-}" ] && [ -n "${KUBE_BASEDOM-}" ] ; then
 	MYSQL_HOST="www.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MYSQL_HOST to %s\n" "$MYSQL_HOST"
 fi
 
-if [ -z "${MAIL_URL-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
+if [ -z "${MAIL_URL-}" ] && [ -n "${KUBE_BASEDOM-}" ] ; then
 	MAIL_URL="smtp://www.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_URL to %s\n" "$MAIL_URL"
 fi
 
-if [ -z "${MAIL_HOSTNAME-}" ] && [ ! -z "${KUBE_BASEDOM-}" ] ; then
+if [ -z "${MAIL_HOSTNAME-}" ] && [ -n "${KUBE_BASEDOM-}" ] ; then
 	MAIL_HOSTNAME="finance-testlocal.$KUBE_BASEDOM"
 	printf "Using KUBE_BASEDOM to set MAIL_HOSTNAME to %s\n" "$MAIL_HOSTNAME"
 fi
@@ -186,7 +189,8 @@ then
 	printf "\tMYSQL_PASSWORD=%s\n" "${MYSQL_PASSWORD-}"
 	printf "\tMYSQL_ROOT_PASSWORD=%s\n" "${MYSQL_ROOT_PASSWORD-}"
 	printf "\tKUBE_BASEDOM=%s\n" "${KUBE_BASEDOM-}"
-	printf "\tKUBE_BASEDOM would set default for MYSQL_HOST, MAIL_URL and MAIL_HOSTNAME\n"
+	printf "\tKUBE_BASEDOM would set default for %s\n" \
+		"MYSQL_HOST, MAIL_URL and MAIL_HOSTNAME"
 	exit 1
 fi
 
@@ -224,7 +228,7 @@ case $action in
 		DB_testuser1_PASSWORD="dummypw"
 		if exec_container "$container_env" "${container_parms[@]}"
 		then printf "Executing container 1st time - ended OK.\n"
-		else 
+		else
 			printf "Executing container 1st time - ended in ERROR.\n"
 			exit 1
 		fi
@@ -260,9 +264,11 @@ case $action in
 		unset MYSQL_ROOT_PASSWORD
 		export -n MYSQL_ROOT_PASSWORD
 		if exec_container "$container_env" "${container_parms[@]}"
-		then printf "Executing container 4th time (no MYSQL_ROOT_PASSWORD) - ended OK.\n"
+		then printf "Executing container 4th time (no %s) - ended OK.\n" \
+			"MYSQL_ROOT_PASSWORD"
 		else
-			printf "Executing container 4th time (no MYSQL_ROOT_PASSWORD) - ended in ERROR.\n"
+			printf "Executing container 4th time (no %s) - ended in ERROR.\n" \
+				"MYSQL_ROOT_PASSWORD"
 			exit 1
 		fi
 
