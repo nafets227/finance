@@ -95,7 +95,6 @@ int readFile(FILE * inpFile);
 double makeBetrag(const char *pchBuffer);
 char* makeDatum(const char *pchBuffer);
 char* makePktDatum(const char *pchBuffer);
-char* makeSourceId(const char *pchSource);
 int compareRecord(const Buchung newBuch, const Buchung existBuch);
 int writeRecord(const Buchung buchung);
 void resetRecord(Buchung *pBuchung);
