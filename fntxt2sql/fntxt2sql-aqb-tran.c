@@ -35,7 +35,7 @@ static const char *SRC_ID(void)
 
 
 //****************************************************************************
-//***** Einen Satz einer CSV Datei parsen ************************************
+//***** Einen Satz einer aqb-Transaktione-Datei parsen ***********************
 //****************************************************************************
 int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 {
