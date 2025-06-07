@@ -22,6 +22,23 @@ static const char *SRC_ID(void)
 	return achID;
 }
 
+static int flushRecord()
+{
+	int rc;
+
+	if(fTranPending)
+	{
+		strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
+		rc = writeRecord(buchung);
+		resetRecord(&buchung);
+		fTranPending = 0;
+		if(rc != 0)
+			return rc;
+	}
+
+	return 0;
+}
+
 //****************************************************************************
 //***** Puffer Zugriffs-Funktionen *******************************************
 //****************************************************************************
@@ -129,9 +146,8 @@ int processAnfangssaldo(const char * const pchBuffer)
 	int rc;
 	int i;
 
-	strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-	if(fTranPending)
-	{rc = writeRecord(buchung); resetRecord(&buchung); fTranPending = 0; if(rc != 0) return rc;}
+	rc = flushRecord();
+	if(rc != 0) return rc;
 
 	buchung.buchart = 'A';
 
@@ -197,9 +213,8 @@ oder
 	int rc;
 
 	//********** Vorherige Buchung schreiben ******************************
-	strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-	if(fTranPending)
-	{rc = writeRecord(buchung); resetRecord(&buchung); fTranPending = 0; if (rc != 0) return rc;}
+	rc = flushRecord();
+	if(rc != 0) return rc;
 
 	buchung.buchart = 'B';
 
@@ -576,9 +591,8 @@ int processSchlusssaldo(const char * const pchBuffer)
 	int rc;
 	int i;
 
-	strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-	if(fTranPending)
-	{rc = writeRecord(buchung); resetRecord(&buchung); fTranPending = 0; if(rc != 0) return rc;}
+	rc = flushRecord();
+	if(rc != 0) return rc;
 
 	buchung.buchart = 'E';
 
@@ -627,9 +641,8 @@ int processZwischensaldo(const char * const pchBuffer)
 	int rc;
 	int i;
 
-	strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-	if(fTranPending)
-	{rc = writeRecord(buchung); resetRecord(&buchung); fTranPending = 0; if(rc != 0) return rc;}
+	rc = flushRecord();
+	if(rc != 0) return rc;
 
 	buchung.buchart = 'Z';
 
@@ -680,28 +693,6 @@ int processValSaldo(const char * const pchBuffer)
 }
 
 //****************************************************************************
-//***** Satz mit Auftragsreferenznummer bearbeiten ***************************
-//****************************************************************************
-int processEndBuchung()
-{
-	int rc;
-
-	debug_printf(dbg_fld, "EndBuchung \n\n");
-
-	if(fTranPending)
-	{
-		strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-		rc = writeRecord(buchung);
-		resetRecord(&buchung);
-		fTranPending = 0;
-		if(rc != 0)
-			return rc;
-	}
-
-	return 0;
-}
-
-//****************************************************************************
 //***** Einen Satz einer Btx-Txt Datei behandeln *****************************
 //****************************************************************************
 static int processBtxRecord(const char * const pchBuffer)
@@ -739,7 +730,10 @@ static int processBtxRecord(const char * const pchBuffer)
 	else if(!memcmp(pchBuffer, ":65:", 4))	// aktueller Valutensaldo
 		return processValSaldo(pchBuffer+4);
 	else if(!memcmp(pchBuffer, "\x2D", 1))	// Ende aktuelle Buchungen
-		return processEndBuchung();
+	{
+		debug_printf(dbg_fld, "EndBuchung \n\n");
+		return flushRecord();
+	}
 	else if(!memcmp(pchBuffer, "/OCMT/", 6))// Andere Waehrung
 		;
 	else if(!memcmp(pchBuffer, "    ", 4) ||
@@ -753,24 +747,6 @@ static int processBtxRecord(const char * const pchBuffer)
 
 	return 0;
 }
-
-int processLastBtxRecord()
-{
-	int rc;
-
-	if(fTranPending)
-	{
-		strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-		rc = writeRecord(buchung);
-		resetRecord(&buchung);
-		fTranPending = 0;
-		if(rc != 0)
-			return rc;
-	}
-
-	return 0;
-}
-
 
 //****************************************************************************
 //***** Read File into Memory, convert special chars and handle          *****
@@ -868,7 +844,7 @@ int processBtxFile(FILE * file)
 		iRc = processBtxRecord(pch);
 
 	if(iRc == 0)
-		processLastBtxRecord();
+		flushRecord();
 
 	pchBtxBuffer = NULL;
 	iBtxBufferLen = 0;
