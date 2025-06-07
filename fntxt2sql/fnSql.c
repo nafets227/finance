@@ -100,10 +100,11 @@ const char * const * getCreateSql(void)
 
 	static const char achCreViewCat[] = "CREATE OR REPLACE VIEW %s_cat AS "
 		"( SELECT "
-			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
+			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, "
+			"IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
 			"WAEHRUNG, "
 			"BETRAG - IFNULL(KATG2_BETRAG, 0) - IFNULL(KATG3_BETRAG, 0) - "
-			         "IFNULL(KATG4_BETRAG, 0) - IFNULL(KATG5_BETRAG, 0) AS BETRAG, "
+				"IFNULL(KATG4_BETRAG, 0) - IFNULL(KATG5_BETRAG, 0) AS BETRAG, "
 			"BUCHUNGS_SL, REFERENZ, GV_CODE, PART_NAME1, "
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
@@ -115,7 +116,8 @@ const char * const * getCreateSql(void)
 			"substring_index(KATG, '/', 3) AS KATG_L3 "
 			"FROM %s ) "
 		"UNION ( SELECT "
-			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
+			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, "
+			"IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
 			"WAEHRUNG, "
 			"KATG2_BETRAG, "
 			"BUCHUNGS_SL, REFERENZ, GV_CODE, PART_NAME1, "
@@ -130,7 +132,8 @@ const char * const * getCreateSql(void)
 			"FROM %s "
 			"WHERE KATG2_BETRAG <> 0 AND KATG2_BETRAG IS NOT NULL ) "
 		"UNION ( SELECT "
-	        "ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
+			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, "
+			"IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
 			"WAEHRUNG, "
 			"KATG3_BETRAG, "
 			"BUCHUNGS_SL, REFERENZ, GV_CODE, PART_NAME1, "
@@ -145,7 +148,8 @@ const char * const * getCreateSql(void)
 			"FROM %s "
 			"WHERE KATG3_BETRAG <> 0 AND KATG3_BETRAG IS NOT NULL ) "
 		"UNION ( SELECT "
-	        "ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
+			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, "
+			"IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
 			"WAEHRUNG, "
 			"KATG4_BETRAG, "
 			"BUCHUNGS_SL, REFERENZ, GV_CODE, PART_NAME1, "
@@ -160,7 +164,8 @@ const char * const * getCreateSql(void)
 			"FROM %s "
 			"WHERE KATG4_BETRAG <> 0 AND KATG4_BETRAG IS NOT NULL ) "
 		"UNION ( SELECT "
-	        "ID, ORIG_KTONR, ORIG_BLZ, BUCHART, IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
+			"ID, ORIG_KTONR, ORIG_BLZ, BUCHART, "
+				"IFNULL(IFNULL(DATUM_KOR, VALUTA),DATUM) AS DATUM, "
 			"WAEHRUNG, "
 			"KATG5_BETRAG, "
 			"BUCHUNGS_SL, REFERENZ, GV_CODE, PART_NAME1, "
@@ -186,7 +191,7 @@ const char * const * getCreateSql(void)
 				"FROM fn_entry s1 "
 				"WHERE "
 					"s1.orig_ktonr=l0.orig_ktonr "
-	       			"AND s1.datum_kor is not null "
+					"AND s1.datum_kor is not null "
 					"AND s1.datum_kor <= l0.saldo_day "
 					"AND s1.datum > l0.saldo_day "
 				") - ("
@@ -219,7 +224,7 @@ const char * const * getCreateSql(void)
 					"*, "
 					"sum(betrag) OVER ( "
 						"partition by orig_ktonr, orig_blz, saldo_partition "
-		       			"order by orig_ktonr, datum, buchart desc "
+						"order by orig_ktonr, datum, buchart desc "
 						"rows between unbounded preceding and current row "
 						") as saldo "
 				"FROM ( "
@@ -270,42 +275,53 @@ const char * const * getCreateSql(void)
 				"KATG5, KATG5_BETRAG "
 			") on %s_todo TO fin_user";
 
-	static char achTempCreTab[sizeof(achCreTab)+sizeof(config.achSqlTabName)] = "";
-	static char achTempCreViewCat[sizeof(achCreViewCat)+6*sizeof(config.achSqlTabName)] = "";
-	static char achTempCreViewManual[sizeof(achCreViewManual)+2*sizeof(config.achSqlTabName)] = "";
-	static char achTempCreViewBalance[sizeof(achCreViewBalance)+2*sizeof(config.achSqlTabName)] = "";
-	static char achTempCreViewTodo[sizeof(achCreViewTodo)+2*sizeof(config.achSqlTabName)] = "";
-	static char achTempGrantTab[sizeof(achGrantTab)+sizeof(config.achSqlTabName)] = "";
-	static char achTempGrantViewCat[sizeof(achGrantViewCat)+sizeof(config.achSqlTabName)] = "";
-	static char achTempGrantViewManual[sizeof(achGrantViewManual)+sizeof(config.achSqlTabName)] = "";
-	static char achTempGrantViewBalance[sizeof(achGrantViewBalance)+sizeof(config.achSqlTabName)] = "";
-	static char achTempGrantViewTodo[sizeof(achGrantViewTodo)+sizeof(config.achSqlTabName)] = "";
+	static char achTempCreTab[
+		sizeof(achCreTab)+sizeof(config.achSqlTabName)] = "";
+	static char achTempCreViewCat[
+		sizeof(achCreViewCat)+6*sizeof(config.achSqlTabName)] = "";
+	static char achTempCreViewManual[
+		sizeof(achCreViewManual)+2*sizeof(config.achSqlTabName)] = "";
+	static char achTempCreViewBalance[
+		sizeof(achCreViewBalance)+2*sizeof(config.achSqlTabName)] = "";
+	static char achTempCreViewTodo[
+		sizeof(achCreViewTodo)+2*sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantTab[
+		sizeof(achGrantTab)+sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantViewCat[
+		sizeof(achGrantViewCat)+sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantViewManual[
+		sizeof(achGrantViewManual)+sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantViewBalance[
+		sizeof(achGrantViewBalance)+sizeof(config.achSqlTabName)] = "";
+	static char achTempGrantViewTodo[
+		sizeof(achGrantViewTodo)+sizeof(config.achSqlTabName)] = "";
 
 	static char const * apchTempResult[] = {
-		achTempCreTab, achTempCreViewCat, achTempCreViewManual, achTempCreViewBalance, achTempCreViewTodo,
-		achTempGrantTab, achTempGrantViewCat, achTempGrantViewManual, achTempGrantViewBalance, achTempGrantViewTodo,
-		NULL};
+		achTempCreTab, achTempCreViewCat, achTempCreViewManual,
+		achTempCreViewBalance, achTempCreViewTodo, achTempGrantTab,
+		achTempGrantViewCat, achTempGrantViewManual, achTempGrantViewBalance,
+		achTempGrantViewTodo, NULL};
 
 	snprintf(achTempCreTab , sizeof(achTempCreTab ), achCreTab,
 		config.achSqlTabName);
 	snprintf(achTempCreViewCat, sizeof(achTempCreViewCat), achCreViewCat,
 		config.achSqlTabName, config.achSqlTabName,
-	    config.achSqlTabName, config.achSqlTabName,
-	    config.achSqlTabName, config.achSqlTabName);
-	snprintf(achTempCreViewManual , sizeof(achTempCreViewManual ), achCreViewManual,
-	    config.achSqlTabName, config.achSqlTabName);
-	snprintf(achTempCreViewBalance , sizeof(achTempCreViewBalance ), achCreViewBalance,
-	    config.achSqlTabName, config.achSqlTabName);
+		config.achSqlTabName, config.achSqlTabName,
+		config.achSqlTabName, config.achSqlTabName);
+	snprintf(achTempCreViewManual , sizeof(achTempCreViewManual ),
+		achCreViewManual, config.achSqlTabName, config.achSqlTabName);
+	snprintf(achTempCreViewBalance , sizeof(achTempCreViewBalance ),
+		achCreViewBalance, config.achSqlTabName, config.achSqlTabName);
 	snprintf(achTempCreViewTodo , sizeof(achTempCreViewTodo ), achCreViewTodo,
-	    config.achSqlTabName, config.achSqlTabName);
+		config.achSqlTabName, config.achSqlTabName);
 	snprintf(achTempGrantTab , sizeof(achTempGrantTab ), achGrantTab,
 		config.achSqlTabName);
 	snprintf(achTempGrantViewCat, sizeof(achTempGrantViewCat), achGrantViewCat,
 		config.achSqlTabName);
-	snprintf(achTempGrantViewManual, sizeof(achTempGrantViewManual), achGrantViewManual,
-		config.achSqlTabName);
-	snprintf(achTempGrantViewBalance, sizeof(achTempGrantViewBalance), achGrantViewBalance,
-		config.achSqlTabName);
+	snprintf(achTempGrantViewManual, sizeof(achTempGrantViewManual),
+		achGrantViewManual, config.achSqlTabName);
+	snprintf(achTempGrantViewBalance, sizeof(achTempGrantViewBalance),
+		achGrantViewBalance, config.achSqlTabName);
 	snprintf(achTempGrantViewTodo, sizeof(achTempGrantViewTodo), achGrantViewTodo,
 		config.achSqlTabName);
 
@@ -344,7 +360,8 @@ const char * getInsertSql(const Buchung buchung)
 	for(i = 0; i < sizeof(buchung.vzweck) / sizeof(buchung.vzweck[0]); i++)
 	{ strcat(achSql, ", "); sqlPrintField(achSql, buchung.vzweck[i]); }
 
-	strcat(achSql, ", "); sqlPrintField(achSql, buchung.source); strcat(achSql, ")");
+	strcat(achSql, ", "); sqlPrintField(achSql, buchung.source);
+		strcat(achSql, ")");
 
 	return achSql;
 }

@@ -87,65 +87,80 @@ int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 			break;
 		case 1: // localBankCode
 			debug_printf(dbg_fld, "BLZ: %s\n", pchField);
-			strncpy(&aqbBuchung->blz[0], pchField, sizeof(aqbBuchung->blz)-1);
+			strncpy(&aqbBuchung->blz[0], pchField,
+				sizeof(aqbBuchung->blz)-1);
 			break;
 		case 2: // localAccountNumber
 			debug_printf(dbg_fld, "KontoNr: %s\n", pchField);
-			strncpy(&aqbBuchung->ktonr[0], pchField, sizeof(aqbBuchung->ktonr)-1);
+			strncpy(&aqbBuchung->ktonr[0], pchField,
+				sizeof(aqbBuchung->ktonr)-1);
 			break;
 		case 3: // remoteBankCode
 			debug_printf(dbg_fld, "PartBLZ: %s\n", pchField);
 			pchSep = strstr(pchField, "?31");
-			if(pchSep != NULL) { // Special (erroneous) case: '?31' separates BLZ from ktonr.
+			if(pchSep != NULL) {
+				// Special (erroneous) case: '?31' separates BLZ from ktonr.
 				debug_printf(dbg_fld, "PartBLZ/Kto: %s\n", pchSep+3);
-				strncpy(&aqbBuchung->part_ktonr[0], pchSep+3, sizeof(aqbBuchung->part_ktonr)-1);
-			    *pchSep  = '\0';
-			    iSeps--;
+				strncpy(&aqbBuchung->part_ktonr[0], pchSep+3,
+					sizeof(aqbBuchung->part_ktonr)-1);
+				*pchSep  = '\0';
+				iSeps--;
 				}
-			strncpy(&aqbBuchung->part_blz[0], pchField, sizeof(aqbBuchung->part_blz)-1);
+			strncpy(&aqbBuchung->part_blz[0], pchField,
+				sizeof(aqbBuchung->part_blz)-1);
 			break;
 		case 4: // remoteAccountNumber
 			if(strlen(pchField) > 0)
 				{
 				debug_printf(dbg_fld, "PartKto: %s\n", pchField);
 				pchSep = strstr(pchField, "?32");
-				if(pchSep != NULL) // Special (erroneous) case: '?32' introduces "PartName"
+				if(pchSep != NULL)
+					// Special (erroneous) case: '?32' introduces "PartName"
 					{
 					debug_printf(dbg_fld, "PartKto/PartName: %s\n", pchSep+3);
-					strncpy(&aqbBuchung->name[0], pchSep+3, sizeof(aqbBuchung->name)-2);
+					strncpy(&aqbBuchung->name[0], pchSep+3,
+						sizeof(aqbBuchung->name)-2);
 					strcat(&aqbBuchung->name[0], " ");
-				    *pchSep  = '\0';
-				    iSeps--;
+					*pchSep  = '\0';
+					iSeps--;
 					}
-				strncpy(&aqbBuchung->part_ktonr[0], pchField, sizeof(aqbBuchung->part_ktonr)-1);
+				strncpy(&aqbBuchung->part_ktonr[0], pchField,
+					sizeof(aqbBuchung->part_ktonr)-1);
 				}
 			else
-				debug_printf(dbg_fld, "PartKto (null): %s\n", aqbBuchung->part_ktonr);
+				debug_printf(dbg_fld, "PartKto (null): %s\n",
+					aqbBuchung->part_ktonr);
 			break;
 		case 5: // date
 			debug_printf(dbg_fld, "Datum: %s\n", pchField);
-			strncpy(&aqbBuchung->datum[0], pchField, sizeof(aqbBuchung->datum)-1);
+			strncpy(&aqbBuchung->datum[0], pchField,
+				sizeof(aqbBuchung->datum)-1);
 			break;
 		case 6: // valutadate
 			debug_printf(dbg_fld, "Valuta: %s\n", pchField);
-			strncpy(&aqbBuchung->valuta[0], pchField, sizeof(aqbBuchung->valuta)-1);
+			strncpy(&aqbBuchung->valuta[0], pchField,
+				sizeof(aqbBuchung->valuta)-1);
 			break;
 		case 7: // value_value
 			debug_printf(dbg_fld, "Betrag: %s\n", pchField);
-			strncpy(&aqbBuchung->betrag[0], pchField, sizeof(aqbBuchung->betrag)-1);
+			strncpy(&aqbBuchung->betrag[0], pchField,
+				sizeof(aqbBuchung->betrag)-1);
 			break;
 		case 8: // value_currency
 			debug_printf(dbg_fld, "Waehrung: %s\n", pchField);
-			strncpy(&aqbBuchung->waehrung[0], pchField, sizeof(aqbBuchung->waehrung)-1);
+			strncpy(&aqbBuchung->waehrung[0], pchField,
+				sizeof(aqbBuchung->waehrung)-1);
 			break;
 		case 10: // remoteName
 			debug_printf(dbg_fld, "Name: %s\n", pchField);
 			pchSep = strstr(pchField, "?34");
-			if(pchSep != NULL) // Special (erroneous) case: '?34' introduces "Textschluesselergaenzung"
+			if(pchSep != NULL)
+				// Special (erroneous) case: '?34' introduces
+				// "Textschluesselergaenzung"
 				{
 				debug_printf(dbg_fld, "Name/TxtSL: %s\n", pchSep+3);
-			    *pchSep  = '\0';
-			    iSeps--;
+				*pchSep  = '\0';
+				iSeps--;
 				}
 			strncat(&aqbBuchung->name[0], pchField,
 					sizeof(aqbBuchung->name)-1-strlen(aqbBuchung->name));
@@ -164,26 +179,32 @@ int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 		case 23: // purpose11
 			debug_printf(dbg_fld, "VZweck: %s\n", pchField);
 			pchSep = strstr(pchField, "?");
-			if(i+iAddVZweck-12 >= sizeof(aqbBuchung->vzweck)/sizeof(aqbBuchung->vzweck[0]))
+			if(i+iAddVZweck-12 >=
+				sizeof(aqbBuchung->vzweck)/sizeof(aqbBuchung->vzweck[0]))
 				{
 				if(*pchField != 0)
-					fprintf(stderr, "Warning: VZweck(%d) \"%s\" ignored.\n", (int)i-12, pchField);
+					fprintf(stderr, "Warning: VZweck(%d) \"%s\" ignored.\n",
+						(int)i-12, pchField);
 				}
 			else
 				{
 				if(pchSep != NULL) // Erroneous field contains ?
 					{
 					*pchSep = '\0';
-					strncpy(aqbBuchung->vzweck[i+iAddVZweck-12], pchField, sizeof(aqbBuchung->vzweck[0])-1);
+					strncpy(aqbBuchung->vzweck[i+iAddVZweck-12], pchField,
+						sizeof(aqbBuchung->vzweck[0])-1);
 					iAddVZweck++;
 					pchSep += 3;
 					while(*pchSep == ' ')
 						pchSep++;
-					strncpy(aqbBuchung->vzweck[i+iAddVZweck-12], pchSep, sizeof(aqbBuchung->vzweck[0])-1);
+					strncpy(aqbBuchung->vzweck[i+iAddVZweck-12], pchSep,
+						sizeof(aqbBuchung->vzweck[0])-1);
 					iSeps--;
 					}
 				else
-					strncpy(aqbBuchung->vzweck[i+iAddVZweck-12], pchField, sizeof(aqbBuchung->vzweck[0])-1);
+					strncpy(aqbBuchung->vzweck[i+iAddVZweck-12],
+						pchField,
+						sizeof(aqbBuchung->vzweck[0])-1);
 				}
 			break;
 		default:
@@ -198,7 +219,9 @@ int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 
 	if(iSeps != 0)
 		{
-		fprintf(stderr, "Error in field: %d Separators \'?\' not processed.\n", (int)iSeps);
+		fprintf(stderr,
+			"Error in field: %d Separators \'?\' not processed.\n",
+			(int)iSeps);
 		return -5;
 		}
 

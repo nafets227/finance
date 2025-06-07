@@ -116,7 +116,8 @@ int parseCsv(char *pchBuffer, CsvBuchung *csvBuchung)
 			strcpy(&csvBuchung->betrag[0], pchField);
 			break;
 		case 10:
-			debug_printf(dbg_fld, "Waehrung: %s (len=%d)\n", pchField, (int)strlen(pchField));
+			debug_printf(dbg_fld, "Waehrung: %s (len=%d)\n",
+				pchField, (int)strlen(pchField));
 			strcpy(&csvBuchung->waehrung[0], pchField);
 			break;
 		default:

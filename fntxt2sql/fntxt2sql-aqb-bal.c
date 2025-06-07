@@ -55,7 +55,9 @@ static int parseAqbBal(char *pchBuffer, Buchung *pBuchung)
 
 		/* Fields of AqBanking Output
 		 * See chapter 10.4.7 of AqBanking Handbook at
-		 * https://www.aquamaniac.de/sites/download/download.php?package=09&release=09&file=01&dummy=aqbanking4-handbook-20091231.pdf
+		 * https://www.aquamaniac.de/sites/download/
+				download.php?package=09&release=09&file=01&
+				dummy=aqbanking4-handbook-20091231.pdf
 			1 "Account" (fester String)
 			2 Bankleitzahl des Kontos
 			3 Kontonummer
@@ -98,7 +100,8 @@ static int parseAqbBal(char *pchBuffer, Buchung *pBuchung)
 		case 5: // date booked
 			debug_printf(dbg_fld, "Datum: %s\n", pchField);
 			if(*pchField)
-				strncpy(&pBuchung->datum[0], makeDatum(pchField), sizeof(pBuchung->datum)-1);
+				strncpy(&pBuchung->datum[0], makeDatum(pchField),
+					sizeof(pBuchung->datum)-1);
 			break;
 
 		case 11: // Value noted

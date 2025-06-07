@@ -276,10 +276,10 @@ int compareRecord(const Buchung newBuch, const Buchung existBuch)
 
 	if(strcmp(newBuch.orig_blz, existBuch.orig_blz))
 	{
-		if(  (  !strcmp(newBuch.orig_blz, "70020270") &&
+		if(	(	!strcmp(newBuch.orig_blz, "70020270") &&
 				!strcmp(existBuch.orig_blz, "70020001") ) ||
-			 (  !strcmp(newBuch.orig_blz, "70020001") &&
-			    !strcmp(existBuch.orig_blz, "70020270") ) )
+			(	!strcmp(newBuch.orig_blz, "70020001") &&
+				!strcmp(existBuch.orig_blz, "70020270") ) )
 		{
 			// Sicherstellen dass ein Mindest Anzahl von Feldern uebereinstimmen
 			if( !strcmp(newBuch.orig_ktonr, existBuch.orig_ktonr) &&
@@ -355,9 +355,9 @@ int compareRecord(const Buchung newBuch, const Buchung existBuch)
 
 	//****** vzweck 1-7 ******************************************************
 	char newText[sizeof(newBuch.vzweck)] = "",
-	     newTextTrim[sizeof(newBuch.vzweck)],
-	     existText[sizeof(existBuch.vzweck)] = "",
-	     existTextTrim[sizeof(existBuch.vzweck)];
+		newTextTrim[sizeof(newBuch.vzweck)],
+		existText[sizeof(existBuch.vzweck)] = "",
+		existTextTrim[sizeof(existBuch.vzweck)];
 	const char *ignoreText="SVWZ+";
 	const int   ignoreLen=strlen(ignoreText);
 
@@ -803,7 +803,9 @@ const char * makeSourceDesc(const char *pchRcsFile, const char *pchRevision)
 	strcat(achResult, makeCVSDesc(pchRevision));
 	strcat(achResult, ")");
 
-	debug_printf(dbg_in, "makeSourceDesc(\"%s\",\"%s\") = \"%s\"\n", pchRcsFile, pchRevision, achResult);
+	debug_printf(dbg_in,
+		"makeSourceDesc(\"%s\",\"%s\") = \"%s\"\n",
+		pchRcsFile, pchRevision, achResult);
 
 	return achResult;
 }
