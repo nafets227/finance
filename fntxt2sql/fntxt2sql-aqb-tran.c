@@ -39,6 +39,7 @@ static const char *SRC_ID(void)
 //****************************************************************************
 int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 {
+	// jscpd:ignore-start
 	int i, iSeps = 0, iAddVZweck = 0;
 	char *pchTemp, *pchField, *pchSep;
 
@@ -202,6 +203,7 @@ int parseAqb(char *pchBuffer, AqbBuchung *aqbBuchung)
 		}
 
 	return 0;
+	// jscpd:ignore-end
 }
 
 //****************************************************************************

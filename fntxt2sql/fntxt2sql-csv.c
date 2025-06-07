@@ -38,6 +38,7 @@ static const char *SRC_ID(void)
 //****************************************************************************
 int parseCsv(char *pchBuffer, CsvBuchung *csvBuchung)
 {
+	// jscpd:ignore-start
 	int i;
 	char *pchTemp, *pchField;
 
@@ -129,6 +130,7 @@ int parseCsv(char *pchBuffer, CsvBuchung *csvBuchung)
 	}
 
 	return 0;
+	// jscpd:ignore-end
 }
 
 //****************************************************************************

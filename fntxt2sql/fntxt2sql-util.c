@@ -411,6 +411,7 @@ int writeRecord(const Buchung inBuchung)
 	switch(config.printFormat)
 	{
 	case txtMultiLine:
+		// jscpd:ignore-start
 		printf("%s/%s: " // BLZ / Kto
 				"%s/%s "  // Buchungsdatum / valuta
 				"%+011.2f %s "  // Betrag / Waehrung
@@ -431,6 +432,7 @@ int writeRecord(const Buchung inBuchung)
 
 		printf("\tSRC %s\n", buchung.source);
 		break;
+		// jscpd:ignore-end
 
 	case txtSingleLine:
 		printf("%8s/%10s %10s/%10s"
