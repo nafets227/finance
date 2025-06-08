@@ -1,4 +1,4 @@
-FROM alpine:3.21.3 AS builder
+FROM alpine:3.22.0 AS builder
 LABEL description="Finance Build Container for aqbanking"
 
 # install prerequisited
@@ -93,7 +93,7 @@ RUN \
 	cp -a fntxt2sql  dist/usr/local/bin/
 
 ##############################################################################
-FROM alpine:3.21.3
+FROM alpine:3.22.0
 
 LABEL org.opencontainers.image.authors="Stefan Schallenberg aka \
 	nafets227 <infos@nafets.de>"
