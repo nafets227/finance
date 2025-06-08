@@ -7,7 +7,8 @@
 int main(int argc, char * argv[])
 {
 
-	fprintf(stderr, "This program is not available anymore. Use fntxt2sql -btx instead.\n");
+	fprintf(stderr, "This program is not available anymore. "
+		"Use fntxt2sql -btx instead.\n");
 	return -1;
 
 }

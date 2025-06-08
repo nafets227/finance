@@ -46,13 +46,13 @@ endif
 
 # Debugging/profiling version?
 ifneq ($(DEBUG), 0)
-  # Flags for developer's version
-  CFLAGS+=-g -pg -DDEBUG
-  LDFLAGS+=-pg
+	# Flags for developer's version
+	CFLAGS+=-g -pg -DDEBUG
+	LDFLAGS+=-pg
 else
-  # Flags for production version
-  CFLAGS+=-O
-  LDFLAGS+=-s
+	# Flags for production version
+	CFLAGS+=-O
+	LDFLAGS+=-s
 endif
 
 ##### Use Math library for floor function!
@@ -66,10 +66,10 @@ export CFLAGS
 all: fntxt2sql
 
 fntxt2sql: fntxt2sql.o \
-	       fntxt2sql-btx.o fntxt2sql-csv.o fntxt2sql-aqm.o \
-	       fntxt2sql-aqb-tran.o fntxt2sql-aqb-bal.o fntxt2sql-aqb6.o \
-	       fntxt2sql-hbci.o \
-	       fntxt2sql-util.o fntxt2sql-mysql.o fnSql.o
+		fntxt2sql-btx.o fntxt2sql-csv.o fntxt2sql-aqm.o \
+		fntxt2sql-aqb-tran.o fntxt2sql-aqb-bal.o fntxt2sql-aqb6.o \
+		fntxt2sql-hbci.o \
+		fntxt2sql-util.o fntxt2sql-mysql.o fnSql.o
 	$(LINK.o) -o $@ $^ $(LIBS)
 
 fntxt2sql.o: fntxt2sql.c fntxt2sql.h

@@ -9,8 +9,31 @@ on:
     branches:
       - '*'
 
+permissions: read-all
 
 jobs:
+  _github_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SuperLint
+        uses: super-linter/super-linter/slim@v7.4.0
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_SHELL_SHFMT: false
+          VALIDATE_YAML_PRETTIER: false
+          VALIDATE_MARKDOWN_PRETTIER: false
+          VALIDATE_GIT_COMMITLINT: false
+          VALIDATE_CLANG_FORMAT: false
+          VALIDATE_CPP: false
+          USE_FIND_ALGORITHM: true
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   docker-build-ci:
     runs-on: ubuntu-latest
     permissions:
@@ -70,7 +93,6 @@ jobs:
           HBCI_PINFILE: ${{ secrets.HBCI_PINFILE }}
         run: |
           [ "$RUNNER_DEBUG" == 1 ] &&
-            DEBUGSH="set -x" &&
             TESTPARM="--debug" &&
             set -x
 
@@ -79,7 +101,7 @@ jobs:
             exit 1
           else
             # dump testdata
-            while read line ; do
+            while read -r line ; do
               case $line in
                 PIN_* )
                   line=${line##PIN_}
@@ -103,6 +125,7 @@ jobs:
           FINIMG="${{ steps.meta.outputs.tags}}"
           FINNET="${{ job.services.db.network}}"
 
+          #shellcheck disable=SC2086 # TESTPARM can be empty
           . ./testlocal.sh test $TESTPARM
 
       - name: Cleanup Test

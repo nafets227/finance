@@ -95,7 +95,6 @@ int readFile(FILE * inpFile);
 double makeBetrag(const char *pchBuffer);
 char* makeDatum(const char *pchBuffer);
 char* makePktDatum(const char *pchBuffer);
-char* makeSourceId(const char *pchSource);
 int compareRecord(const Buchung newBuch, const Buchung existBuch);
 int writeRecord(const Buchung buchung);
 void resetRecord(Buchung *pBuchung);
@@ -142,7 +141,8 @@ int processHbci(char * dirName);
 //****************************************************************************
 //***** Functions from fntxt2sql-mysql.c **************************************
 //****************************************************************************
-int initMysql(const char *pchHost, const char *pchDb, const char *pchUser, const char *pchPassword);
+int initMysql(const char *pchHost, const char *pchDb, const char *pchUser,
+	const char *pchPassword);
 int writeMysqlRecord(const Buchung buchung);
 int checkMysqlRecord(const Buchung buchung);
 void termMysql(void);

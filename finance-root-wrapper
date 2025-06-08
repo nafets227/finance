@@ -17,9 +17,12 @@ find /finance -! -user finance -exec chown finance {} ";"
 find /finance -! -group finance -exec chown :finance {} ";"
 
 # set permission to rr- of /finance/.hbci-pinfile
-find /finance -maxdepth 1 -name .hbci-pinfile -perm /o=rwx -exec chmod o-rwx {} ";"
-find /finance -maxdepth 1 -name .hbci-pinfile -perm /g=wx -exec chmod g-wx {} ";"
-find /finance -maxdepth 1 -name .hbci-pinfile -perm /u=wx -exec chmod u-wx {} ";"
+find /finance -maxdepth 1 -name .hbci-pinfile -perm /o=rwx \
+	-exec chmod o-rwx {} ";"
+find /finance -maxdepth 1 -name .hbci-pinfile -perm /g=wx \
+	-exec chmod g-wx {} ";"
+find /finance -maxdepth 1 -name .hbci-pinfile -perm /u=wx \
+	-exec chmod u-wx {} ";"
 
 printf "Switching to restricted user finance\n"
 cd /finance

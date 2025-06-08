@@ -22,13 +22,13 @@ function trim {
 #### DB Setup privileges #####################################################
 function dbsetup_privileges () {
 	printf "Granting DB privileges to %s.\n" "$MYSQL_USER"
-	$MYSQL_ROOT_CMD <<-EOF
+	if ! $MYSQL_ROOT_CMD <<-EOF
 		GRANT all privileges
 			ON $MYSQL_DATABASE.*
 			TO '$MYSQL_USER'@'%'
 			WITH GRANT OPTION;
 		EOF
-	if [ $? != "0" ] ; then
+	then
 		printf "Error granting DB privileges.\n"
 		return 1
 	fi
@@ -37,16 +37,18 @@ function dbsetup_privileges () {
 #### DB Setup Users ##########################################################
 function dbsetup_users () {
 	printf "(Re-)Creating DB User mariadb.sys\n"
-	mysql \
-		--host=$MYSQL_HOST \
+	if ! mysql \
+		--host="$MYSQL_HOST" \
 		--user=root \
-		--password=$MYSQL_ROOT_PASSWORD \
+		--password="$MYSQL_ROOT_PASSWORD" \
 		mysql \
 		<<-EOF
 			CREATE USER IF NOT EXISTS 'mariadb.sys'@'localhost' ACCOUNT LOCK;
 			GRANT SELECT,UPDATE,DELETE on mysql.global_priv to 'mariadb.sys'@'localhost';
 			EOF
-	if [ $? != "0" ] ; then return  1 ; fi
+	then
+		return 1
+	fi
 
 	where_users=""
 	for u in ${DB_USERS-} ; do
@@ -60,14 +62,15 @@ function dbsetup_users () {
 			AND
 				is_role="N";
 		EOF
-	while IFS=$'\t' read db_user db_host ; do
+	while IFS=$'\t' read -r db_user db_host ; do
 		printf "Deleting DB User %s @ %s\n" "$db_user" "$db_host"
-		$MYSQL_ROOT_CMD <<-EOF
+		if ! $MYSQL_ROOT_CMD <<-EOF
 			DROP USER '$db_user'@'$db_host';
 			EOF
-		if [ $? != "0" ] ; then return  1 ; fi
-	done
-	if [ $? != "0" ] ; then return 1 ; fi
+		then
+			return 1
+		fi
+	done || return 1
 
 	$MYSQL_ROOT_CMD -N --batch <<-EOF |
 		SELECT user
@@ -75,53 +78,62 @@ function dbsetup_users () {
 			WHERE user NOT IN ('fin_user') AND
 				is_role="Y";
 		EOF
-	while read db_user ; do
+	while read -r db_user ; do
 			printf "Deleting DB Role %s\n" "$db_user"
-			$MYSQL_ROOT_CMD <<-EOF
+			if ! $MYSQL_ROOT_CMD <<-EOF
 				DROP ROLE '$db_user' ;
 				EOF
-			if [ $? != "0" ] ; then return  1 ; fi
-	done
-	if [ $? != "0" ] ; then return 1 ; fi
+			then
+				return 1
+			fi
+	done || return 1
 
 	printf "Creating DB Role fin_user.\n"
-	$MYSQL_ROOT_CMD <<-EOF
+	if ! $MYSQL_ROOT_CMD <<-EOF
 		CREATE ROLE IF NOT EXISTS fin_user;
 		EOF
-	if [ $? != "0" ] ; then return  1 ; fi
+	then
+		return 1
+	fi
 
 	for u in ${DB_USERS-} ; do
-		eval p=\${DB_${u}_PASSWORD-}
+		eval "p=\${DB_${u}_PASSWORD-}"
 		if [ -z "$p" ] ; then
 			printf "Creating DB User %s without password\n" "$u"
-			$MYSQL_ROOT_CMD <<-EOF
+			if ! $MYSQL_ROOT_CMD <<-EOF
 				CREATE USER IF NOT EXISTS '$u'@'%'
 				EOF
-			if [ $? != "0" ] ; then return  1 ; fi
+			then
+				return 1
+			fi
 		else
 			printf "Creating DB User %s with password\n" "$u"
-			$MYSQL_ROOT_CMD <<-EOF
+			if ! $MYSQL_ROOT_CMD <<-EOF
 				CREATE USER IF NOT EXISTS '$u'@'%' IDENTIFIED BY '$p';
 				EOF
-			if [ $? != "0" ] ; then return  1 ; fi
+			then
+				return 1
+			fi
 		fi
-		$MYSQL_ROOT_CMD <<-EOF
+		if ! $MYSQL_ROOT_CMD <<-EOF
 			GRANT fin_user TO '$u'@'%';
 			SET DEFAULT ROLE fin_user FOR '$u'@'%';
 			EOF
-		if [ $? != "0" ] ; then return 1 ; fi
+		then
+			return 1
+		fi
 	done
 }
 
 ##### dbsetup_tables #########################################################
 dbsetup_tables () {
 	printf "Creating/Updating database %s.\n" "$MYSQL_DATABASE"
-	fntxt2sql -cre -mysql \
-		-mysql_host $MYSQL_HOST \
-		-mysql_database $MYSQL_DATABASE \
-		-mysql_user $MYSQL_USER \
-		-mysql_password $MYSQL_PASSWORD
-	if [ "$?" != "0" ] ; then
+	if ! fntxt2sql -cre -mysql \
+		-mysql_host "$MYSQL_HOST" \
+		-mysql_database "$MYSQL_DATABASE" \
+		-mysql_user "$MYSQL_USER" \
+		-mysql_password "$MYSQL_PASSWORD"
+	then
 		printf "Error creating/updating database.\n"
 		exit 1
 	fi
@@ -129,32 +141,29 @@ dbsetup_tables () {
 
 ##### aqsetup ################################################################
 function aqsetup () {
-	local line pin u blz parm
+	local line u blz parm
 	local account_nr=0
 	local accounts_blz=( )
 	local accounts_user=( )
 
 	# Read .hbci-pinfile
-	while read line ; do
+	while read -r line ; do
 		if [ "${#line}" == "0" ] ; then
 			continue;	# ignore blank lines
-		elif [ ${line:0:1} == "#" ] ; then
+		elif [ "${line:0:1}" == "#" ] ; then
 			continue;	# ignore comment lines
 		fi
 		case $line in
 			PIN_* )
 				# HBCI with german BLZ and account number
-#				pin=$(trim "${line#*=}")
-#				pin=${pin%\"}
-#				pin=${pin#\"}
 				line=$(trim "${line%%=*}")
 				line=${line##PIN_}
 				u=${line#*_}
 				blz=${line%_*}
 				#DEBUG printf "DEBUG: PIN blz=%s u=%s\n" "$blz" "$u"
 
-				accounts_blz[$account_nr]="$blz"
-				accounts_user[$account_nr]="$u"
+				accounts_blz["$account_nr"]="$blz"
+				accounts_user["$account_nr"]="$u"
 				(( account_nr ++ ))
 				;;
 
@@ -209,7 +218,7 @@ function aqsetup () {
 	# if list is empty rc=4 is set, so we ignore it.
 	if [ $rc == 4 ] && [ -z "$users" ] ; then rc=0; fi
 	[ $rc != 0 ] && return 1
-	while read line ; do
+	while read -r line ; do
 		# line looks like
 		# User 1: Bank: de/50010517 User Id: 1234567890 Customer Id: 12345678901234
 		#DEBUG printf "DEBUG: Line \"%s\"\n" "$line"
@@ -223,16 +232,17 @@ function aqsetup () {
 		u=${u%% Customer Id: *}
 		#DEBUG printf "DEBUG: SETUP blz=%s u=%s\n" "$blz" "$u"
 		eval "AQCONF_${blz}_${u}=1"
-	done <<<$users
+	done <<<"$users"
 
 	# Now configure each account in pinfile but not yet in aqhbci
+	local url="" tanmode="" setup="" aqconf=""
 	for i in $(seq 0 $account_nr) ; do
 		blz=${accounts_blz[$i]}
 		u=${accounts_user[$i]}
-		eval url=\"\$URL_${blz}_${u}\"
-		eval tanmode=\"\$\{TANMODE_${blz}_${u}-\}\"
-		eval setup=\"\$\{SETUP_${blz}_${u}-\}\"
-		eval aqconf=\"\$\{AQCONF_${blz}_${u}-\}\"
+		eval "url=\"\$URL_${blz}_${u}\""
+		eval "tanmode=\"\${TANMODE_${blz}_${u}-}\""
+		eval "setup=\"\${SETUP_${blz}_${u}-}\""
+		eval "aqconf=\"\${AQCONF_${blz}_${u}-}\""
 		if [ -z "$aqconf" ] ; then
 			aqsetup_acc "$blz" "$u" "$url" "$tanmode" "$setup" || return 1
 		else
@@ -299,13 +309,14 @@ function aqsetup_acc () {
 		printf "\tApplying special handling for ING-Diba\n"
 	fi
 
+	#shellcheck disable=SC2086 # parm may be empty
 	aqhbci_wrapper adduser \
-		-b $blz \
-		-N $u \
-		-u $u \
+		-b "$blz" \
+		-N "$u" \
+		-u "$u" \
 		-t pintan \
 		--context=1 \
-		-s $url \
+		-s "$url" \
 		--hbciversion=300 \
 		$parm \
 		|| return 1
@@ -331,8 +342,8 @@ function aqsetup_acc () {
 	fi
 
 	if [ -z "$disable_setitanmode" ] ; then
-		aqhbci_wrapper setitanmode -u "$uu" -m "$tanmode"
-		if [ $? != 0 ] ; then
+		if ! aqhbci_wrapper setitanmode -u "$uu" -m "$tanmode"
+		then
 			printf "Following itan modes are available:\n" &&
 			aqhbci_wrapper \
 				--noninteractive \
@@ -344,7 +355,8 @@ function aqsetup_acc () {
 
 	aqhbci_wrapper getaccounts -u "$uu"
 	rc=$? ; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 getaccounts. aqhbci-config dump follows.\n" "$rc"
+		printf "Error %s in aqhbci-tool4 getaccounts. %s.\n" \
+			"$rc" "aqhbci-config dump follows"
 		aqhbci_wrapper \
 			listusers
 		aqhbci_wrapper \
@@ -356,7 +368,7 @@ function aqsetup_acc () {
 	# Since aqhbci does not allow to select by user we selct by bank.
 	# If accounts was already added with a different user results are unknown.
 	accs=$(aqhbci_wrapper listaccounts -v ) || return 1
-	while read line ; do
+	while read -r line ; do
 		# line looks like
 		# Account 0: Bank: 70020270 Account Number: 4840199334  SubAccountId: EUR \
 		# Account Type: bank LocalUniqueId: 5
@@ -382,7 +394,7 @@ function aqsetup_acc () {
 		# printf "ignoring account %s id=%s for bank %s\n" \
 		#	"$acc_nr" "$acc_id" "$acc_blz"
 		fi
-	done <<<$accs
+	done <<<"$accs"
 
 	# unclear why needed another time, but without it it does not work.
 	aqhbci_wrapper getaccounts -u "$uu" || return 1
@@ -392,8 +404,8 @@ function aqsetup_acc () {
 
 ##### Import ################################################################
 function import () {
-	for f in `ls -d $datadir/inbound.* 2>/dev/null`; do
-		if [ -d $f ]; then
+	for f in "$datadir"/inbound.* ; do
+		if [ -d "$f" ]; then
 			printf "Importing directory %s\n" "$f"
 			import_handleDir "$f" "$datadir/store"
 
@@ -406,18 +418,18 @@ function import () {
 }
 
 ##### Import_rescan ##########################################################
-function import_rescan () {
-	for f in `ls -d $datadir/store.* 2>/dev/null`; do
-		if [ -d $f ]; then
-			printf "Importing directory %s\n" "$f"
-			import_handleDir "$f"
-		else
-			printf "Not Importing Non-Directory %s\n" "$f"
-		fi
-	done
-
-	return 0
-}
+# function import_rescan () {
+# 	for f in "$datadir"/store.* ; do
+# 		if [ -d "$f" ]; then
+# 			printf "Importing directory %s\n" "$f"
+# 			import_handleDir "$f"
+# 		else
+# 			printf "Not Importing Non-Directory %s\n" "$f"
+# 		fi
+# 	done
+#
+# 	return 0
+# }
 
 ##### Handle one inbound or store directory ##################################
 # Parameter 1: Directory to be scanned
@@ -431,23 +443,23 @@ function import_handleDir
 	ftype=${scandir##*.}
 
 	# Create target directory if it does not exist
-	if [ ! -z $moveTo ] && [ ! -d $moveTo.$ftype ] ; then
-		mkdir $moveTo.$ftype || return 1
+	if [ -n "$moveTo" ] && [ ! -d "$moveTo.$ftype" ] ; then
+		mkdir "$moveTo.$ftype" || return 1
 	fi
 
-	for f in `ls -d $scandir/* 2>/dev/null`; do
+	for f in "$scandir"/* ; do
 		case $ftype in
 			aqb6 | aqb-tran | aqb-bal | aqm | btx)
-				if [ -f $f ]; then
+				if [ -f "$f" ]; then
 					printf "Importing file %s\n" "$f"
 					fntxt2sql \
-						-$ftype \
-						-f $f \
+						-"$ftype" \
+						-f "$f" \
 						-mysql \
-						-mysql_host $MYSQL_HOST \
-						-mysql_database $MYSQL_DATABASE \
-						-mysql_user $MYSQL_USER \
-						-mysql_password $MYSQL_PASSWORD
+						-mysql_host "$MYSQL_HOST" \
+						-mysql_database "$MYSQL_DATABASE" \
+						-mysql_user "$MYSQL_USER" \
+						-mysql_password "$MYSQL_PASSWORD"
 					rc=$?
 				else
 					printf "Not importing Directory %s %s\n" "$ftype" "$f"
@@ -456,16 +468,16 @@ function import_handleDir
 				;;
 			# for HBCI only directories are allowed
 			hbci )
-				if [ -d $f ]; then
+				if [ -d "$f" ]; then
 					printf "Importing HBCI directory %s\n" "$f"
-					$fntxt2sql \
-						-$ftype \
-						-f $f \
+					fntxt2sql \
+						-"$ftype" \
+						-f "$f" \
 						-mysql \
-						-mysql_host $MYSQL_HOST \
-						-mysql_database $MYSQL_DATABASE \
-						-mysql_user $MYSQL_USER \
-						-mysql_password $MYSQL_PASSWORD
+						-mysql_host "$MYSQL_HOST" \
+						-mysql_database "$MYSQL_DATABASE" \
+						-mysql_user "$MYSQL_USER" \
+						-mysql_password "$MYSQL_PASSWORD"
 					rc=$?
 				else
 					printf "Not importing Non-Directory %s %s\n" "$ftype" "$f"
@@ -482,9 +494,9 @@ function import_handleDir
 				return 1
 		esac
 
-		if [ ! -z $moveTo ]; then
+		if [ -n "$moveTo" ]; then
 			if [ "$rc" == 0 ]; then
-				mv -n $f $moveTo.$ftype/ || return 1
+				mv -n "$f" "$moveTo.$ftype"/ || return 1
 				printf "Moved imported file %s to %s\n" "$f" "$moveTo.$ftype"
 			else
 				printf "Import of $f failed (RC=%s).\n" "$rc"
@@ -511,10 +523,9 @@ function alert () {
 				orig_ktonr="$a" AND
 				datum = ( SELECT MAX(DATUM) from fn_entry where orig_ktonr='$a');
 			EOF
-		)
-		if [ "$?" != "0" ] ; then return 1 ; fi
+		) || return 1
 
-
+		#shellcheck disable=SC2086 #MAIL_TO intentionally contains more words
 		( $MYSQL_CMD <<-EOF
 			SELECT datum, betrag, part_name1, vzweck1, vzweck2
 			FROM fn_entry
@@ -533,7 +544,8 @@ function alert () {
 			-s "Account-info $a: $Saldo" \
 			-r "$MAIL_FROM" $MAIL_TO \
 			|| return 1
-			# -SNosave is included in -d and generates error messages - so dont include it
+			# -SNosave is included in -d and generates error messages
+			# so dont include it
 			# -n -d -vv -Sv15-compat -Ssendwait -Sexpandaddr=fail,-all,+addr
 
 	done
@@ -543,6 +555,9 @@ function alert () {
 
 ##### Main ###################################################################
 set -euo pipefail
+shopt -s nullglob
+
+
 [ "${DEBUG-}" == "1" ] && set -x
 
 datadir=/finance
@@ -565,15 +580,18 @@ elif [ ! -r $datadir/.hbci-pinfile ] ; then
 	exit 1
 fi
 
-if [ ! -z "${MAIL_TO-}" ] ; then
+if [ -n "${MAIL_TO-}" ] ; then
 	if [ -z "${MAIL_FROM-}" ] ; then
-		printf "Variable MAIL_FROM needs to be set if using Alerting indicated by MAIL_TO\n"
+		printf "Variable %s needs to be set on Alerting activated by %s\n" \
+			"MAIL_FROM" "MAIL_TO"
 		exit 1
 	elif [ -z "${MAIL_URL-}" ] ; then
-		printf "Variable MAIL_URL needs to be set if using Alerting indicated by MAIL_TO\n"
+		printf "Variable  needs to be set on Alerting activated by %s\n" \
+			"MAIL_URL" "MAIL_TO"
 		exit 1
 	elif [ -z "${MAIL_ACCOUNTS-}" ] ; then
-		printf "Variable MAIL_ACCOUNTS needs to be set if using Alerting indicated by MAIL_TO\n"
+		printf "Variable %s needs to be set on Alerting activated by %s\n" \
+			"MAIL_ACCOUNTS" "MAIL_TO"
 		exit 1
 	fi
 	if [ -z "${MAIL_HOSTNAME-}" ] ; then
@@ -598,12 +616,12 @@ while [ "$#" -gt 0 ] ; do
 	shift
 done
 
-if ! ping  -c 1 $MYSQL_HOST ; then
+if ! ping  -c 1 "$MYSQL_HOST" ; then
 	printf "Warning: MYSQL_HOST %s is not pingable.\n" "$MYSQL_HOST"
 	[ "${DEBUG-}" != "1" ] && set -x
 	cat /etc/resolv.conf
-	dig +search $MYSQL_HOST || true # dont stop on error
-	ping -c 1 $MYSQL_HOST || true # dont stop on error
+	dig +search "$MYSQL_HOST" || true # dont stop on error
+	ping -c 1 "$MYSQL_HOST" || true # dont stop on error
 	[ "${DEBUG-}" != "1" ] && set +x
 fi
 
@@ -613,7 +631,7 @@ MYSQL_CMD="$MYSQL_CMD --user=$MYSQL_USER"
 MYSQL_CMD="$MYSQL_CMD --password=$MYSQL_PASSWORD"
 MYSQL_CMD="$MYSQL_CMD $MYSQL_DATABASE"
 
-if [ ! -z "${MYSQL_ROOT_PASSWORD-}" ] ; then
+if [ -n "${MYSQL_ROOT_PASSWORD-}" ] ; then
 	printf "Got DBADM privilege because \$MYSQL_ROOT_PASSWORD is set.\n"
 
 	MYSQL_ROOT_CMD="mysql"
@@ -622,15 +640,16 @@ if [ ! -z "${MYSQL_ROOT_PASSWORD-}" ] ; then
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --password=$MYSQL_ROOT_PASSWORD"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD $MYSQL_DATABASE"
 else
-	printf "No DBADM privileges because \$MYSQL_ROOT_PASSWORD is not set.\ Will not check users.n"
+	printf "No DBADM privileges because %s is not set. %s.\n" \
+		"\$MYSQL_ROOT_PASSWORD" "Will not check users"
 	MYSQL_ROOT_CMD=""
 fi
 
-if [ ! -z "$MYSQL_ROOT_CMD" ] ; then
+if [ -n "$MYSQL_ROOT_CMD" ] ; then
 	dbsetup_privileges || exit 1
 fi
 
-if [ ! -z "$MYSQL_ROOT_CMD" ] && [ ! -z "$DB_USERS" ] ; then
+if [ -n "$MYSQL_ROOT_CMD" ] && [ -n "$DB_USERS" ] ; then
 	dbsetup_users || exit 1
 fi
 
@@ -649,24 +668,24 @@ aqbanking_wrapper \
 	--balance \
 	--transactions \
 	--ignoreUnsupported \
-	-c $datadir/inbound.aqb6/$(date +\%Y\%m\%d-\%H\%M\%S.\%N) \
-	--fromdate=$fromdate \
+	-c "$datadir/inbound.aqb6/$(date '+%Y%m%d-%H%M%S.%N')" \
+	--fromdate="$fromdate" \
 	|| exit 1
 
 # @TODO change to aqb6. Check for formatstring (new option inaqb6) and
 # also modify fntxt2sql to the new format
 printf "Processing transactions and balances \n"
-for f in $(ls $datadir/inbound.aqb/* 2>/dev/null) ; do
-	fnam=$(basename $f)
-	aqbanking_wrapper listtrans -c $f >$datadir/inbound.aqb-tran/$fnam && \
-	aqbanking_wrapper listbal   -c $f >$datadir/inbound.aqb-bal/$fnam  && \
-	mv $f $datadir/store.aqb
+for f in "$datadir"/inbound.aqb/*  ; do
+	fnam=$(basename "$f")
+	aqbanking_wrapper listtrans -c "$f" >"$datadir/inbound.aqb-tran/$fnam" && \
+	aqbanking_wrapper listbal   -c "$f" >"$datadir/inbound.aqb-bal/$fnam"  && \
+	mv "$f" $datadir/store.aqb
 done
 
 printf "Importing transactions and balances into database\n"
 import || exit 1
 
-if [ ! -z "${MAIL_TO:-}" ] ; then
+if [ -n "${MAIL_TO:-}" ] ; then
 	printf "Sending alert EMail\n"
 	alert || exit 1
 fi

@@ -22,6 +22,23 @@ static const char *SRC_ID(void)
 	return achID;
 }
 
+static int flushRecord()
+{
+	int rc;
+
+	if(fTranPending)
+	{
+		strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
+		rc = writeRecord(buchung);
+		resetRecord(&buchung);
+		fTranPending = 0;
+		if(rc != 0)
+			return rc;
+	}
+
+	return 0;
+}
+
 //****************************************************************************
 //***** Puffer Zugriffs-Funktionen *******************************************
 //****************************************************************************
@@ -121,19 +138,19 @@ int processAuszugsnummer(const char * const pchBuffer)
 }
 
 //****************************************************************************
-//***** Satz mit Auftragsreferenznummer bearbeiten ***************************
+//***** Satz mit Saldo bearbeiten ***************************
 //****************************************************************************
-int processAnfangssaldo(const char * const pchBuffer)
+static int processSaldo(const char * const pchBuffer, const char buchart,
+	const char * const name)
 {
 	char achBuffer[32];
 	int rc;
 	int i;
 
-	strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-	if(fTranPending)
-	{rc = writeRecord(buchung); resetRecord(&buchung); fTranPending = 0; if(rc != 0) return rc;}
+	rc = flushRecord();
+	if(rc != 0) return rc;
 
-	buchung.buchart = 'A';
+	buchung.buchart = buchart;
 
 	strcpy(achBuffer, pchBuffer+10);
 	for(i = 0; i < strlen(achBuffer); i++)
@@ -163,7 +180,7 @@ int processAnfangssaldo(const char * const pchBuffer)
 		return -1;
 	}
 
-	debug_printf(dbg_fld, "Anfangssaldo %+9.2f %s %s\n",
+	debug_printf(dbg_fld, "%ssaldo %+9.2f %s %s\n", name,
 			buchung.betrag, buchung.waehrung, buchung.datum);
 
 
@@ -197,9 +214,8 @@ oder
 	int rc;
 
 	//********** Vorherige Buchung schreiben ******************************
-	strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-	if(fTranPending)
-	{rc = writeRecord(buchung); resetRecord(&buchung); fTranPending = 0; if (rc != 0) return rc;}
+	rc = flushRecord();
+	if(rc != 0) return rc;
 
 	buchung.buchart = 'B';
 
@@ -568,136 +584,12 @@ int processComDirText(const char * const pchBuffer)
 }
 
 //****************************************************************************
-//***** Satz mit Schlusssalso bearbeiten *************************************
-//****************************************************************************
-int processSchlusssaldo(const char * const pchBuffer)
-{
-	char achBuffer[32];
-	int rc;
-	int i;
-
-	strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-	if(fTranPending)
-	{rc = writeRecord(buchung); resetRecord(&buchung); fTranPending = 0; if(rc != 0) return rc;}
-
-	buchung.buchart = 'E';
-
-	strcpy(achBuffer, pchBuffer+10);
-	for(i = 0; i < strlen(achBuffer); i++)
-		if(achBuffer[i] == ',')
-			achBuffer[i] = '.';
-	buchung.betrag = atof(achBuffer);
-
-	memcpy(buchung.waehrung, pchBuffer+7, 3);
-	buchung.waehrung[4] = '\0';
-
-	memcpy(achBuffer, pchBuffer+1, 6);
-	achBuffer[6] = '\0';
-	strcpy(buchung.datum, makeDatum(achBuffer));
-
-	switch(*pchBuffer)
-	{
-	case 'D': // Debit
-		buchung.betrag = -buchung.betrag;
-		break;
-
-	case 'C': // Credit
-		break;
-
-	default:
-		printf("Credit / Debit Zeichen %c unbekannt.\n", *pchBuffer);
-		return -1;
-	}
-
-	debug_printf(dbg_fld, "Schlussssaldo %+9.2f %s %s\n",
-			buchung.betrag, buchung.waehrung, buchung.datum);
-
-
-	fTranPending = 1;
-
-	return 0;
-}
-
-//****************************************************************************
-//***** Satz mit Zwischensaldo bearbeiten ************************************
-//****************************************************************************
-int processZwischensaldo(const char * const pchBuffer)
-{
-	char achBuffer[32];
-	int rc;
-	int i;
-
-	strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-	if(fTranPending)
-	{rc = writeRecord(buchung); resetRecord(&buchung); fTranPending = 0; if(rc != 0) return rc;}
-
-	buchung.buchart = 'Z';
-
-	strcpy(achBuffer, pchBuffer+10);
-	for(i = 0; i < strlen(achBuffer); i++)
-		if(achBuffer[i] == ',')
-			achBuffer[i] = '.';
-	buchung.betrag = atof(achBuffer);
-
-	memcpy(buchung.waehrung, pchBuffer+7, 3);
-	buchung.waehrung[4] = '\0';
-
-	memcpy(achBuffer, pchBuffer+1, 6);
-	achBuffer[6] = '\0';
-	strcpy(buchung.datum, makeDatum(achBuffer));
-
-	switch(*pchBuffer)
-	{
-	case 'D': // Debit
-		buchung.betrag = -buchung.betrag;
-		break;
-
-	case 'C': // Credit
-		break;
-
-	default:
-		printf("Credit / Debit Zeichen %c unbekannt.\n", *pchBuffer);
-		return -1;
-	}
-
-	debug_printf(dbg_fld, "Zwischensaldo %+9.2f %s %s\n",
-			buchung.betrag, buchung.waehrung, buchung.datum);
-
-
-	fTranPending = 1;
-
-	return 0;
-}
-
-//****************************************************************************
 //***** Satz mit Auftragsreferenznummer bearbeiten ***************************
 //****************************************************************************
 int processValSaldo(const char * const pchBuffer)
 {
 	//	strncpy(buchung.origkto, pchBuffer, sizeof(buchung.origkto)-1);
 	debug_printf(dbg_fld, "ValSaldo %s\n", pchBuffer);
-	return 0;
-}
-
-//****************************************************************************
-//***** Satz mit Auftragsreferenznummer bearbeiten ***************************
-//****************************************************************************
-int processEndBuchung()
-{
-	int rc;
-
-	debug_printf(dbg_fld, "EndBuchung \n\n");
-
-	if(fTranPending)
-	{
-		strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-		rc = writeRecord(buchung);
-		resetRecord(&buchung);
-		fTranPending = 0;
-		if(rc != 0)
-			return rc;
-	}
-
 	return 0;
 }
 
@@ -721,9 +613,9 @@ static int processBtxRecord(const char * const pchBuffer)
 	else if(!memcmp(pchBuffer, ":28C:", 4))	// Auszugsnummer
 		return processAuszugsnummer(pchBuffer+4);
 	else if(!memcmp(pchBuffer, ":60F:", 5))	// Anfangssaldo
-		return processAnfangssaldo(pchBuffer+5);
+		return processSaldo(pchBuffer, 'A', "Anfangs");
 	else if(!memcmp(pchBuffer, ":60M:", 5))	// Zwischensaldo
-		return processAnfangssaldo(pchBuffer+5);
+		return processSaldo(pchBuffer, 'A', "Anfangs");
 	else if(!memcmp(pchBuffer, ":61:", 4))	// Umsatzzeile
 		return processUmsatz(pchBuffer+4);
 	else if(!memcmp(pchBuffer, ":86:", 4))	// Mehrzweckfeld
@@ -731,20 +623,23 @@ static int processBtxRecord(const char * const pchBuffer)
 	else if(!memcmp(pchBuffer, ":NS:", 4))	// ComDirect Text
 		return processComDirText(pchBuffer+4);
 	else if(!memcmp(pchBuffer, ":62F:" , 5))// Schlusssaldo
-		return processSchlusssaldo(pchBuffer+5);
+		return processSaldo(pchBuffer, 'E', "Schluss");
 	else if(!memcmp(pchBuffer, ":62M:" , 5))// Zwischensaldo
-		return processZwischensaldo(pchBuffer+5);
+		return processSaldo(pchBuffer, 'Z', "Zwischen");
 	else if(!memcmp(pchBuffer, ":64:", 4))	// aktueller Valutensaldo
 		return processValSaldo(pchBuffer+4);
 	else if(!memcmp(pchBuffer, ":65:", 4))	// aktueller Valutensaldo
 		return processValSaldo(pchBuffer+4);
 	else if(!memcmp(pchBuffer, "\x2D", 1))	// Ende aktuelle Buchungen
-		return processEndBuchung();
+	{
+		debug_printf(dbg_fld, "EndBuchung \n\n");
+		return flushRecord();
+	}
 	else if(!memcmp(pchBuffer, "/OCMT/", 6))// Andere Waehrung
 		;
 	else if(!memcmp(pchBuffer, "    ", 4) ||
 			*pchBuffer == '\0'			   )// Leeres Feld
-	    ;
+		;
 	else					// Unbekannte Felder
 	{
 		printf("Unknown Field \"%s\"\n", pchBuffer);
@@ -753,24 +648,6 @@ static int processBtxRecord(const char * const pchBuffer)
 
 	return 0;
 }
-
-int processLastBtxRecord()
-{
-	int rc;
-
-	if(fTranPending)
-	{
-		strcpy(buchung.source, makeSourceId(SRC_ID())); // Origin belegen
-		rc = writeRecord(buchung);
-		resetRecord(&buchung);
-		fTranPending = 0;
-		if(rc != 0)
-			return rc;
-	}
-
-	return 0;
-}
-
 
 //****************************************************************************
 //***** Read File into Memory, convert special chars and handle          *****
@@ -868,7 +745,7 @@ int processBtxFile(FILE * file)
 		iRc = processBtxRecord(pch);
 
 	if(iRc == 0)
-		processLastBtxRecord();
+		flushRecord();
 
 	pchBtxBuffer = NULL;
 	iBtxBufferLen = 0;
