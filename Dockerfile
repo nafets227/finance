@@ -35,7 +35,9 @@ RUN \
 	set -x && \
 	git clone https://git.aquamaniac.de/git/gwenhywfar.git . && \
 	git checkout tags/5.12.0 && \
-	sed -i "s:i18n_libs=\"\$LIBS\":i18n_libs=\"\$LIBS -lintl\":" configure.ac && \
+	sed -i "s:i18n_libs=\"\$LTLIBINTL\":i18n_libs=\"\$LTLIBINTL -lintl\":" \
+		configure.ac && \
+	sed -i "s:AM_GNU_GETTEXT:AM_GLIB_GNU_GETTEXT:" configure.ac && \
 	make -f Makefile.cvs && \
 	./configure \
 		CFLAGS=-Wno-error=deprecated-declarations \
@@ -70,6 +72,8 @@ RUN \
 	git checkout 781a234 && \
 	rm -rf debian && \
 	sed -i 's:automake-1.16:automake-1.17:' autogen.sh && \
+	sed -i 's:aclocal:aclocal --aclocal-path /usr/share/gettext/m4:' \
+		autogen.sh && \
 	./autogen.sh && \
 	#autoupdate && \
 	#autoconf && \
@@ -112,6 +116,7 @@ RUN \
 		gettext \
 		grep \
 		iputils \
+		libgcrypt \
 		mariadb-client \
 		mariadb-connector-c \
 		s-nail \
