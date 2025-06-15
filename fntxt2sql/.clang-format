@@ -1,0 +1,28 @@
+# clang-format configuration file
+# basis is the one from linux kernel in parent directory
+# so we put only our modifications here.
+---
+BasedOnStyle: InheritParentConfig
+AlignAfterOpenBracket: DontAlign
+AlignOperands: DontAlign
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: false
+AlwaysBreakBeforeMultilineStrings: false
+BinPackArguments: true
+BinPackParameters: true
+BraceWrapping:
+  AfterControlStatement: MultiLine
+BreakStringLiterals: true
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+IndentWidth: 4
+ObjCBlockIndentWidth: 4
+RemoveBracesLLVM: true
+RemoveEmptyLinesInUnwrappedLines: true
+TabWidth: 4
+UseTab: Never
+
+IndentPPDirectives: BeforeHash
+ReflowComments: Always
+ColumnLimit: 79
+
