@@ -140,8 +140,7 @@ int processAuszugsnummer(const char * const pchBuffer)
 //****************************************************************************
 //***** Satz mit Saldo bearbeiten ***************************
 //****************************************************************************
-static int processSaldo(const char * const pchBuffer, const char buchart,
-	const char * const name)
+static int processSaldo(const char * const pchBuffer, const char buchart, const char * const name)
 {
 	char achBuffer[32];
 	int rc;
@@ -639,7 +638,7 @@ static int processBtxRecord(const char * const pchBuffer)
 		;
 	else if(!memcmp(pchBuffer, "    ", 4) ||
 			*pchBuffer == '\0'			   )// Leeres Feld
-		;
+	    ;
 	else					// Unbekannte Felder
 	{
 		printf("Unknown Field \"%s\"\n", pchBuffer);

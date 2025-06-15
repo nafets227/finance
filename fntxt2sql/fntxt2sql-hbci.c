@@ -49,10 +49,7 @@ static int hbci_open(pxdoc_t ** pxDoc, char *pchDirName, char *pchFileName)
 	// Open Paradox file
 	iRc = PX_open_file(*pxDoc, achFileName);
 	if(iRc != 0)
-	{
-		fprintf(stderr, "Eror %d in px_open_file(\"%s\")\n", iRc, achFileName);
-		return iRc;
-	}
+	{ fprintf(stderr, "Eror %d in px_open_file(\"%s\")\n", iRc, achFileName); return iRc; }
 
 	return 0;
 
@@ -67,8 +64,7 @@ static void hbci_close(pxdoc_t ** pxDoc)
 	return;
 }
 
-static int hbci_openIndexedDb(pxdoc_t ** pxDoc, pxdoc_t ** pxIndex,
-	char *pchDirName, char *pchFileName)
+static int hbci_openIndexedDb(pxdoc_t ** pxDoc, pxdoc_t ** pxIndex, char *pchDirName, char *pchFileName)
 {
 	int iRc;
 	char achFileName [255];
@@ -76,9 +72,21 @@ static int hbci_openIndexedDb(pxdoc_t ** pxDoc, pxdoc_t ** pxIndex,
 	strcpy(achFileName, pchFileName);
 	strcat(achFileName, ".db");
 	iRc = hbci_open(pxDoc, pchDirName, achFileName);
-	if(iRc != 0)
-		return iRc;
+	if(iRc != 0) return iRc;
+	/*
+	strcpy(achFileName, pchFileName);
+	strcat(achFileName, ".px");
+	iRc = hbci_open(pxIndex, pchDirName, achFileName);
+	if(iRc != 0) return iRc;
 
+	iRc = PX_read_primary_index(*pxIndex);
+	if(iRc != 0)
+		{ fprintf(stderr, "Eror %d in px_read_primary_index(\"%s\")\n", iRc, achFileName); return iRc; }
+
+	iRc = PX_add_primary_index(*pxDoc, *pxIndex);
+	if(iRc != 0)
+		{ fprintf(stderr, "Eror %d in px_add_primary_index(\"%s\")\n", iRc, achFileName); return iRc; }
+	 */
 	return 0;
 }
 
@@ -156,8 +164,7 @@ static int hbci_comp_Textblk2(const void *pv1, const void*pv2)
 
 
 #define HBCI_ERR_WRONG_TYPE(value, expected)	 \
-	fprintf(stderr, #value " (%d) != " #expected " (%d)\n", \
-		(int)(value->type), (int)expected)
+	fprintf(stderr, #value " (%d) != " #expected " (%d)\n",(int)(value->type), (int)expected)
 
 static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 		TextBlk *pTextBlk, long lCountTextBlk)
@@ -178,15 +185,13 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 	if(pxValues[0]->type != pxfAlpha || pxValues[0]->isnull != 0)
 	{ HBCI_ERR_WRONG_TYPE(pxValues[0], pxfAlpha);  return -1;}
 	debug_printf(dbg_fld, "KtoNr: %s\n", pxValues[0]->value.str.val);
-	strncpy(pBuchung->orig_ktonr, pxValues[0]->value.str.val,
-		sizeof(pBuchung->orig_ktonr));
+	strncpy(pBuchung->orig_ktonr, pxValues[0]->value.str.val, sizeof(pBuchung->orig_ktonr));
 
 	// szBLZ char(10),
 	if(pxValues[1]->type != pxfAlpha || pxValues[1]->isnull != 0)
 	{ HBCI_ERR_WRONG_TYPE(pxValues[1], pxfAlpha);  return -1;}
 	debug_printf(dbg_fld, "BLZ: %s\n", pxValues[1]->value.str.val);
-	strncpy(pBuchung->orig_blz, pxValues[1]->value.str.val,
-		sizeof(pBuchung->orig_blz));
+	strncpy(pBuchung->orig_blz, pxValues[1]->value.str.val, sizeof(pBuchung->orig_blz));
 
 	// lAuszZaehler integer,
 	// Field is ignored
@@ -231,8 +236,7 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 	{ HBCI_ERR_WRONG_TYPE(pxValues[7], pxfAlpha);  return -1;}
 	debug_printf(dbg_fld, "PNR: %s\n", pxValues[7]->value.str.val);
 	if(pxValues[7]->isnull == 0)
-		strncpy(pBuchung->primanota, pxValues[7]->value.str.val,
-			sizeof(pBuchung->primanota));
+		strncpy(pBuchung->primanota, pxValues[7]->value.str.val, sizeof(pBuchung->primanota));
 	else
 		*pBuchung->primanota = '\0';
 
@@ -240,8 +244,7 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 	if(pxValues[8]->type != pxfAlpha || pxValues[8]->isnull != 0)
 	{ HBCI_ERR_WRONG_TYPE(pxValues[8], pxfAlpha);  return -1;}
 	debug_printf(dbg_fld, "BuText: %s\n", pxValues[8]->value.str.val);
-	strncpy(pBuchung->butext, pxValues[8]->value.str.val,
-		sizeof(pBuchung->butext));
+	strncpy(pBuchung->butext, pxValues[8]->value.str.val, sizeof(pBuchung->butext));
 
 	// lBetrag integer,
 	if(pxValues[9]->type != pxfLong || pxValues[9]->isnull != 0)
@@ -279,8 +282,7 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 	{
 		if(pTextBlkAct->nZeile == 10000) // This number marks a original
 		{			     				 // currency text during Euro conversion period.
-			strncpy(pBuchung->waehrung, pTextBlkAct->achText,
-				sizeof(pBuchung->waehrung));
+			strncpy(pBuchung->waehrung, pTextBlkAct->achText, sizeof(pBuchung->waehrung));
 			pTextBlkAct++;
 			continue;
 		}
@@ -293,13 +295,10 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 					iPos < sizeof(pTextBlkAct->achText) &&
 						pTextBlkAct->achText[iPos] != '\0';
 					iPos++)
-				if( (
-						pTextBlkAct->achText[iPos] >= '0' &&
-						pTextBlkAct->achText[iPos] <= '9'
-					) ||
-					pTextBlkAct->achText[iPos] == '.' ||
-					pTextBlkAct->achText[iPos] == ',' ||
-					pTextBlkAct->achText[iPos] == ' ')
+				if( (pTextBlkAct->achText[iPos] >= '0' && pTextBlkAct->achText[iPos] <= '9') ||
+						pTextBlkAct->achText[iPos] == '.' ||
+						pTextBlkAct->achText[iPos] == ',' ||
+						pTextBlkAct->achText[iPos] == ' ')
 					;	// Character im Spezial-Set
 				else
 				{
@@ -316,8 +315,7 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 		}
 
 		debug_printf(dbg_fld, "VZweck[%d]: \"%s\" (%d)\n",
-				(int)iVZweckNr, pTextBlkAct->achText,
-				(int)pTextBlkAct->nZeile);
+				(int)iVZweckNr, pTextBlkAct->achText, (int)pTextBlkAct->nZeile);
 		strncpy(pBuchung->vzweck[iVZweckNr],
 				pTextBlkAct->achText,
 				sizeof(pBuchung->vzweck[iVZweckNr]));
@@ -327,37 +325,32 @@ static int hbci_convertBuchung(pxval_t **pxValues, Buchung *pBuchung,
 
 	// Sonderbehandlung: Wenn der Text "Bankverbdg.: (Blz./KtoNr.)" erscheint,
 	// werden die naehsten 2 VZwecks besonders interpretiert.
-	// " Bankverbdg.: (Blz./KtoNr.)"
-	// "       70020270 / 780762394"
-	// "    HYPOVEREINSBANK HYPOTH."
+	// " Bankverbdg.: (Blz./KtoNr.)" "       70020270 / 780762394" "    HYPOVEREINSBANK HYPOTH."
 	for(iVZweckNr = 0; iVZweckNr < iVZweckCnt; iVZweckNr++)
-		if(strcmp(pBuchung->vzweck[iVZweckNr],
-			"Bankverbdg.: (Blz./KtoNr.)") == 0)
+		if(strcmp(pBuchung->vzweck[iVZweckNr], "Bankverbdg.: (Blz./KtoNr.)") == 0)
 		{
 			if(iVZweckNr+1 < iVZweckCnt &&
-				strlen(pBuchung->part_blz) == 0)
+			   strlen(pBuchung->part_blz) == 0)
 				strncpy(pBuchung->part_blz,
 						&pBuchung->vzweck[iVZweckNr+1][0],
 						sizeof(pBuchung->part_blz)-1);
 			if(iVZweckNr+1 < iVZweckCnt &&
-				strlen(pBuchung->part_ktonr) == 0 )
+			   strlen(pBuchung->part_ktonr) == 0 )
 				strncpy(pBuchung->part_ktonr,
 						&pBuchung->vzweck[iVZweckNr+1][11],
 						sizeof(pBuchung->part_ktonr)-1);
 			if(iVZweckNr+2 < iVZweckCnt &&
-				strlen(pBuchung->part_name1) == 0 )
+			   strlen(pBuchung->part_name1) == 0 )
 				strncpy(pBuchung->part_name1,
 						pBuchung->vzweck[iVZweckNr+2],
 						sizeof(pBuchung->part_name1)-1);
 			if(iVZweckNr+3 < iVZweckNr &&
-				strlen(pBuchung->part_name2) == 0 )
+			   strlen(pBuchung->part_name2) == 0 )
 				strncpy(pBuchung->part_name2,
 						pBuchung->vzweck[iVZweckNr+3],
 						sizeof(pBuchung->part_name2)-1);
-			debug_printf(dbg_fld,
-				"Special VZweck detected: %8s/%10s \"%27s\" \"%27s\"\n",
-				pBuchung->part_blz, pBuchung->part_ktonr,
-				pBuchung->part_name1, pBuchung->part_name2);
+			debug_printf(dbg_fld, "Special VZweck detected: %8s/%10s \"%27s\" \"%27s\"\n",
+					pBuchung->part_blz, pBuchung->part_ktonr, pBuchung->part_name1, pBuchung->part_name2);
 			pBuchung->vzweck[iVZweckNr][0] = '\0';
 			pBuchung->vzweck[iVZweckNr+1][0] = '\0';
 			pBuchung->vzweck[iVZweckNr+2][0] = '\0';
@@ -396,16 +389,14 @@ static int hbci_convertTextblk(pxval_t **pxValues, TextBlk *pTextBlk)
 	if(pxValues[6]->type != pxfAlpha || pxValues[6]->isnull != 0)
 	{ HBCI_ERR_WRONG_TYPE(pxValues[6], pxfAlpha);  return -1;}
 	debug_printf(dbg_fld, "szText: %s\n", pxValues[6]->value.str.val);
-	strncpy(pTextBlk->achText, pxValues[6]->value.str.val,
-		sizeof(pTextBlk->achText)-1);
+	strncpy(pTextBlk->achText, pxValues[6]->value.str.val, sizeof(pTextBlk->achText)-1);
 
 	return 0;
 }
 
 int processHbci(char * dirName)
 {
-	pxdoc_t * pxBuchung = 0, *pxBuchungIndex = 0, *pxTextBlk = 0;
-	pxdoc_t *pxTextBlkIndex = 0;
+	pxdoc_t * pxBuchung = 0, *pxBuchungIndex = 0, *pxTextBlk = 0, *pxTextBlkIndex = 0;
 	long lRecCountBuchung = 0, lRecCountTextBlk = 0;
 	pxval_t ** pxValues = 0;
 	int iRc, iRecNo;
@@ -436,8 +427,7 @@ int processHbci(char * dirName)
 
 		hbci_convertTextblk(pxValues, textBlk+(iRecNo-1));
 	}
-	qsort(textBlk, PX_get_num_records(pxTextBlk), sizeof(*textBlk),
-		hbci_comp_Textblk);
+	qsort(textBlk, PX_get_num_records(pxTextBlk), sizeof(*textBlk), hbci_comp_Textblk);
 
 
 	lRecCountBuchung  = PX_get_num_records(pxBuchung);

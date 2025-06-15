@@ -51,7 +51,7 @@ int initMysql(const char * const pchHost, const char * const pchDbParm,
 
 	if (mysql_set_character_set(pMysqlConn, "latin1") != 0)
 	{
-		fprintf(stderr, "mysql_set_character_set failed.\n");
+	    fprintf(stderr, "mysql_set_character_set failed.\n");
 	}
 
 	return 0;
@@ -130,8 +130,7 @@ int fetchSqlBuchung(MYSQL_RES *pResult, Buchung *pBuchung)
 	iFieldCount = mysql_num_fields(pResult);
 	if(iFieldCount != iExpFieldCount)
 	{
-		fprintf(stderr,
-				"Wrong number of result values from mysql: %d instead of %d\n",
+		fprintf(stderr, "Wrong number of result values from mysql: %d instead of %d\n",
 				iFieldCount, iExpFieldCount);
 		return -1;
 	}
@@ -150,52 +149,30 @@ int fetchSqlBuchung(MYSQL_RES *pResult, Buchung *pBuchung)
 	}
 
 	// Record successfully retrieved so now copy the values into buchung structure
-	strncpy(pBuchung->orig_blz   , row[ 0] ? row[ 0] : "",
-		sizeof(pBuchung->orig_blz   ));
-	strncpy(pBuchung->orig_ktonr , row[ 1] ? row[ 1] : "",
-		sizeof(pBuchung->orig_ktonr ));
-	strncpy(pBuchung->datum      , row[ 2] ? row[ 2] : "",
-		sizeof(pBuchung->datum      ));
-	strncpy(pBuchung->valuta     , row[ 3] ? row[ 3] : "",
-		sizeof(pBuchung->valuta     ));
+	strncpy(pBuchung->orig_blz   , row[ 0] ? row[ 0] : "", sizeof(pBuchung->orig_blz   ));
+	strncpy(pBuchung->orig_ktonr , row[ 1] ? row[ 1] : "", sizeof(pBuchung->orig_ktonr ));
+	strncpy(pBuchung->datum      , row[ 2] ? row[ 2] : "", sizeof(pBuchung->datum      ));
+	strncpy(pBuchung->valuta     , row[ 3] ? row[ 3] : "", sizeof(pBuchung->valuta     ));
 	pBuchung->betrag = atof(row[ 4]);
-	strncpy(pBuchung->waehrung   , row[ 5] ? row[ 5] : "",
-		sizeof(pBuchung->waehrung   ));
+	strncpy(pBuchung->waehrung   , row[ 5] ? row[ 5] : "", sizeof(pBuchung->waehrung   ));
 	pBuchung->buchart = row[ 6][0];
-	strncpy(pBuchung->buchungs_sl, row[ 7] ? row[ 7] : "",
-		sizeof(pBuchung->buchungs_sl));
-	strncpy(pBuchung->gv_code    , row[ 8] ? row[ 8] : "",
-		sizeof(pBuchung->gv_code    ));
-	strncpy(pBuchung->part_blz   , row[ 9] ? row[ 9] : "",
-		sizeof(pBuchung->part_blz   ));
-	strncpy(pBuchung->part_ktonr , row[10] ? row[10] : "",
-		sizeof(pBuchung->part_ktonr ));
-	strncpy(pBuchung->part_name1 , row[11] ? row[11] : "",
-		sizeof(pBuchung->part_name1 ));
-	strncpy(pBuchung->part_name2 , row[12] ? row[12] : "",
-		sizeof(pBuchung->part_name2 ));
-	strncpy(pBuchung->primanota  , row[13] ? row[13] : "",
-		sizeof(pBuchung->primanota  ));
-	strncpy(pBuchung->referenz   , row[14] ? row[14] : "",
-		sizeof(pBuchung->referenz   ));
-	strncpy(pBuchung->butext     , row[15] ? row[15] : "",
-		sizeof(pBuchung->butext     ));
-	strncpy(pBuchung->vzweck[0]  , row[16] ? row[16] : "",
-		sizeof(pBuchung->vzweck[0]  ));
-	strncpy(pBuchung->vzweck[1]  , row[17] ? row[17] : "",
-		sizeof(pBuchung->vzweck[1]  ));
-	strncpy(pBuchung->vzweck[2]  , row[18] ? row[18] : "",
-		sizeof(pBuchung->vzweck[2]  ));
-	strncpy(pBuchung->vzweck[3]  , row[19] ? row[19] : "",
-		sizeof(pBuchung->vzweck[3]  ));
-	strncpy(pBuchung->vzweck[4]  , row[20] ? row[20] : "",
-		sizeof(pBuchung->vzweck[4]  ));
-	strncpy(pBuchung->vzweck[5]  , row[21] ? row[21] : "",
-		sizeof(pBuchung->vzweck[5]  ));
-	strncpy(pBuchung->vzweck[6]  , row[22] ? row[22] : "",
-		sizeof(pBuchung->vzweck[6]  ));
-	strncpy(pBuchung->source     , row[23] ? row[23] : "",
-		sizeof(pBuchung->source     ));
+	strncpy(pBuchung->buchungs_sl, row[ 7] ? row[ 7] : "", sizeof(pBuchung->buchungs_sl));
+	strncpy(pBuchung->gv_code    , row[ 8] ? row[ 8] : "", sizeof(pBuchung->gv_code    ));
+	strncpy(pBuchung->part_blz   , row[ 9] ? row[ 9] : "", sizeof(pBuchung->part_blz   ));
+	strncpy(pBuchung->part_ktonr , row[10] ? row[10] : "", sizeof(pBuchung->part_ktonr ));
+	strncpy(pBuchung->part_name1 , row[11] ? row[11] : "", sizeof(pBuchung->part_name1 ));
+	strncpy(pBuchung->part_name2 , row[12] ? row[12] : "", sizeof(pBuchung->part_name2 ));
+	strncpy(pBuchung->primanota  , row[13] ? row[13] : "", sizeof(pBuchung->primanota  ));
+	strncpy(pBuchung->referenz   , row[14] ? row[14] : "", sizeof(pBuchung->referenz   ));
+	strncpy(pBuchung->butext     , row[15] ? row[15] : "", sizeof(pBuchung->butext     ));
+	strncpy(pBuchung->vzweck[0]  , row[16] ? row[16] : "", sizeof(pBuchung->vzweck[0]  ));
+	strncpy(pBuchung->vzweck[1]  , row[17] ? row[17] : "", sizeof(pBuchung->vzweck[1]  ));
+	strncpy(pBuchung->vzweck[2]  , row[18] ? row[18] : "", sizeof(pBuchung->vzweck[2]  ));
+	strncpy(pBuchung->vzweck[3]  , row[19] ? row[19] : "", sizeof(pBuchung->vzweck[3]  ));
+	strncpy(pBuchung->vzweck[4]  , row[20] ? row[20] : "", sizeof(pBuchung->vzweck[4]  ));
+	strncpy(pBuchung->vzweck[5]  , row[21] ? row[21] : "", sizeof(pBuchung->vzweck[5]  ));
+	strncpy(pBuchung->vzweck[6]  , row[22] ? row[22] : "", sizeof(pBuchung->vzweck[6]  ));
+	strncpy(pBuchung->source     , row[23] ? row[23] : "", sizeof(pBuchung->source     ));
 
 	return 1;
 }

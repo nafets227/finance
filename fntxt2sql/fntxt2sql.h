@@ -141,8 +141,7 @@ int processHbci(char * dirName);
 //****************************************************************************
 //***** Functions from fntxt2sql-mysql.c **************************************
 //****************************************************************************
-int initMysql(const char *pchHost, const char *pchDb, const char *pchUser,
-	const char *pchPassword);
+int initMysql(const char *pchHost, const char *pchDb, const char *pchUser, const char *pchPassword);
 int writeMysqlRecord(const Buchung buchung);
 int checkMysqlRecord(const Buchung buchung);
 void termMysql(void);

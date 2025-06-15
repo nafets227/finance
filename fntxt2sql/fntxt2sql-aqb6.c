@@ -99,8 +99,7 @@ static AB_IMEXPORTER_CONTEXT *readContext(const char *ctxFile)
 //****************************************************************************
 //***** AqBanking6 Saldo behandeln *******************************************
 //****************************************************************************
-static int processAqb6Bal(const AB_IMEXPORTER_ACCOUNTINFO *iea,
-	const AB_BALANCE *b)
+static int processAqb6Bal(const AB_IMEXPORTER_ACCOUNTINFO *iea, const AB_BALANCE *b)
 {
 	Buchung buchung;
 
@@ -119,10 +118,8 @@ static int processAqb6Bal(const AB_IMEXPORTER_ACCOUNTINFO *iea,
 		return 0; // Ignore this Balance
 	}
 
-	save_strcpy(buchung.orig_blz,
-		AB_ImExporterAccountInfo_GetBankCode(iea));
-	save_strcpy(buchung.orig_ktonr,
-		AB_ImExporterAccountInfo_GetAccountNumber(iea));
+	save_strcpy(buchung.orig_blz, AB_ImExporterAccountInfo_GetBankCode(iea));
+	save_strcpy(buchung.orig_ktonr, AB_ImExporterAccountInfo_GetAccountNumber(iea));
 	const char *pchWaehrung = AB_ImExporterAccountInfo_GetCurrency(iea);
 	if (pchWaehrung == NULL)
 	{
@@ -193,7 +190,7 @@ int processAqb6File(char *pchFileName)
 
 	gui=GWEN_Gui_new();
 	GWEN_Gui_AddFlags(gui, GWEN_GUI_FLAGS_NONINTERACTIVE);
-	GWEN_Gui_SetGui(gui);
+    GWEN_Gui_SetGui(gui);
 
 	ab=AB_Banking_new("nafets227/finance", NULL, 0);
 	if (ab == NULL)
@@ -219,8 +216,8 @@ int processAqb6File(char *pchFileName)
 
 	for (AB_IMEXPORTER_ACCOUNTINFO *iea =
 			AB_ImExporterContext_GetFirstAccountInfo(ctx);
-		iea;
-		iea=AB_ImExporterAccountInfo_List_Next(iea))
+	    iea;
+	    iea=AB_ImExporterAccountInfo_List_Next(iea))
 	{ // for all accounts
 		const char *iban = AB_ImExporterAccountInfo_GetIban(iea);
 		debug_printf(dbg_in, "processsAqb6Acc: %s\n", iban);

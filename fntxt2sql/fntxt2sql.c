@@ -99,6 +99,7 @@ int processFile(char *achInpFileName)
 	}
 
 	debug_printf(dbg_file, "Reached End Of File\n");
+	//	{if(((int)debugInfo.debug_level) & (dbg_file)) fprintf(debugInfo.dbgFile, "Reached End Of File\n");}
 
 	return iRc;
 
