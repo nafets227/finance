@@ -66,55 +66,55 @@ export CFLAGS
 all: fntxt2sql
 
 fntxt2sql: fntxt2sql.o \
-	       fntxt2sql-btx.o fntxt2sql-csv.o fntxt2sql-aqm.o \
-	       fntxt2sql-aqb-tran.o fntxt2sql-aqb-bal.o fntxt2sql-aqb6.o \
-	       fntxt2sql-hbci.o \
-	       fntxt2sql-util.o fntxt2sql-mysql.o fnSql.o
-	$(LINK.o) -o $@ $^ $(LIBS)
+           fntxt2sql-btx.o fntxt2sql-csv.o fntxt2sql-aqm.o \
+           fntxt2sql-aqb-tran.o fntxt2sql-aqb-bal.o fntxt2sql-aqb6.o \
+           fntxt2sql-hbci.o \
+           fntxt2sql-util.o fntxt2sql-mysql.o fnSql.o
+    $(LINK.o) -o $@ $^ $(LIBS)
 
 fntxt2sql.o: fntxt2sql.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql.c
 
 fntxt2sql-btx.o: fntxt2sql-btx.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-btx.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-btx.c
 
 fntxt2sql-csv.o: fntxt2sql-csv.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-csv.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-csv.c
 
 fntxt2sql-aqm.o: fntxt2sql-aqm.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqm.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqm.c
 
 fntxt2sql-aqb-tran.o: fntxt2sql-aqb-tran.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqb-tran.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqb-tran.c
 
 fntxt2sql-aqb-bal.o: fntxt2sql-aqb-bal.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqb-bal.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqb-bal.c
 
 fntxt2sql-aqb6.o: fntxt2sql-aqb6.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqb6.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-aqb6.c
 
 fntxt2sql-hbci.o: fntxt2sql-hbci.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-hbci.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-hbci.c
 
 fntxt2sql-mysql.o: fntxt2sql-mysql.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-mysql.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-mysql.c
 
 fntxt2sql-util.o: fntxt2sql-util.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-util.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fntxt2sql-util.c
 
 fnSql.o: fnSql.c fntxt2sql.h
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fnSql.c
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c fnSql.c
 
 .c.o:
-	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c $^
+    $(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" -o $@ -c $^
 
 install: fntxt2sql finance
-	install -o finance -m 755 -d $(BINDIR)
-	install -o finance -m 755 cron.finance   $(BINDIR)
-	install -o finance -m 755 mailSilvi.sh   $(BINDIR)
-	install -o finance -m 755 finance        $(BINDIR)
-	install -o finance -m 755 fntxt2sql      $(BINDIR)
+    install -o finance -m 755 -d $(BINDIR)
+    install -o finance -m 755 cron.finance   $(BINDIR)
+    install -o finance -m 755 mailSilvi.sh   $(BINDIR)
+    install -o finance -m 755 finance        $(BINDIR)
+    install -o finance -m 755 fntxt2sql      $(BINDIR)
 
 clean:
-	-rm -f *.o fntxt2sql
+    -rm -f *.o fntxt2sql
 
