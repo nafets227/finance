@@ -52,6 +52,7 @@ static void sqlPrintDoubleField(char *out, const double value)
 //****************************************************************************
 const char * const * getCreateSql(void)
 {
+    // clang-format off
 	static const char achCreTab[] =
 		"CREATE TABLE IF NOT EXISTS %s ("
 		"ID"          " INT"          " PRIMARY KEY AUTO_INCREMENT" ","
@@ -274,6 +275,7 @@ const char * const * getCreateSql(void)
 				"KATG4, KATG4_BETRAG, "
 				"KATG5, KATG5_BETRAG "
 			") on %s_todo TO fin_user";
+    // clang-format on
 
 	static char achTempCreTab[
 		sizeof(achCreTab)+sizeof(config.achSqlTabName)] = "";
@@ -339,7 +341,7 @@ const char * getInsertSql(const Buchung buchung)
 
 	sprintf(achSql,
 			"INSERT INTO %s (%s) VALUES (", config.achSqlTabName, ALL_FIELDS);
-
+    // clang-format off
 	sqlPrintField(achSql, buchung.orig_blz);
 	strcat(achSql, ", "); sqlPrintField(achSql, buchung.orig_ktonr);
 	strcat(achSql, ", "); sqlPrintField(achSql, buchung.datum);
@@ -356,6 +358,7 @@ const char * getInsertSql(const Buchung buchung)
 	strcat(achSql, ", "); sqlPrintField(achSql, buchung.primanota);
 	strcat(achSql, ", "); sqlPrintField(achSql, buchung.referenz);
 	strcat(achSql, ", "); sqlPrintField(achSql, buchung.butext);
+    // clang-format on
 
 	for(i = 0; i < sizeof(buchung.vzweck) / sizeof(buchung.vzweck[0]); i++)
 	{ strcat(achSql, ", "); sqlPrintField(achSql, buchung.vzweck[i]); }
