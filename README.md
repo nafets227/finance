@@ -85,7 +85,7 @@ to MAIL_URL. Authentication to the mail server is not yet supported.
 * MAIL_HOSTNAME optionally give the hostname that we report to SMTP server in
   HELO command. Usefule if the SMTP server requires a FQDN. Defaults to
   hostname.
-* DEBUG if set to 1, container will log all bash scripts (set -x)
+* DEBUG if set to 1, container will log all Bash scripts (set -x)
 
 ## Advanced features
 ### enhanced features of fntxt2sql
@@ -104,6 +104,6 @@ without 2 factor authorisation, you can try with ./testlocal exec
 ### testing with testlocal.sh
 testlocal.sh adds additional Environment Variables for testing:
 * MYSQL_LOCAL_HOST (defaults to MYSQL_HOST)
-* FINIMG docker image to test (default: nafets227/finance:local)
+* FINIMG Docker image to test (default: nafets227/finance:local)
 Both are useful if you are testing on a local machine or in a GitHub Action
 like .github/workflows/docker-ci.yml

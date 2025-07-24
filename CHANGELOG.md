@@ -54,7 +54,7 @@ warned.
   balances of days where both noted and booked balances exist are ignored.
   This applies to "today" balances, that are not final and might change in
   the remaining time of the day.
-* fixes bash error when running with unset MAIL_TO
+* fixes Bash error when running with unset MAIL_TO
 
 ## 0.7.3
 * really fix DB view _cat where valuta is NULL
@@ -87,7 +87,7 @@ Known Bug:
 ## 0.6.1
 * Bump to aqbanking 6.3.0
 * Bump to gwenhywfar 5.6.0
-* use xmlsec from alpine linux
+* use xmlsec from alpine Linux
 * stop using Docker Hub Builds, that are no longer free of charge
 * Move default location for Docker Images is ghcr.io/nafets227/finance
 * Keep updating deprecated location docker.io/nafets227/finance
@@ -98,14 +98,14 @@ Known Bug:
 * Allow interactive input of TAN
 
 ## 0.5.1
-* ease testing with testlocal [ test | bash | initdata | initdb ]
+* ease testing with testlocal [ test | Bash | initdata | initdb ]
 * Bump to aqbanking 6.2.1
 * bump to gwenhywfar 5.3.0
 * bump to xmlsec1 1.2.30
 
 ## 0.5
 ## 0.5-BETA2
-* Switch to Alpine linux, reducing Image size from >1GB to ~90MB
+* Switch to Alpine Linux, reducing Image size from >1GB to ~90MB
 * Bump to AqBanking 6.1.0
 * fn_entry_balance now includes bank code number (#13)
 
@@ -130,7 +130,7 @@ Known Bug:
 * Do not exit when DB Server does not respond to ping
 
 ## 0.4 (2019-05-15)
-* move to archlinux/base as docker base image since pritunl/archlinux is
+* move to archlinux/base as Docker base image since pritunl/archlinux is
   discontinued
 
 ## 0.3.3 (2018-05.16)
