@@ -1,5 +1,5 @@
 /.README.md.html
 testdata
 /proddata/
-/.hbci-pinfile
+*hbci*pinfile
 fntxt2sql/*.o
