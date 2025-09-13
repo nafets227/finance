@@ -9,7 +9,7 @@ on:
     branches:
       - '*'
 
-permissions: read-all
+permissions: read-all # zizmor: ignore[excessive-permissions]
 
 jobs:
   _github_lint:
@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: SuperLint
         uses: super-linter/super-linter/slim@v8.1.0
@@ -56,6 +57,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Log into registry ghcr.io
         uses: docker/login-action@v3
@@ -92,7 +95,7 @@ jobs:
       - name: Test
         env:
           HBCI_PINFILE: ${{ secrets.HBCI_PINFILE }}
-        run: |
+        run: | # zizmor: ignore[template-injection] safely handled
           [ "$RUNNER_DEBUG" == 1 ] &&
             TESTPARM="--debug" &&
             set -x

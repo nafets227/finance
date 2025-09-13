@@ -1,0 +1,9 @@
+# Config for zizmor Linter inside SuperLinter
+rules:
+  unpinned-uses:
+    ignore:
+      - docker-ci.yaml
+      - docker-publish.yaml
+  unpinned-images:
+    ignore:
+      - docker-ci.yaml
