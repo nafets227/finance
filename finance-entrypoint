@@ -213,8 +213,7 @@ function aqsetup () {
 	(( account_nr -- ))
 
 	# read configuration of aqhbci
-	users=$(aqhbci_wrapper listusers )
-	rc=$?
+	users=$(aqhbci_wrapper listusers ) && rc=0 || rc=$?
 	# if list is empty rc=4 is set, so we ignore it.
 	if [ $rc == 4 ] && [ -z "$users" ] ; then rc=0; fi
 	[ $rc != 0 ] && return 1
@@ -258,13 +257,13 @@ function aqbanking_wrapper () {
 	#DEBUG
 	printf " ---------- aqbanking-cli %s\n" "$*" >&2
 	[ "$1" == "--noninteractive" ] && shift
-	aqbanking-cli \
+	if ! aqbanking-cli \
 		$taninteractive \
 		--acceptvalidcerts \
 		--pinfile=$datadir/.hbci-pinfile \
-		"$@"
-	rc=$?; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqbanking-clie %s\n" "$rc" "$*" >&2
+		"$@" 
+	then
+		printf "Error %s in aqbanking-clie %s\n" "$?" "$*" >&2
 		return $rc
 	fi
 }
@@ -273,13 +272,13 @@ function aqhbci_wrapper () {
 	#DEBUG
 	printf " ---------- aqhbci-tool4 %s\n" "$*" >&2
 	[ "$1" == "--noninteractive" ] && shift
-	aqhbci-tool4 \
+	if ! aqhbci-tool4 \
 		$taninteractive \
 		--acceptvalidcerts \
 		--pinfile=$datadir/.hbci-pinfile \
 		"$@"
-	rc=$?; if [ "$rc" != 0 ] ; then
-		printf "Error %s in aqhbci-tool4 %s\n" "$rc" "$*" >&2
+	then
+		printf "Error %s in aqhbci-tool4 %s\n" "$?" "$*" >&2
 		return $rc
 	fi
 }
@@ -353,10 +352,10 @@ function aqsetup_acc () {
 		fi
 	fi
 
-	aqhbci_wrapper getaccounts -u "$uu"
-	rc=$? ; if [ "$rc" != 0 ] ; then
+	if ! aqhbci_wrapper getaccounts -u "$uu"
+	then
 		printf "Error %s in aqhbci-tool4 getaccounts. %s.\n" \
-			"$rc" "aqhbci-config dump follows"
+			"$?" "aqhbci-config dump follows"
 		aqhbci_wrapper \
 			listusers
 		aqhbci_wrapper \
@@ -459,8 +458,8 @@ function import_handleDir
 						-mysql_host "$MYSQL_HOST" \
 						-mysql_database "$MYSQL_DATABASE" \
 						-mysql_user "$MYSQL_USER" \
-						-mysql_password "$MYSQL_PASSWORD"
-					rc=$?
+						-mysql_password "$MYSQL_PASSWORD" \
+					&& rc=0 || rc=$?
 				else
 					printf "Not importing Directory %s %s\n" "$ftype" "$f"
 					rc=-1
@@ -477,8 +476,8 @@ function import_handleDir
 						-mysql_host "$MYSQL_HOST" \
 						-mysql_database "$MYSQL_DATABASE" \
 						-mysql_user "$MYSQL_USER" \
-						-mysql_password "$MYSQL_PASSWORD"
-					rc=$?
+						-mysql_password "$MYSQL_PASSWORD" \
+					&& rc=0 || rc=$?
 				else
 					printf "Not importing Non-Directory %s %s\n" "$ftype" "$f"
 					rc=-1
