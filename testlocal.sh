@@ -30,9 +30,9 @@ function test_dbconnect {
 		"$CMD_PW" \
 		'"--execute=SELECT 1;"' \
 		"$MYSQL_DATABASE" \
-		"$REDIR"
-	rc=$?
-	if [ $rc != "$rcexp" ] ; then
+		"$REDIR" \
+	&& rc=0 || rc=$?
+	if [ "$rc" != "$rcexp" ] ; then
 		printf "ERR: Connecting to DB at %s with user %s%s: RC=%s(Exp=%s)\n" \
 			"$MYSQL_LOCAL_HOST" "$user" "$PRT_PW" "$rc" "$rcexp"
 		return 1
@@ -275,20 +275,20 @@ case $action in
 		printf "***** All tests on finance have been successfully completed. *****\n"
 		;;
 	exec )
-		exec_container "" "-ti" "$@"
-		exit $?
+		exec_container "" "-ti" "$@" || exit 1
+		exit 0
 		;;
 	bash )
-		exec_container "" "/bin/bash" "$@"
-		exit $?
+		exec_container "" "/bin/bash" "$@" || exit 1
+		exit 0
 		;;
 	initdata )
-		setup_testdata
-		exit $?
+		setup_testdata || exit 1
+		exit 0
 		;;
 	initdb )
-		setup_testdb
-		exit $?
+		setup_testdb || exit 1
+		exit 0
 		;;
 
 	*)
