@@ -109,7 +109,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
-		// @TODO: use full KATG field includding slashed
+		// @TODO: use full KATG field including slashed
 			"substring_index(KATG, '/', 1) AS KATG, "
 			"substring_index(KATG, '/', 1) AS KATG_L1, "
 			"substring_index(KATG, '/', 2) AS KATG_L2, "
@@ -124,7 +124,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
-		// @TODO: use full KATG field includding slashed
+		// @TODO: use full KATG field including slashed
 			"substring_index(KATG2, '/', 1) AS KATG, "
 			"substring_index(KATG2, '/', 1) AS KATG_L1, "
 			"substring_index(KATG2, '/', 2) AS KATG_L2, "
@@ -140,7 +140,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
-		// @TODO: use full KATG field includding slashed
+		// @TODO: use full KATG field including slashed
 			"substring_index(KATG3, '/', 1) AS KATG, "
 			"substring_index(katg3, '/', 1) as KATG_L1, "
 			"substring_index(katg3, '/', 2) as KATG_L2, "
@@ -156,7 +156,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
-		// @TODO: use full KATG field includding slashed
+		// @TODO: use full KATG field including slashed
 			"substring_index(KATG4, '/', 1) AS KATG, "
 			"substring_index(katg4, '/', 1) as KATG_L1, "
 			"substring_index(katg4, '/', 2) as KATG_L2, "
@@ -172,7 +172,7 @@ const char * const * getCreateSql(void)
 			"PART_NAME2, PART_KTONR, PART_BLZ, BUTEXT, "
 			"PRIMANOTA, VZWECK1, VZWECK2, VZWECK3, VZWECK4, "
 			"VZWECK5, VZWECK6, VZWECK7, SOURCE, "
-		// @TODO: use full KATG field includding slashed
+		// @TODO: use full KATG field including slashed
 			"substring_index(KATG5, '/', 1) AS KATG, "
 			"substring_index(katg5, '/', 1) as KATG_L1, "
 			"substring_index(katg5, '/', 2) as KATG_L2, "
