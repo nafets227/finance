@@ -7,3 +7,6 @@ rules:
   unpinned-images:
     ignore:
       - docker-ci.yaml
+  dependabot-cooldown:
+    ignore:
+      - dependabot.yaml
