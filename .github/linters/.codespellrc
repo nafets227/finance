@@ -1,2 +1,2 @@
 [codespell]
-skip = ./fntxt2sql/*.c
+skip = fntxt2sql/*.c
