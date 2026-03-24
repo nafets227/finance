@@ -141,7 +141,7 @@ dbsetup_tables () {
 
 ##### aqsetup ################################################################
 function aqsetup () {
-	local line u blz parm
+	local line u blz param
 	local account_nr=0
 	local accounts_blz=( )
 	local accounts_user=( )
@@ -168,41 +168,44 @@ function aqsetup () {
 				;;
 
 			URL_* )
-				parm=$(trim "${line#*=}")
-				parm=${parm%\"}
-				parm=${parm#\"}
+				param=$(trim "${line#*=}")
+				param=${param%\"}
+				param=${param#\"}
 				line=$(trim "${line%%=*}")
 				line=${line##URL_}
 				u=${line#*_}
 				blz=${line%_*}
-				#DEBUG printf "DEBUG: URL blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
+				#DEBUG printf "DEBUG: URL blz=%s u=%s param=\"%s\"\n" \
+				#   "$blz" "$u" "$param"
 
-				eval "URL_${blz}_${u}=\"\$parm\""
+				eval "URL_${blz}_${u}=\"\$param\""
 				;;
 			TANMODE_* )
-				parm=$(trim "${line#*=}")
-				parm=${parm%\"}
-				parm=${parm#\"}
+				param=$(trim "${line#*=}")
+				param=${param%\"}
+				param=${param#\"}
 				line=$(trim "${line%%=*}")
 				line=${line##TANMODE_}
 				u=${line#*_}
 				blz=${line%_*}
-				#DEBUG printf "DEBUG: TANMODE blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
+				#DEBUG printf "DEBUG: TANMODE blz=%s u=%s param=\"%s\"\n" \
+				#    "$blz" "$u" "$param"
 
-				eval "TANMODE_${blz}_${u}=\"\$parm\""
+				eval "TANMODE_${blz}_${u}=\"\$param\""
 				;;
 
 			SETUP_* )
-				parm=$(trim "${line#*=}")
-				parm=${parm%\"}
-				parm=${parm#\"}
+				param=$(trim "${line#*=}")
+				param=${param%\"}
+				param=${param#\"}
 				line=$(trim "${line%%=*}")
 				line=${line##SETUP_}
 				u=${line#*_}
 				blz=${line%_*}
-				#DEBUG printf "DEBUG: SETUP blz=%s u=%s parm=\"%s\"\n" "$blz" "$u" "$parm"
+				#DEBUG printf "DEBUG: SETUP blz=%s u=%s param=\"%s\"\n" \
+				#   "$blz" "$u" "$param"
 
-				eval "SETUP_${blz}_${u}=\"\$parm\""
+				eval "SETUP_${blz}_${u}=\"\$param\""
 				;;
 			* )
 				printf "Warning: Ignoring unknown HBCI config Line %s in %s\n" \
@@ -290,11 +293,11 @@ function aqsetup_acc () {
 	local u="$2"
 	local url="$3"
 	local tanmode="$4"
-	local parm="$5"
+	local param="$5"
 
 	local disable_getbankinfo="" disable_getsysid="" disable_setitanmode=""
 	printf "Configuring HBCI for BLZ %s User %s tanmode=%s url=%s setup=%s\n" \
-		"$blz" "$u" "$tanmode" "$url" "$parm"
+		"$blz" "$u" "$tanmode" "$url" "$param"
 
 	if [ "$blz" == "50010517" ] ; then
 		# Special handline of ING-Diba Germany
@@ -309,7 +312,7 @@ function aqsetup_acc () {
 		printf "\tApplying special handling for ING-Diba\n"
 	fi
 
-	#shellcheck disable=SC2086 # parm may be empty
+	#shellcheck disable=SC2086 # param may be empty
 	aqhbci_wrapper adduser \
 		-b "$blz" \
 		-N "$u" \
@@ -318,7 +321,7 @@ function aqsetup_acc () {
 		--context=1 \
 		-s "$url" \
 		--hbciversion=300 \
-		$parm \
+		$param \
 		|| return 1
 
 	# find unique userid
@@ -365,7 +368,7 @@ function aqsetup_acc () {
 	fi
 
 	# read accounts just added
-	# Since aqhbci does not allow to select by user we selct by bank.
+	# Since aqhbci does not allow to select by user we select by bank.
 	# If accounts was already added with a different user results are unknown.
 	accs=$(aqhbci_wrapper listaccounts -v ) || return 1
 	while read -r line ; do

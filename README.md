@@ -12,7 +12,7 @@ editing the data.
 * Only PIN access is currently supported, no HBCI Keys
 * Only tested with german banks that have a "BLZ".
 * Only MariaDB is tested, MySQL should also work. Main divergence from
-  Standard SQL is that tinance uses the "IF EXISTS" claus in CREATE TABLE and
+  Standard SQL is that tinance uses the "IF EXISTS" clause in CREATE TABLE and
   similar commands.
 
 ## Changelog
@@ -26,9 +26,9 @@ AqBanking PINFILE is expected at /finance/.hbci-pinfile
 ### Setup Parameters
 For banks or accounts that need special parameters, you can add a line
 ```text
-SETUP_<blz>_<user> = "aqhbci-tool4 parms"
+SETUP_<blz>_<user> = "aqhbci-tool4 params"
 ```
-into the Pinfile. The parameters wil be forwarded to aqhbci-tool4 adduser when
+into the Pinfile. The parameters will be forwarded to aqhbci-tool4 adduser when
 it is called. Please note that this is not available in AqBanking but just in
 this container.
 
@@ -59,17 +59,17 @@ If also DB_USERS is set, finance container will reset users:
 
 ### Accessing the database
 Typically the database is accessed from a database tool like Microsoft Access.
-In order to prevent users from accidently modifying any bookings their access
+In order to prevent users from accidentally modifying any bookings their access
 rights are restricted. You need to list all userIDs in the Environment variable
 DB_USERS, then start the container and it will grant the restricted rights.
 
 ## Alerting
 If MAIL_TO is set, every run will send the bookings of the last 7 days plus the
-current balance ot MAIL_ACCOUNTS to MAIL_TO. The delivery will be based on SMTP
+current balance of MAIL_ACCOUNTS to MAIL_TO. The delivery will be based on SMTP
 to MAIL_URL. Authentication to the mail server is not yet supported.
 
 ## Environment Variables
-* MYSQL_HOST gives the DNS name or IP adress of the host that holds the
+* MYSQL_HOST gives the DNS name or IP address of the host that holds the
   database.
 * MYSQL_DATABASE name of the database
 * MYSQL_USER UserID to connect to the database
@@ -83,7 +83,7 @@ to MAIL_URL. Authentication to the mail server is not yet supported.
 * MAIL_URL Server where to deliver the Alerting emails like
   'smtp[s]://user:password@some.host:port'
 * MAIL_HOSTNAME optionally give the hostname that we report to SMTP server in
-  HELO command. Usefule if the SMTP server requires a FQDN. Defaults to
+  HELO command. Useful if the SMTP server requires a FQDN. Defaults to
   hostname.
 * DEBUG if set to 1, container will log all Bash scripts (set -x)
 
