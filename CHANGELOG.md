@@ -1,5 +1,15 @@
 # finance CHANGELOG
 
+## 1.2.0 (6.4.2026)
+* Docker HUb will no longer receive any Update, including this version
+* AqBanking 6.8.3
+* Gwenhywfar 5.14.1
+* pxlib 0.6.10
+* alpine 3.23.3
+* Build Updates Super-linter 8.5.0
+* Build actions/checkout 6
+* Code Beautifies
+
 ## 1.1.1 (30.8.2024)
 * Update to Dev Version of AqBanking to overcome the pin error message
 
