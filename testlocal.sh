@@ -2,7 +2,7 @@
 #
 # Test finance locally, assuming a working Mysql/MariaDB somewhere
 #
-# Environment Vairables to be set:
+# Environment Variables to be set:
 #
 # MYSQL_LOCAL_HOST, MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD
 
@@ -195,7 +195,7 @@ then
 fi
 
 action=${1:-test}
-shift || true # ignore error in shift if no parm was given
+shift || true # ignore error in shift if no param was given
 
 case $action in
 	build)

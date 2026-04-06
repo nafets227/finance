@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
 		//***** Unknown Option *****
 		else
 		{
-			fprintf(stderr, "Unknown parm: %s\n", argv[iActArg]);
+			fprintf(stderr, "Unknown param: %s\n", argv[iActArg]);
 			return -1;
 		}
 	}

@@ -77,7 +77,7 @@ warned.
   [README.md](README.md))
 * Bump to aqbanking 6.3.2
 * Bump to gwnhywfar 5.7.3
-* suppress warning printed by find on wrong order of parms (--maxdepth)
+* suppress warning printed by find on wrong order of params (--maxdepth)
 
 Known Bug:
 * Initialising from scratch fails if bank requires a tan for getAccounts.
@@ -148,7 +148,7 @@ Known Bug:
   Requires up-to-date MariaDB/MySQL as it uses Database Window functions.
 
 ## 0.2 (2018-04-08)
-* New Variabel MAIL_HOSTNAME (see [README.md](README.md) for more details)
+* New Variable MAIL_HOSTNAME (see [README.md](README.md) for more details)
 * Bugfix testscript (drop fn\_entry\_manual before start)
 
 ## 0.1.1 (2018-04-05)
