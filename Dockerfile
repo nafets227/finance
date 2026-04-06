@@ -68,16 +68,8 @@ WORKDIR /pxlib
 RUN \
 	set -x && \
 	git clone https://github.com/steinm/pxlib.git . && \
-	touch config.rpath && \
-	git checkout 781a234 && \
-	rm -rf debian && \
-	sed -i 's:automake-1.16:automake-1.17:' autogen.sh && \
-	sed -i 's:aclocal:aclocal --aclocal-path /usr/share/gettext/m4:' \
-		autogen.sh && \
-	./autogen.sh && \
-	#autoupdate && \
-	#autoconf && \
-	# autoreconf && \
+	git checkout 88e97a5 && \
+	autoreconf --install && \
 	./configure \
 		--prefix=/usr/local \
 		--with-gsf \
