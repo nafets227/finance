@@ -34,7 +34,7 @@ WORKDIR /gwenhywfar
 RUN \
 	set -x && \
 	git clone https://git.aquamaniac.de/git/gwenhywfar.git . && \
-	git checkout tags/5.12.0 && \
+	git checkout tags/5.14.1 && \
 	sed -i "s:i18n_libs=\"\$LTLIBINTL\":i18n_libs=\"\$LTLIBINTL -lintl\":" \
 		configure.ac && \
 	sed -i "s:AM_GNU_GETTEXT:AM_GLIB_GNU_GETTEXT:" configure.ac && \
@@ -53,7 +53,7 @@ WORKDIR /aqbanking
 RUN \
 	set -x && \
 	git clone https://git.aquamaniac.de/git/aqbanking.git . && \
-	git checkout tags/6.6.0 && \
+	git checkout tags/6.8.3 && \
 	sed -i "s:i18n_libs=\"\$LIBS\":i18n_libs=\"\$LIBS -lintl\":" configure.ac && \
 	ACLOCAL_FLAGS="-I /usr/local/share/aclocal" make -f Makefile.cvs && \
 	./configure && \
