@@ -37,7 +37,7 @@ function dbsetup_privileges () {
 #### DB Setup Users ##########################################################
 function dbsetup_users () {
 	printf "(Re-)Creating DB User mariadb.sys\n"
-	if ! mysql \
+	if ! mariadb \
 		--host="$MYSQL_HOST" \
 		--user=root \
 		--password="$MYSQL_ROOT_PASSWORD" \
@@ -636,7 +636,7 @@ if ! ping  -c 1 "$MYSQL_HOST" ; then
 	[ "${DEBUG-}" != "1" ] && set +x
 fi
 
-MYSQL_CMD="mysql"
+MYSQL_CMD="mariadb"
 MYSQL_CMD="$MYSQL_CMD --host=$MYSQL_HOST"
 MYSQL_CMD="$MYSQL_CMD --user=$MYSQL_USER"
 MYSQL_CMD="$MYSQL_CMD --password=$MYSQL_PASSWORD"
@@ -645,7 +645,7 @@ MYSQL_CMD="$MYSQL_CMD $MYSQL_DATABASE"
 if [ -n "${MYSQL_ROOT_PASSWORD-}" ] ; then
 	printf "Got DBADM privilege because \$MYSQL_ROOT_PASSWORD is set.\n"
 
-	MYSQL_ROOT_CMD="mysql"
+	MYSQL_ROOT_CMD="mariadb"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --host=$MYSQL_HOST"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --user=root"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --password=$MYSQL_ROOT_PASSWORD"

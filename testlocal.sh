@@ -24,7 +24,7 @@ function test_dbconnect {
 	else
 		REDIR=""
 	fi
-	eval mysql \
+	eval mariadb \
 		--host="$MYSQL_LOCAL_HOST" \
 		--user="$user" \
 		"$CMD_PW" \
@@ -45,7 +45,7 @@ function test_dbconnect {
 function setup_testdb () {
 	printf "Setting up Test Database start.\n"
 	# Setup Helper Vars
-	MYSQL_ROOT_CMD="mysql"
+	MYSQL_ROOT_CMD="mariadb"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --host=$MYSQL_LOCAL_HOST"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --user=root"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --password=$MYSQL_ROOT_PASSWORD"
