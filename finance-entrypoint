@@ -521,7 +521,7 @@ function import_handleDir
 ##### Alert ##################################################################
 # send balance and transactions via EMail
 function alert () {
-	export LC_ALL=C
+	export LC_ALL=C.UTF-8
 	export MAILRC=/dev/null
 
 	for a in ${MAIL_ACCOUNTS-} ; do
