@@ -21,10 +21,10 @@ function test_dbconnect {
 	fi
 	if [ "$DEBUG" != "1" ] ; then
 		REDIR=">/dev/null 2>/dev/null"
-		MARIADB_OPT=( )
+		MARIADB_OPT=( "--skip-ssl-verify-server-cert" )
 	else
 		REDIR=""
-		MARIADB_OPT=( "-v" "-v" )
+		MARIADB_OPT=( "--skip-ssl-verify-server-cert" "-v" "-v" )
 	fi
 	eval mariadb "${MARIADB_OPT[@]}" \
 		--host="$MYSQL_LOCAL_HOST" \
