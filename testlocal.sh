@@ -21,10 +21,12 @@ function test_dbconnect {
 	fi
 	if [ "$DEBUG" != "1" ] ; then
 		REDIR=">/dev/null 2>/dev/null"
+		MARIADB_OPT=( )
 	else
 		REDIR=""
+		MARIADB_OPT=( "-v" "-v" )
 	fi
-	eval mariadb \
+	eval mariadb "${MARIADB_OPT[@]}" \
 		--host="$MYSQL_LOCAL_HOST" \
 		--user="$user" \
 		"$CMD_PW" \
@@ -50,6 +52,9 @@ function setup_testdb () {
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --user=root"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --password=$MYSQL_ROOT_PASSWORD"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD $MYSQL_DATABASE"
+	if [ "$DEBUG" == 1 ] ; then
+		MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD -v -v"
+	fi
 
 	test_dbconnect "$MYSQL_USER" "$MYSQL_PASSWORD" 0 || return 1
 
