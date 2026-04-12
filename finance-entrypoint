@@ -297,6 +297,7 @@ function aqsetup_acc () {
 	local param="$5"
 
 	local disable_getbankinfo="" disable_getsysid="" disable_setitanmode=""
+	local disable_base64=""
 	printf "Configuring HBCI for BLZ %s User %s tanmode=%s url=%s setup=%s\n" \
 		"$blz" "$u" "$tanmode" "$url" "$param"
 
@@ -305,8 +306,10 @@ function aqsetup_acc () {
 		# They are not PSD2 compliant, one can only read balances and
 		# transactions, but its enough for us.
 		# Unidentified getbankinfo is not working, so we need to disable it
+		# instead useflag noBase64 needs to be set
 		disable_getbankinfo="1"
-		disable_getsysid="1"
+		# disable_getsysid="1"
+		disable_base64="1"
 		if [ -z "$tanmode" ] ; then
 			disable_setitanmode="1"
 		fi
@@ -336,6 +339,10 @@ function aqsetup_acc () {
 		aqhbci_wrapper --noninteractive listusers \
 		| sed -n "${sed_regex}\\(.*\\)#\\1#p"
 		) || return 1
+
+	if [ -n "$disable_base64" ] ; then
+		aqhbci_wrapper adduserflags -f noBase64 -u "$uu" || return 1
+	fi
 
 	if [ -z "$disable_getbankinfo" ] ; then
 		aqhbci_wrapper getbankinfo -u "$uu" || return 1
