@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Test finance locally, assuming a working Mysql/MariaDB somewhere
 #
@@ -11,28 +11,26 @@ function test_dbconnect {
 	local pw="$2"
 	local rcexp="${3:-0}"
 
-	local CMD_PW
+	local PRT_PW REDIR MARIADB_OPT=()
 	if [ -z "$pw" ] ; then
-		CMD_PW=""
 		PRT_PW=""
 	else
-		CMD_PW="--password=$pw"
+		MARIADB_OPT+=( "--password=$pw" )
 		PRT_PW=", password \"$pw\""
 	fi
 	if [ "$DEBUG" != "1" ] ; then
-		REDIR=">/dev/null 2>/dev/null"
-		MARIADB_OPT=( "--skip-ssl-verify-server-cert" )
+		REDIR=/dev/null
+		MARIADB_OPT+=( "--skip-ssl-verify-server-cert" )
 	else
-		REDIR=""
-		MARIADB_OPT=( "--skip-ssl-verify-server-cert" "-v" "-v" )
+		REDIR=/dev/stdout
+		MARIADB_OPT+=( "--skip-ssl-verify-server-cert" "-v" "-v" )
 	fi
-	eval mariadb "${MARIADB_OPT[@]}" \
+	mariadb "${MARIADB_OPT[@]}" \
 		--host="$MYSQL_LOCAL_HOST" \
 		--user="$user" \
-		"$CMD_PW" \
-		'"--execute=SELECT 1;"' \
+		"--execute=SELECT 1;" \
 		"$MYSQL_DATABASE" \
-		"$REDIR" \
+		>"$REDIR" 2>&1 \
 	&& rc=0 || rc=$?
 	if [ "$rc" != "$rcexp" ] ; then
 		printf "ERR: Connecting to DB at %s with user %s%s: RC=%s(Exp=%s)\n" \
@@ -43,9 +41,11 @@ function test_dbconnect {
 	return 0
 }
 
-##### Setup Database for Tests ###############################################
 function setup_testdb () {
+	# Setup Database for Tests
 	printf "Setting up Test Database start.\n"
+	local MYSQL_ROOT_CMD
+
 	# Setup Helper Vars
 	MYSQL_ROOT_CMD="mariadb"
 	MYSQL_ROOT_CMD="$MYSQL_ROOT_CMD --host=$MYSQL_LOCAL_HOST"
@@ -80,8 +80,8 @@ function setup_testdb () {
 	return 0
 }
 
-##### Setup Test data directory for Tests ####################################
 function setup_testdata () {
+	# Setup Test data directory for Tests
 	# prepare the filesystem (make it empty)
 	test -d ./testdata  && rm -rf ./testdata
 	mkdir ./testdata
@@ -90,8 +90,8 @@ function setup_testdata () {
 	return 0
 }
 
-#### Test DB Setup ###########################################################
-test_dbsetup () {
+function test_dbsetup () {
+	# Test DB Setup
 	printf "Testing DB Setup start.\n"
 	test_dbconnect "testusershouldbedeleted" "" 1 || return 1
 	test_dbconnect "testuser1" "" 1 || return 1
@@ -102,11 +102,14 @@ test_dbsetup () {
 	return 0
 }
 
-#### Start container #########################################################
-exec_container () {
+function exec_container () {
+	# Start container
 	export MYSQL_HOST MYSQL_DATABASE MYSQL_USER MYSQL_PASSWORD
 	export MYSQL_ROOT_PASSWORD DB_USERS DB_testuser1_PASSWORD
 	export MAIL_TO MAIL_FROM MAIL_URL MAIL_HOSTNAME MAIL_ACCOUNTS
+
+	local DNS_PARM ENTRY_PARM NET_PARM CUSTOM_PARM
+
 	if [ -z "${DNS-}" ] ; then
 		DNS_PARM=""
 	else
@@ -152,7 +155,10 @@ exec_container () {
 		-v "$(pwd)"/testdata:/finance \
 		"$FINIMG" "$@" \
 	|| return 1
+
+	return 0
 }
+
 ##### Main ###################################################################
 set -euo pipefail
 
@@ -210,6 +216,7 @@ case $action in
 	test )
 		if [ "${1-}" == "--debug" ] ; then
 			container_env="-e DEBUG=1"
+			set -x
 			DEBUG=1
 			shift
 		else
@@ -295,7 +302,6 @@ case $action in
 		setup_testdb || exit 1
 		exit 0
 		;;
-
 	*)
 		printf "Error: Unknown action %s\n" "$action"
 		printf "Valid actions: test bash initdata initdb\n"
