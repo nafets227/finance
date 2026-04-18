@@ -1,5 +1,9 @@
 # finance CHANGELOG
 
+## 1.2.1 (18.4.2026)
+* fix ing.de access
+* improve testing in testlocal.h
+
 ## 1.2.0 (6.4.2026)
 * Docker HUb will no longer receive any Update, including this version
 * AqBanking 6.8.3
