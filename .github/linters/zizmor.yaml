@@ -10,3 +10,6 @@ rules:
   dependabot-cooldown:
     ignore:
       - dependabot.yaml
+  secrets-outside-env:
+    ignore:
+      - docker-ci.yaml
