@@ -81,7 +81,7 @@ to MAIL_URL. Authentication to the mail server is not yet supported.
 * MAIL_FROM sender of the Alerting emails
 * MAIL_ACCOUNTS account numbers, separated by blanks, to be alerted.
 * MAIL_URL Server where to deliver the Alerting emails like
-  'smtp[s]://user:password@some.host:port'
+  ```smtp[s]://user:password@some.host:port```
 * MAIL_HOSTNAME optionally give the hostname that we report to SMTP server in
   HELO command. Useful if the SMTP server requires a FQDN. Defaults to
   hostname.
